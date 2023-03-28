@@ -43,13 +43,13 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/",
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -67,6 +67,24 @@ const config = {
           id: "course",
           path: "articles/course",
           routeBasePath: "course",
+          sidebarPath: require.resolve("./sidebars.js"),
+        },
+      ],
+      [
+        "@docusaurus/plugin-content-docs",
+        {
+          id: "dicoding",
+          path: "articles/dicoding",
+          routeBasePath: "dicoding",
+          sidebarPath: require.resolve("./sidebars.js"),
+        },
+      ],
+      [
+        "@docusaurus/plugin-content-docs",
+        {
+          id: "learning",
+          path: "articles/learning",
+          routeBasePath: "learning",
           sidebarPath: require.resolve("./sidebars.js"),
         },
       ],
@@ -91,8 +109,13 @@ const config = {
           //   label: "Tutorial",
           // },
           {
-            to: "/course/intro",
+            to: "/course/",
             label: "Perkuliahan",
+            position: "left",
+          },
+          {
+            to: "/learning/",
+            label: "Belajar",
             position: "left",
           },
           { to: "/blog", label: "Blog", position: "left" },
@@ -134,6 +157,10 @@ const config = {
               {
                 label: "Blog",
                 to: "/blog",
+              },
+              {
+                label: "Belajar",
+                to: "/learning/",
               },
               {
                 label: "GitHub",
