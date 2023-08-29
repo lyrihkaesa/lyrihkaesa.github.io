@@ -1,58 +1,62 @@
-// @ts-check
+// @ts-nocheck
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require("prism-react-renderer/themes/github");
-const darkCodeTheme = require("prism-react-renderer/themes/dracula");
+const lightCodeTheme = require('prism-react-renderer/themes/github');
+const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "Kaesa Lyrih",
-  tagline: "Memberikan Informasi yang Manusiawi ❤",
-  favicon: "img/favicon.ico",
+  title: 'Kaesa Lyrih',
+  tagline: 'Memberikan Informasi yang Manusiawi ❤',
+  favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: "https://lyrihkaesa.github.io",
+  url: 'https://lyrihkaesa.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: "/",
+  baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "lyrihkaesa", // Usually your GitHub org/user name.
-  projectName: "lyrihkaesa.github.io", // Usually your repo name.
+  organizationName: 'lyrihkaesa', // Usually your GitHub org/user name.
+  projectName: 'lyrihkaesa.github.io', // Usually your repo name.
   trailingSlash: false,
-  deploymentBranch: "gh-pages",
+  deploymentBranch: 'gh-pages',
 
-  onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: "id",
-    locales: ["id"],
+    defaultLocale: 'id',
+    locales: ['id'],
   },
 
   presets: [
     [
-      "classic",
+      'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: require.resolve("./sidebars.js"),
+          path: 'articles/docs',
+          routeBasePath: 'docs',
+          sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/",
+          editUrl: 'https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/',
         },
         blog: {
           showReadingTime: true,
+          path: 'articles/blog',
+          routeBasePath: 'blog',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: "https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/",
+          editUrl: 'https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/',
         },
         theme: {
-          customCss: require.resolve("./src/css/custom.css"),
+          customCss: require.resolve('./src/css/custom.css'),
         },
       }),
     ],
@@ -62,30 +66,30 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').plugins} */
     [
       [
-        "@docusaurus/plugin-content-docs",
+        '@docusaurus/plugin-content-docs',
         {
-          id: "course",
-          path: "articles/course",
-          routeBasePath: "course",
-          sidebarPath: require.resolve("./sidebars.js"),
+          id: 'course',
+          path: 'articles/course',
+          routeBasePath: 'course',
+          sidebarPath: require.resolve('./sidebars.js'),
         },
       ],
       [
-        "@docusaurus/plugin-content-docs",
+        '@docusaurus/plugin-content-docs',
         {
-          id: "dicoding",
-          path: "articles/dicoding",
-          routeBasePath: "dicoding",
-          sidebarPath: require.resolve("./sidebars.js"),
+          id: 'dicoding',
+          path: 'articles/dicoding',
+          routeBasePath: 'dicoding',
+          sidebarPath: require.resolve('./sidebars.js'),
         },
       ],
       [
-        "@docusaurus/plugin-content-docs",
+        '@docusaurus/plugin-content-docs',
         {
-          id: "learning",
-          path: "articles/learning",
-          routeBasePath: "learning",
-          sidebarPath: require.resolve("./sidebars.js"),
+          id: 'learning',
+          path: 'articles/learning',
+          routeBasePath: 'learning',
+          sidebarPath: require.resolve('./sidebars.js'),
         },
       ],
     ],
@@ -94,12 +98,12 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: "img/ksa-logo-gradient-blue.png",
+      image: 'img/ksa-logo-gradient-blue.png',
       navbar: {
-        title: "Kaesa",
+        title: 'Kaesa',
         logo: {
-          alt: "Kaesa Lyrih Logo Gradient Blue",
-          src: "img/ksa-logo-gradient-blue.png",
+          alt: 'Kaesa Lyrih Logo Gradient Blue',
+          src: 'img/ksa-logo-gradient-blue.png',
         },
         items: [
           // {
@@ -109,62 +113,62 @@ const config = {
           //   label: "Tutorial",
           // },
           {
-            to: "/course/",
-            label: "Perkuliahan",
-            position: "left",
+            to: '/course/',
+            label: 'Perkuliahan',
+            position: 'left',
           },
           {
-            to: "/learning/",
-            label: "Belajar",
-            position: "left",
+            to: '/learning/',
+            label: 'Belajar',
+            position: 'left',
           },
-          { to: "/blog", label: "Blog", position: "left" },
+          { to: '/blog', label: 'Blog', position: 'left' },
           {
-            href: "https://github.com/lyrihkaesa",
-            label: "GitHub",
-            position: "right",
+            href: 'https://github.com/lyrihkaesa',
+            label: 'GitHub',
+            position: 'right',
           },
         ],
       },
       footer: {
-        style: "dark",
+        style: 'dark',
         links: [
           {
-            title: "Sosial Media",
+            title: 'Sosial Media',
             items: [
               {
-                label: "Fanpage Kaesa Lyrih",
-                href: "https://www.facebook.com/lyrihkaesa.official",
+                label: 'Fanpage Kaesa Lyrih',
+                href: 'https://www.facebook.com/lyrihkaesa.official',
               },
               {
-                label: "Twitter",
-                href: "https://twitter.com/lyrihkaesa",
+                label: 'Twitter',
+                href: 'https://twitter.com/lyrihkaesa',
               },
             ],
           },
           {
-            title: "Komunitas",
+            title: 'Komunitas',
             items: [
               {
-                label: "Facebook Kaesa Toram Online",
-                href: "https://www.facebook.com/groups/kaesatoramonline",
+                label: 'Facebook Kaesa Toram Online',
+                href: 'https://www.facebook.com/groups/kaesatoramonline',
               },
             ],
           },
           {
-            title: "Lainnya",
+            title: 'Lainnya',
             items: [
               {
-                label: "Blog",
-                to: "/blog",
+                label: 'Blog',
+                to: '/blog',
               },
               {
-                label: "Belajar",
-                to: "/learning/",
+                label: 'Belajar',
+                to: '/learning/',
               },
               {
-                label: "GitHub",
-                href: "https://github.com/lyrihkaesa",
+                label: 'GitHub',
+                href: 'https://github.com/lyrihkaesa',
               },
             ],
           },

@@ -8,166 +8,90 @@ Pada artikel ini membahas apa yang dilakukan oleh Kaesa selama perkuliahan.
 
 ## 🆕 Semester 06 | 22 SKS
 
-### 1. Perencanaan Sumber Daya Perusahaan
-
-- Luring (Offline) : H.4.10
-- 3 SKS
-- A12.6408
-
-### 2. Implementasi dan Pengujian Sistem
-
-- Daring (Online) : Kulino
-- 2 SKS
-- A12.6604
-
-### 3. Perencanaan Strategis Sistem Informasi
-
-- Luring (Offline) : H.5.10
-- 3 SKS
-- A12.6409
-
-### 4. Sistem Pendukung Keputusan
-
-- Luring (Offline) : H.3.9
-- 2 SKS
-- A12.6606
-
-### 5. Bisnis Cerdas
-
-- Daring (Online) : Kulino & Kulino
-- 4 SKS
-- A12.6810
-
-### 6. Aplikasi Mobile
-
-- Luring (Offline) : H.3.11 & D.2.J
-- 4 SKS
-- A12.6801
-
-### 7. Arsitektur Enterprise
-
-- Daring (Online) : Kulino
-- 2 SKS
-- A12.6208
-
-### 8. Bahasa Indonesia
-
-- Daring (Online) : Kulino
-- 2 SKS
-- A12.6605
+| Nama Mata Kuliah                                | SKS | Kode Matkul |
+| ----------------------------------------------- | --- | ----------- |
+| H.4.10 · Perencanaan Sumber Daya Perusahaan     | 3   | A12.6408    |
+| Kulino · Implementasi dan Pengujian Sistem      | 2   | A12.6604    |
+| H.5.10 · Perencanaan Strategis Sistem Informasi | 3   | A12.6409    |
+| H.3.9 · Sistem Pendukung Keputusan              | 2   | A12.6606    |
+| Kulino · Bisnis Cerdas                          | 4   | A12.6810    |
+| H.3.11 & D.2.J · Aplikasi Mobile                | 4   | A12.6801    |
+| Kulino · Arsitektur Enterprise                  | 2   | A12.6208    |
+| Kulino · Bahasa Indonesia                       | 2   | A12.6605    |
 
 ---
 
 ## 🗃 Semester 05 | 24 SKS
 
 Kaesa tidak mengikuti perkuliahan reguler saat semester 05.
+Konversi = Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
 
-### 1. Data Mining
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
-
-### 2. Pemrograman Web Lanjut
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
-
-### 3. Pengelolaan Hubungan Pelanggan
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
-
-### 4. Proteksi Aset Informasi
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
-
-### 5. Sistem Informasi Akuntansi
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
-
-### 6. Aplikasi E-Bisnis
-
-- Tidak di konversi kuliah reguler biasa.
-
-### 7. Manajemen Proyek
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
-
-### 8. Teknologi Bergerak
-
-- Konversi MSIB Batch 3 Dicoding Learning Path Multi-Platform & Back-End (Flutter & NodeJS)
+| Nama Mata Kuliah                          | SKS | Kode Matkul |
+| ----------------------------------------- | --- | ----------- |
+| Konversi · Data Mining                    |     | x           |
+| Konversi · Pemrograman Web Lanjut         |     | x           |
+| Konversi · Pengelolaan Hubungan Pelanggan |     | x           |
+| Konversi · Proteksi Aset Informasi        |     | x           |
+| Konversi · Sistem Informasi Akuntansi     |     | x           |
+| Aplikasi E-Bisnis                         |     | x           |
+| Konversi · Manajemen Proyek               |     | x           |
+| Konversi · Teknologi Bergerak             |     | x           |
 
 ---
 
 ## 🗃 Semester 04 | 24 SKS
 
-### 1. Analisa dan Perancangan Sistem Informasi II
-
-### 2. Interaksi Manusia dan Komputer
-
-### 3. Pemrograman Berorientasi Obyek
-
-### 4. Dasar Kewirausahaan
-
-### 5. Probabilitas dan Statistika
-
-### 6. Manajemen Rantai Pasok
-
-### 7. Etika Profesi
-
-### 8. Dasar Kewirausahaan
+| Nama Mata Kuliah                            | SKS | Kode Matkul |
+| ------------------------------------------- | --- | ----------- |
+| Analisa dan Perancangan Sistem Informasi II | x   | x           |
+| Interaksi Manusia dan Komputer              | x   | x           |
+| Pemrograman Berorientasi Obyek              | x   | x           |
+| Dasar Kewirausahaan                         | x   | x           |
+| Probabilitas dan Statistika                 | x   | x           |
+| Manajemen Rantai Pasok                      | x   | x           |
+| Etika Profesi                               | x   | x           |
+| Dasar Kewirausahaan                         | x   | x           |
 
 ---
 
 ## 🗃 Semester 03 | 24 SKS
 
-### 1. Algoritma dan Pemprograman II
-
-### 2. Analisa dan Perancangan Sistem Informasi I
-
-### 3. Basis Data Lanjutan
-
-### 4. Konsep E-Bisnis
-
-### 5. Manajemen Proses Bisnis
-
-### 6. Manajemen Sains
-
-### 7. Technopreneurship
-
-### 8. Pendidikan Kewarganegaraan
+| Nama Mata Kuliah                           | SKS | Kode Matkul |
+| ------------------------------------------ | --- | ----------- |
+| Algoritma dan Pemprograman II              | x   | x           |
+| Analisa dan Perancangan Sistem Informasi I | x   | x           |
+| Basis Data Lanjutan                        | x   | x           |
+| Konsep E-Bisnis                            | x   | x           |
+| Manajemen Proses Bisnis                    | x   | x           |
+| Manajemen Sains                            | x   | x           |
+| Technopreneurship                          | x   | x           |
+| Pendidikan Kewarganegaraan                 | x   | x           |
 
 ---
 
 ## 🗃 Semester 02 | 19 SKS
 
-### 1. Algoritma dan Pemprograman I
-
-### 2. Basis Data
-
-### 3. Infrastruktur Teknologi Informasi
-
-### 4. Keterampilan Interpersonal
-
-### 5. Matematika Bisnis
-
-### 6. Literasi Informasi
-
-### 7. Pendidikan Pancasila
+| Nama Mata Kuliah                  | SKS | Kode Matkul |
+| --------------------------------- | --- | ----------- |
+| Algoritma dan Pemprograman I      | x   | x           |
+| Basis Data                        | x   | x           |
+| Infrastruktur Teknologi Informasi | x   | x           |
+| Keterampilan Interpersonal        | x   | x           |
+| Matematika Bisnis                 | x   | x           |
+| Literasi Informasi                | x   | x           |
+| Pendidikan Pancasila              | x   | x           |
 
 ---
 
 ## 🗃 Semester 01 | 19 SKS
 
-### 1. Dasar Akuntansi
-
-### 2. Konsep Sistem Informasi
-
-### 3. Manajemen dan Bisnis
-
-### 4. Matematika Diskrit
-
-### 5. Dasar-Dasar Komputasi
-
-### 6. Bahasa Inggris
-
-### 7. Pendidikan Agama Islam
-
-### 8. Pengantar Teknologi Informasi
+| Nama Mata Kuliah              | SKS | Kode Matkul |
+| ----------------------------- | --- | ----------- |
+| Dasar Akuntansi               | X   | x           |
+| Konsep Sistem Informasi       | X   | x           |
+| Manajemen dan Bisnis          | X   | x           |
+| Matematika Diskrit            | X   | x           |
+| Dasar-Dasar Komputasi         | X   | x           |
+| Bahasa Inggris                | X   | x           |
+| Pendidikan Agama Islam        | X   | x           |
+| Pengantar Teknologi Informasi | X   | x           |

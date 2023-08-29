@@ -1,0 +1,331 @@
+# Submission Awal: Aplikasi Github User (Navigation dan API)
+
+## Kriteria
+
+Fitur yang harus ada pada aplikasi:
+
+1.  Search User  
+    Syarat:
+    - Menampilkan list data user dari API menggunakan RecyclerView dengan data minimal foto avatar dan username.
+    - Pencarian user menggunakan data dari API berjalan dengan baik.
+    - Pengguna dapat melihat halaman detail dari hasil daftar pencarian.
+2.  Detail User  
+    Syarat:
+    - Terdapat informasi *detail* dari seorang user. Berikut beberapa informasi yang wajib ditampilkan pada halaman aplikasi.
+      - Foto Avatar
+      - Username
+      - Nama
+      - Jumlah Followers
+      - Jumlah Following
+    - **Catatan:** Pastikan kembali semua informasi tersebut ada.
+    - Menampilkan fragment *List Follower* & *List Following* yang diambil dari API.
+    - Menggunakan *Tab Layout* dan *ViewPager* sebagai navigasi antara halaman *List Follower* dan *List Following*.
+3.  Terdapat *indikator loading* saat aplikasi memuat data di semua bagian yang mengambil data dari API, yaitu
+    - List data user
+    - Detail user
+    - List following
+    - List follower
+
+## Penilaian
+
+Submission Anda akan dinilai oleh reviewer dengan **skala 1-5** berdasarkan dari parameter yang ada.
+
+Anda dapat menerapkan **beberapa** **saran** di bawah ini untuk mendapatkan nilai tinggi, berikut sarannya:
+
+- Menerapkan tampilan aplikasi yang sesuai standar:
+  - Tampilan aplikasi memiliki width, height, margin, dan padding yang sesuai.
+  - Pemilihan warna yang sesuai tema aplikasi.
+  - Tidak ada komponen yang saling bertumpuk.
+  - Penggunaan komponen yang sesuai dengan fungsinya.  
+    Contoh : Komponen ImageView yang dijadikan sebagai button navigasi.
+  - Menggunakan *SearchView* pada fitur pencarian.
+  - Aplikasi bisa memberikan pesan eror jika data tidak berhasil ditampilkan.
+- Menuliskan kode dengan *bersih*.
+  - Bersihkan comment dan kode yang tidak digunakan.
+  - Indentasi yang sesuai.
+  - Menghapus import yang tidak digunakan.
+- Aplikasi bisa *menjaga data* yang sudah dimuat ketika terjadi pergantian orientasi dari potrait ke landscape atau sebaliknya.
+- Mengasah penggunaan library networking selain LoopJ (seperti Retrofit, [Fast Android Networking](https://github.com/amitshekhariitbhu/Fast-Android-Networking), dsb).
+- Menerapkan Android Architecture Component (minimal ViewModel dan LiveData) dengan benar.
+  - Tidak membuat satu ViewModel untuk beberapa view sekaligus, tetapi dipisah.
+
+Detail penilaian submission:
+
+![rating-dark-1](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/submission-rating-badge/rating-dark-1.png 'rating-dark-1')
+
+Semua ketentuan terpenuhi, namun penulisan kode masih perlu banyak diperbaiki atau terindikasi melakukan plagiat.
+
+---
+
+![rating-dark-2](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/submission-rating-badge/rating-dark-2.png 'rating-dark-2')
+
+Semua ketentuan terpenuhi, namun penulisan kode masih perlu diperbaiki.
+
+---
+
+![rating-dark-3](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/submission-rating-badge/rating-dark-3.png 'rating-dark-3')
+
+Semua ketentuan terpenuhi, namun hanya mengikuti seperti apa yang ada pada modul.
+
+---
+
+![rating-dark-4](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/submission-rating-badge/rating-dark-4.png 'rating-dark-4')
+
+Semua ketentuan terpenuhi dan menerapkan minimal 3 saran di atas.
+
+---
+
+![rating-dark-5](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/submission-rating-badge/rating-dark-5.png 'rating-dark-5')
+
+Semua ketentuan terpenuhi dan menerapkan minimal 4 saran di atas.
+
+**Catatan:  
+**Jika submission Anda ditolak maka tidak ada penilaian. Kriteria penilaian bintang di atas hanya berlaku jika submission Anda lulus.
+
+## Reources
+
+- Gunakan **endpoint** berikut untuk mendapatkan data dari API, klik untuk melihat contoh penggunaannya.
+  - Search : [https://api.github.com/search/users?q=**{username}**](https://api.github.com/search/users?q=sidiqpermana)
+  - Detail user : [https://api.github.com/users/**{username}**](https://api.github.com/users/sidiqpermana)
+  - List Follower : [https://api.github.com/users/**{username}**/followers](https://api.github.com/users/sidiqpermana/followers)
+  - List Following : [https://api.github.com/users/**{username}**/following](https://api.github.com/users/sidiqpermana/following)
+- Perlu diketahui bahwa jumlah *request* di GitHub API dibatasi hanya 60 *request* per jam seperti yang tertera [di sini](https://developer.github.com/v3/#rate-limiting). Untuk mendapatkan jumlah yang lebih besar, gunakan *Token* pada *Header* untuk mendapatkan request 5000 *request* per jam. Ikuti tutorial pada tautan berikut untuk mengetahui langkah-langkahnya:
+  - [Tutorial GitHub API](https://www.dicoding.com/blog/apa-itu-rate-limit-pada-github-api/)
+
+## Tips dan Trik
+
+Untuk menyelesaikan Submission 1, berikut ini adalah saran urutan dalam pengerjaannya.
+
+- Menampilkan data dari Web API ke RecyclerView.
+- Membuat fitur pencarian.
+- Menampilkan halaman detail.
+- Menampilkan Followers & Following
+
+Nah, mari kita ulas satu per satu langkah-langkahnya.
+
+#### Menampilkan data dari Web API ke RecyclerView.
+
+- Anda bisa menggunakan [Latihan LiveData dengan API](https://www.dicoding.com/academies/14/tutorials/19597/) sebagai basis atau membuat project baru dengan konsep yang sama.
+- Coba terlebih dahulu me-request API dengan token di Postman.  
+  [https://api.github.com/search/users?q={username}](https://api.github.com/search/users?q=sidiqpermana)
+- Buat kelas model dari output API menggunakan RoboPOJOGenerator.  
+  ![dos:8e7f7e507d91c5a236b28c2015448fb920230131155546.jpeg](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:8e7f7e507d91c5a236b28c2015448fb920230131155546.jpeg)
+- Sesuaikan base URL pada ApiConfig dan endpoint pada interface ApiService.
+
+  - Base URL : “https://api.github.com/”
+  - Endpoint: “search/users”
+  - Query : “q”
+
+- Jangan lupa untuk menambahkan header dengan memanfaatkan annotation.  
+  `@Headers("Authorization: token <Your Personal Access Token>")`
+- Kemudian buat RecyclerView, sesuaikan item layout dan data yang ditampilkan pada Adapter. Jangan lupa untuk tetap menampilkan indikator loading ketika memuat data.
+- Sampai sini, setidaknya Anda sudah bisa menampilkan data dari API ke dalam RecyclerView dengan loading seperti berikut.  
+  ![dos:2d257ba475b571be2f3150f3d1b0331f20230131173907.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:2d257ba475b571be2f3150f3d1b0331f20230131173907.gif)Anda bisa menggunakan query bebas secara statis pada tahap ini (misal: “Arif”), yang penting data bisa tampil terlebih dahulu (data username diambil dari key “login”).
+- Supaya tidak perlu menambahkan annotation header satu per satu pada setiap fungsi, Anda juga dapat membuat interceptor pada Retrofit seperti berikut.
+
+```
+  **val authInterceptor = Interceptor { chain ->
+     val req = chain.request()
+     val requestHeaders = req.newBuilder()
+         .addHeader("Authorization", "Your Personal Token")
+         .build()
+     chain.proceed(requestHeaders)
+  }**
+  val client = OkHttpClient.Builder()
+  **.addInterceptor(authInterceptor)**
+     .build()
+  val retrofit = Retrofit.Builder()
+     .baseUrl("https://api.github.com/")
+     .addConverterFactory(GsonConverterFactory.create())
+  **.client(client)**
+     .build()
+```
+
+#### Membuat fitur pencarian.
+
+- Untuk membuat fitur pencarian, Anda dapat mengikuti latihan pada materi berikut.
+
+  - [Latihan SearchView pada Action Bar](https://www.dicoding.com/academies/14/tutorials/1117/)
+
+- Anda hanya perlu menggunakan query hasil dari SearchView (onQueryTextSubmit) untuk dimasukkan ke parameter “q” pada API.
+- Alhasil, aplikasi seharusnya bisa menampilkan list sesuai dengan kata kunci seperti ini.  
+  ![dos:31f0baab7b5fc24df1a7a147a069810320230131173959.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:31f0baab7b5fc24df1a7a147a069810320230131173959.gif)
+
+#### Menampilkan Halaman Detail
+
+- Siapkan terlebih dahulu model dengan menggunakan hasil output dari API untuk halaman detail.  
+  [https://api.github.com/users/{username}  
+  ](https://api.github.com/users/sidiqpermana)![dos:ed938815eb51226ad1a5fc82040cdd1f20230131155546.jpeg](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:ed938815eb51226ad1a5fc82040cdd1f20230131155546.jpeg)
+- Tambahkan fungsi pada ApiSevice untuk mendapatkan endpoint tersebut menggunakan path.
+
+```kotlin
+  @GET("users/{username}")
+  fun getDetailUser(@Path("username") username: String): Call<DetailUserResponse>
+```
+
+- Buat Activity dan desain tampilan untuk halaman detail.
+- Kirim data dan buka halaman detail ketika menekan salah satu tombol.
+- Seperti langkah pertama, buat ViewModel dan panggil API. Perbedaannya jika sebelumnya data yang didapatkan berupa List, sekarang datanya berupa Object yang bisa langsung ditampilkan ke halaman Detail.  
+  ![dos:953704adcd5ac02abb2093bd8e9d993520230131174038.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:953704adcd5ac02abb2093bd8e9d993520230131174038.gif)
+
+#### Menampilkan Followers & Following 
+
+- Untuk menampilkan data follower dan following, Anda bisa melihat latihan berikut.
+
+  - [Latihan Tab Layout dengan ViewPager2](https://www.dicoding.com/academies/14/tutorials/5555/)
+
+- Tambahkan dulu TabLayout & ViewPager pada XML halaman detail (di sebelah bawah data detail user).
+- Karena tampilan follower dab following  mirip, kita bisa menggunakan satu Fragment saja untuk membuatnya. Silakan buat dulu Fragment tersebut dan buat desain untuk menampilkan RecyclerView dan Loading (mirip halaman utama).
+- Buat dua argument yang akan dikirimkan dari Adapter ke Fragment, yaiti position (untuk mengetahui Follower & Following) dan username (untuk request ke API).
+- Buat adapter untuk ViewPager dan buat global variabel username untuk mengirim data dari Activity ke Adapter.
+
+  class SectionsPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
+      var username: String = ""
+      override fun createFragment(position: Int): Fragment {
+          val fragment = FollowFragment()
+          fragment.arguments = Bundle().apply {
+              putInt(FollowFragment.ARG_POSITION, position + 1)
+              putString(FollowFragment.ARG_USERNAME, username)
+          }
+          return fragment
+      }
+      override fun getItemCount(): Int {
+          return 2
+      }
+  }
+
+- Selanjutnya, inisialisasi adapter pada Activity dan set data username. Jangan lupa, untuk menghubungkan ViewPager dengan TabLayout menggunakan TabLayoutMediator
+- Terakhir, buat logic untuk membedakan tampilan Follower dan Following pada Fragment berdasarkan data position yang dikirimkan. Anda bisa mengetes terlebih dahulu menggunakan TextView biasa untuk memeriksa apakah logika dan username terkirim dengan benar.
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+          super.onViewCreated(view, savedInstanceState)
+          arguments?.let {
+              position = it.getInt(ARG_POSITION)
+              username = it.getString(ARG_USERNAME)
+          }
+          if (position == 1){
+              binding.testUsername.text = "Get Follower $username"
+          } else {
+              binding.testUsername.text = "Get Following $username"
+          }
+      }
+
+- Sampai sini, jika dijalankan akan menjadi seperti ini.  
+  ![dos:2c12272eb1a379c23460b09765a4ad1e20230131174109.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:2c12272eb1a379c23460b09765a4ad1e20230131174109.gif)
+- Setelah logika menampilkan username tampil dengan benar. Saatnya mengambil data Follower dan Following dari API dengan membuat service. Biasanya Anda perlu membuat modelnya terlebih dahulu, tetapi coba lihat hasil response dari  
+  [https://api.github.com/users/{username}/followers](https://api.github.com/users/sidiqpermana/followers) dan [https://api.github.com/users/{username}/following](https://api.github.com/users/sidiqpermana/following). Jika diperhatikan hasil dari kedua API tersebut identik dengan hasil dari API pencarian user berikut [https://api.github.com/search/users?q={username}](https://api.github.com/search/users?q=sidiqpermana). Jadi Anda bisa cukup menggunakan satu model yang sama.
+- Selanjutnya, tambahkan service sesuai dengan endpoint yang dibutuhkan. Nah, ada yang menarik di sini. Coba perhatikan hasil API yang dibuat.
+
+  [
+    {
+      "login": "fuadmuhammad",
+      "id": 75670,
+      "node_id": "MDQ6VXNlcjc1Njcw",
+      "avatar_url": "https://avatars.githubusercontent.com/u/75670?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/fuadmuhammad",
+      "html_url": "https://github.com/fuadmuhammad",
+      "followers_url": "https://api.github.com/users/fuadmuhammad/followers",
+      "following_url": "https://api.github.com/users/fuadmuhammad/following{/other_user}",
+      "gists_url": "https://api.github.com/users/fuadmuhammad/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/fuadmuhammad/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/fuadmuhammad/subscriptions",
+      "organizations_url": "https://api.github.com/users/fuadmuhammad/orgs",
+      "repos_url": "https://api.github.com/users/fuadmuhammad/repos",
+      "events_url": "https://api.github.com/users/fuadmuhammad/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/fuadmuhammad/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    …
+
+- Berbeda dengan kasus sebelumnya, pada API ini respons dimulai dengan JSONArray, artinya Anda harus membuat nilai kembalian berupa List seperti ini, bukan object secara langsung seperti sebelumnya.
+
+```kotlin
+  @GET("users/{username}/followers")
+  fun getFollowers(@Path("username") username: String): Call<List<ItemsItem>>
+  @GET("users/{username}/following")
+  fun getFollowing(@Path("username") username: String): Call<List<ItemsItem>>
+```
+
+- Langkah selanjutnya tidak berbeda jauh dengan sebelumnya. Panggil API di dalam ViewModel dan observe melalui Fragment sesuai logika yang sudah dibuat sebelumnya. Beberapa hal yang mungkin Anda temui dan perlu ketahui adalah perbedaan antara Activity dan Fragment.
+
+  Activity
+
+  Fragment
+
+  Observe LiveData
+
+  viewModel.detailUser.observe(this) {
+
+  }
+
+  viewModel.listFollowing.observe(viewLifecycleOwner) {
+                 …
+  }
+
+  Context
+
+  binding.rvUsers.layoutManager = LinearLayoutManager(this)
+
+  binding.rvFollow.layoutManager = LinearLayoutManager(requireActivity())
+
+  Dengan begitu, hasil akhir dari submission ini akan terlihat seperti ini.  
+  ![dos:fbcb2a0a07dd9aa2955013561f44b1a220230131174131.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:fbcb2a0a07dd9aa2955013561f44b1a220230131174131.gif)  
+  Jangan lupa untuk menambahkan loading untuk setiap prosesnya.
+
+## Lainnya
+
+### Submission yang Tidak Sesuai Kriteria
+
+Jika submission Anda tidak sesuai dengan kriteria, maka akan ditolak oleh reviewer, berikut poin-poin yang harus diperhatikan:
+
+- Tidak memenuhi kriteria yang sudah ditentukan.
+- Fitur pencarian tidak berjalan dengan baik.
+- Fitur pencarian tidak memanfaatkan endpoint dari GitHub API.
+- Tidak menggunakan RecyclerView untuk menampilkan list user.
+- Tidak menggunakan Fragment untuk menampung halaman Follower dan Following.
+- Tidak menggunakan TabLayout, BottomNavigationView, atau yang lainnya sebagai navigasi antara Follower dan Following.
+- Menggunakan Button sebagai navigasi ke list Following dan Follower.
+- Tidak terdapat indikator loading ketika memuat data di semua halaman.
+- Gambar avatar tidak berhasil ditampilkan.
+- Informasi yang ditampilkan pada list dengan detail user tidak relevan.
+- Project tidak bisa di-build.
+- Aplikasi force closed.
+- Mengirimkan file selain proyek Android Studio.
+- Mengirimkan proyek yang bukan karya sendiri.
+
+### Forum Diskusi
+
+Jika mengalami kesulitan, Anda bisa menanyakan langsung ke forum diskusi. [https://www.dicoding.com/academies/14/discussions](https://www.dicoding.com/academies/14/discussions?query=&query_criteria=&sort=&sort_direction=&title=&tutorial=560&keywords=&creator=).
+
+### FAQ
+
+Di sini kami telah mengumpulkan beberapa pertanyaan yang sering ditanyakan terkait materi. Anda dapat membacanya terlebih dahulu sebelum mengerjakan submission untuk mengetahui tantangan apa saja yang sering dihadapi:  
+.[https://www.dicoding.com/academies/14/discussions/33541](https://www.dicoding.com/academies/14/discussions/33541).
+
+### Ketentuan Berkas Submission
+
+Beberapa poin yang perlu diperhatikan ketika mengirimkan berkas submission:
+
+- Menggunakan **Android Studio.**
+- Menggunakan bahasa pemrograman **Kotlin** atau **Java**.
+- Mengirimkan pekerjaan Anda dalam bentuk folder Proyek Android Studio yang telah diarsipkan (**ZIP**).
+
+Sebelum mengirimkan proyek, pastikan Anda sudah mengekspornya dengan benar. Bagaimana cara ekspor proyek ke dalam berkas **ZIP**?
+
+1.  Pilih menu **File → Export → Export to ZIP File...** pada Android Studio.
+2.  Pilih direktori penyimpanan dan klik **OK**.
+
+Dengan cara di atas, ukuran dari berkas **ZIP** akan lebih kecil dibandingkan Anda melakukan kompresi secara manual pada file explorer.
+
+### Ketentuan Proses Review
+
+Beberapa hal yang perlu Anda ketahui mengenai proses review
+
+- Tim penilai akan mengulas submission Anda dalam waktu **selambatnya 3 (tiga)** hari kerja (tidak termasuk Sabtu, Minggu, dan hari libur nasional).
+- Tidak disarankan untuk melakukan *submit berkali-kali* karena akan memperlama proses penilaian.
+- Anda akan mendapatkan notifikasi hasil review submission via email. Status submission juga bisa dilihat dengan mengecek di halaman [submission](https://www.dicoding.com/academysubmissions/my).
+- Setelah melakukan submit tugas di submission ini, Anda bisa mengakses modul selanjutnya tanpa harus menunggu hingga proses review selesai dari tim Reviewer.
+- Anda masih bisa mengakses modul selanjutnya meskipun submission di-reject oleh tim Reviewer.
+- Pastikan submission Anda sudah disetujui (_approved_) oleh tim reviewer, sebelum dapat mengakses submission berikutnya.

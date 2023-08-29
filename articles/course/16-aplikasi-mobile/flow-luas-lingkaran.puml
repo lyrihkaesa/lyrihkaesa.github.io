@@ -1,0 +1,25 @@
+@startuml
+
+title Perhitungan Luas Lingkaran
+
+actor User
+boundary HitungLingkaranPage
+control LingkaranManager
+
+User -> HitungLingkaranPage: membuka aplikasi
+activate HitungLingkaranPage
+
+User -> HitungLingkaranPage: memasukkan nilai jari-jari
+User -> HitungLingkaranPage: menekan tombol Hitung Luas
+activate HitungLingkaranPage
+HitungLingkaranPage -> LingkaranManager: hitungLuas(jariJari)
+activate LingkaranManager
+LingkaranManager --> HitungLingkaranPage: hasil perhitungan luas
+deactivate LingkaranManager
+HitungLingkaranPage -> HitungLingkaranPage: menampilkan hasil perhitungan luas
+deactivate HitungLingkaranPage
+
+User -> HitungLingkaranPage: menutup aplikasi
+deactivate HitungLingkaranPage
+
+@enduml
