@@ -2,10 +2,11 @@
 slug: 2023-05-24-organization-file-and-folder
 title: Organization File and Folder
 authors: lyrihkaesa
-tags: [produktif]
+tags:
+  - produktif
 ---
 
-## Ringkasan:
+## Ringkasan
 
 Berikut adalah beberapa tips pengelolaan file yang efisien:
 
