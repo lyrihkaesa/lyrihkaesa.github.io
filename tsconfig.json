@@ -4,6 +4,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "types": ["@docusaurus/module-type-aliases"],
+    "module": "Node16",
   }
   
 }
