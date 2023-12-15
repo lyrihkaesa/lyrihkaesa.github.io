@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[663],{74596:s=>{s.exports=JSON.parse('{"label":"lms","permalink":"/blog/tags/lms","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

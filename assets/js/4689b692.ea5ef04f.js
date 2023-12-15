@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[5568],{19316:a=>{a.exports=JSON.parse('{"label":"produktif","permalink":"/blog/tags/produktif","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
