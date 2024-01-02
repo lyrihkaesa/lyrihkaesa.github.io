@@ -1,8 +1,7 @@
 // @ts-nocheck
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -11,7 +10,8 @@ const config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://lyrihkaesa.github.io',
+  // url: 'https://lyrihkaesa.github.io',
+  url: 'https://kaesa.charapon.my.id',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
@@ -89,6 +89,15 @@ const config = {
           id: 'learning',
           path: 'articles/learning',
           routeBasePath: 'learning',
+          sidebarPath: require.resolve('./sidebars.js'),
+        },
+      ],
+      [
+        '@docusaurus/plugin-content-docs',
+        {
+          id: 'sales',
+          path: 'articles/sales',
+          routeBasePath: 'sales',
           sidebarPath: require.resolve('./sidebars.js'),
         },
       ],
@@ -176,8 +185,9 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} lyrihkaesa 💙, Inc. Built with Docusaurus.`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
+        additionalLanguages: ['powershell', 'bash', 'php', 'java', 'dart'],
       },
     }),
 };
