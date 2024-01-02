@@ -24,7 +24,7 @@ Bobot Ternormalisasi = Bobot setiap kriterian / penjumlahan semua bobot kriteria
 
 Nilai dari total bobot harus memenuhi persamaan:
 
-![Formula 1 WP](formula-1-wp.jpg)
+![Formula 1 WP](img/formula-1-wp.jpg)
 
 #### 4. Menentukan nilai vektor S
 
@@ -32,7 +32,7 @@ Dengan cara mengalikan seluruh kriteria bagi sebuah alternatif dengan bobot seba
 
 Rumus untuk menghitung nilai preferensi untuk alternatif Ai, diberikan sebagai berikut:
 
-![Formula 2 WP](formula-2-wp.jpg)
+![Formula 2 WP](img/formula-2-wp.jpg)
 
 Keterangan:  
 S : menyatakan preferensi alternatif yang dianalogikan sebagai vektor S  
@@ -48,7 +48,7 @@ Yaitu nilai yang akan digunakan untuk perangkingan.
 
 Nilai preferensi relatif dari setiap alternatif dapat dihitung dengan rumus:
 
-![Formula 3 WP](formula-3-wp.jpg)
+![Formula 3 WP](img/formula-3-wp.jpg)
 
 Keterangan:  
 V : menyatakan preferensi alternatif yang dianalogikan sebagai vektor V  
@@ -76,32 +76,32 @@ Rating kecocokan setiap alternatif pada setiap kriteria.
 
 TOPSIS membutuhkan rating kinerja setiap alternatif Ai pada setiap kriteria Cj yang ternormalisasi, yaitu:
 
-![Normalisasi](topsis-normalisasi.png)
+![Normalisasi](img/topsis-normalisasi.png)
 
 #### 4. Perkalian antara bobot dengan nilai setiap atribut
 
 Perkalian ini untuk membentuk matrik Y. dapat ditentukan berdasarkan ranking bobot ternormalisasi (yij) sebagai berikut:
 
-![Perkalian Bobot](topsis-perkalian-bobot.png)
+![Perkalian Bobot](img/topsis-perkalian-bobot.png)
 
 dengan i=1,2,...,m dan j=1,2,...,n
 
 #### 5. Menentukan matriks solusi ideal positif dan matriks solusi ideal negatif
 
-![Matrik Sousi Ideal](topsis-matrik-solusi-ideal.png)
+![Matrik Sousi Ideal](img/topsis-matrik-solusi-ideal.png)
 
 #### 6. Menentukan jarak antara nilai setiap alternatif dengan matriks solusi ideal positif dan negatif
 
 Jarak antara alternatif Ai dengan solusi ideal positif dirumuskan sebagai:
-![Ideal Positif](topsis-jarak-ideal-positif.png)
+![Ideal Positif](img/topsis-jarak-ideal-positif.png)
 
 Jarak antara alternatif Ai dengan solusi ideal negatif dirumuskan sebagai:
-![Ideal Negatif](topsis-jarak-ideal-negatif.png)
+![Ideal Negatif](img/topsis-jarak-ideal-negatif.png)
 
 #### 7. Menentukan nilai preferensi untuk setiap alternatif
 
 Nilai preferensi untuk setiap alternatif (Vi) diberikan sebagai:
 
-![Nilai Preferensi](topsis-nilai-preferensi.png)
+![Nilai Preferensi](img/topsis-nilai-preferensi.png)
 
 Nilai Vi yang lebih besar menunjukkan bahwa alternatif Ai lebih dipilih.

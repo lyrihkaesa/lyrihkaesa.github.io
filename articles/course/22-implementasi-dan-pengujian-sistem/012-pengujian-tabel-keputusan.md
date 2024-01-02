@@ -35,7 +35,7 @@ Perusahaan asuransi mobil memberikan diskon kepada pengemudi yang sudah menikah 
 | - Married?      | Yes  | Yes  | No   | No   |
 | - Good Student? | Yes  | No   | Yes  | No   |
 
-- Semua isi tabel berisi kombinasi ketentuan. Diberikan dua kondisi biner (Ya atau Tidak), kemungkinan kombinasi adalah {Yes, Yes}, {Yes, No}, {No, Yes}, dan {No, No}.
+- Semua isi tabel berisi kombinasi ketentuan. Diberikan dua kondisi biner (Ya atau Tidak), kemungkinan kombinasi adalah (Yes, Yes), (Yes, No), (No, Yes), dan (No, No).
 - Setiap aturan mewakili salah satu dari kombinasi. Sebagai penguji, maka akan melakukan verifikasi bahwa semua kombinasi kondisi telah ditentukan.
 - Kehilangan kombinasi dapat mengakibatkan pengembangan sistem yang mungkin tidak memproses rangkaian input tertentu dengan benar.
 

@@ -1,4 +1,4 @@
-# Metoe TOPSIS
+# Metode TOPSIS
 
 ## Langkah-Langkah Metode TOPSIS
 

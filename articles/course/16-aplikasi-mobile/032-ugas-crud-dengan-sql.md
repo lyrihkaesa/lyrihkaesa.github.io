@@ -1,4 +1,11 @@
-# Pertemuan Minggu ke-03 part 02
+# TUGAS CRUD dengan SQL
+
+## Pertemuan Minggu ke-03 - 01
+
+Tugas membuat CRUD dengan SQL Lite. Obat-obatan minimal 5 atribute.
+
+Menyimpan obat-obatan.
+## Pertemuan Minggu ke-03 part 02
 
 Saya lupa ini membahas apa akan tetapi terdapat tugas individu.
 

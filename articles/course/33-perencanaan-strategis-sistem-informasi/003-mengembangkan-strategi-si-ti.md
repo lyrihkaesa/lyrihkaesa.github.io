@@ -23,7 +23,7 @@ Ketika Strategi telah ditetapkan, rencana implementasi kemudian dapat dibangun, 
 
 Proses Strategi SI/TI mengacu pada formulasi dan perencanaan. Dimana Strategi SI/TI mendorong Perencanaan SI/TI, dan dalam membangun perencanaan SI/TI akan timbul aspek-aspek yang menyebabkan tinjauan ulang terhadap Strategi SI/TI.
 
-![Proses Strategi SI/TI](05.png)
+![Proses Strategi SI/TI](img/05.png)
 
 ## Evolusi Proses Strategi SI/TI
 
@@ -129,7 +129,7 @@ Kendala dalam proses strategi TI
 
 ## Tantangan dalam Perencanaan Strategis SI/TI
 
-![Revised Model IS Strategi Proses](06.png)
+![Revised Model IS Strategi Proses](img/06.png)
 
 ## Elemen Kunci dalam Pendekatan Perencanaan yang Efektif
 
@@ -163,7 +163,7 @@ Strategi dapat maju tergantung pada kematangan prosesnya, pengalaman, starting p
 
 **4) Kriteria Kesuksesan**
 
-![Kriteria Kesuksesan](07.png)
+![Kriteria Kesuksesan](img/07.png)
 
 Kriteria Kesuksesan dapat diidentifikasikan sebagai berikut:
 
@@ -216,7 +216,7 @@ Tujuan Formulasi dan Perencanaan Strategi SI/TI:
 
 ## Framework Strategi SI/TI
 
-![Framework Formulasi dan Perencanaan Strategi SI/TI](08.png)
+![Framework Formulasi dan Perencanaan Strategi SI/TI](img/08.png)
 
 ## Referensi
 

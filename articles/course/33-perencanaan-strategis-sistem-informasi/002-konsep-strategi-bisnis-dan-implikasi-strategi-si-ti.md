@@ -22,7 +22,7 @@ Awal 1976 ada penelitian yang berhasil mengenali kegagalan/kelemahan dari perenc
 
 Dalam perjalanan evolusinya, tahun 1980 peneliti lain berhasil mengembangkan model untuk mendeskripsikan peningkatan kematangan Strategi dan Perencanaan Strategis dalam Organisasi.
 
-![Grafik Evolusi Strategic Management Maturity Sumber. Ward & Peppard. 2002 ](grafik-evaluasi-strategic-management-maturity.png)
+![Grafik Evolusi Strategic Management Maturity Sumber. Ward & Peppard. 2002 ](img/grafik-evaluasi-strategic-management-maturity.png)
 
 ## Fase Evolusi Strategi dan Perencaan Strategis dalam Organisasi
 
@@ -128,7 +128,7 @@ Semua stakeholder mengharapkan keuntungan material dan finansial dari organisasi
 Organisasi harus mengidentifikasi dan mengevaluasi serta memutuskan strategi yang ingin dicapai.
 Kemudian ditetapkan bagaimana cara untuk mencapai strategi tersebut, dengan merencanakan aktivitas/tindakan yang dibutuhkan, serta secara efektif mengembangkan dan menggunakan sumber daya.
 
-![Kerangka Kerja Strategis Sumber. Ward & Peppard. 2002](02.png)
+![Kerangka Kerja Strategis Sumber. Ward & Peppard. 2002](img/02.png)
 
 Elemen kunci dari Perencanaan Proses Bisnis (Bussiness Planning Process)
 
@@ -186,7 +186,7 @@ Membutuhkan:
 3. Definisi peran dan tanggung jawab.
 4. Memiliki pegawai yang antusias untuk berkontribusi dalam pencapaian strategi
 
-![Realita Pengembangan Strategi Sumber. Ward & Peppard. 2002 ](03.png)
+![Realita Pengembangan Strategi Sumber. Ward & Peppard. 2002 ](img/03.png)
 
 Strategi hanyalah alat untuk mencapai tujuan, untuk mencapai apapun yang mereka butuhkan diimplementasikan! ini mensyaratkan bahwa sumber daya yang memadai harus diperoleh, dan dialokasikan secara efektif, organisasi bertanggung jawab sesuai dengan sumber daya yang ada dan orang-orang termotivasi untuk berkontribusi pada pencapaian strategi.
 
@@ -198,7 +198,7 @@ Boston Consulting Group Matrix yang biasa dikenal dengan singkatan BCG Matrix ad
 
 Berikut adalah gambaran dari BGC Matrix:
 
-![BGC Matix](04.png)
+![BGC Matix](img/04.png)
 
 Terdapat 4 kuadran yang menggambarkan kondisi sebuah produk, yaitu:
 

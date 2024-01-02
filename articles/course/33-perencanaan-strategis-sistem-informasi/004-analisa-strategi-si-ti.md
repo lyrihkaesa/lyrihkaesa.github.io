@@ -33,7 +33,7 @@ Hubungan antara SI/TI dan BPR, adalah SI/TI harus dipandang berbeda dari sekedar
 
 Hal ini akan memungkinkan rekonsiliasi dari pertanyaan dasar mengenai dampak keselarasan pengembangan Strategi SI/TI dengan inisiasi re-engineering.
 
-![Peran SI/TI dalam BPR](09.png)
+![Peran SI/TI dalam BPR](img/09.png)
 
 Rekonsiliasi SI/TI dan BPR
 
@@ -56,7 +56,7 @@ Untuk mendapatkan hasil yang diinginkan, perlu untuk dicapai pemahaman mengenai 
 
 Hal tersebut didapatkan melalui analisa yang fokus pada elemen dalam lingkungan bisnis dan SI/TI.
 
-![Menetapkan IS Demand](10.png)
+![Menetapkan IS Demand](img/10.png)
 
 ### Mengumpulkan Data yang Relevan
 
@@ -178,7 +178,7 @@ BSC melakukan pemeriksaan terhadap kinejra kinerja dari 4 prespektif yang saling
 - Perspektif Pembelajaran dan Inovasi (Innovation and Learning Perspective)  
   Untuk mencapai visi organisasi. Bagaimana kita akan terus meningkat dan menciptakan nilai dimasa depan bagi stakeholder?
 
-![Perspektif Balanced Scorecards](11.png)
+![Perspektif Balanced Scorecards](img/11.png)
 
 ### Critical Success Factor Analysis
 
@@ -186,7 +186,7 @@ Merupakan teknik yang populer dalam pengembangan Strategi SI/TI dan Strategi Bis
 Critical Success Factor (CSF) menurut Rockart didefinisikan sebagai sejumlah area yang terbatas yang hasilnya dapat menjamin kesuksesan performa kompetitif organisasi.
 Mereka merupakan area utama dimana hal-hal harus dilakukan dengan benar untuk keuntungan bisnis, sehingga harus mendapat perhatian khusus dari manajemen.
 
-![Proses CSF](12.png)
+![Proses CSF](img/12.png)
 
 CSF bukan merupakan perangkat/alat manajemen, alasannya:
 
@@ -210,14 +210,14 @@ Penilaian proses bisnis bertujuan untuk mendefiniskan area dimana kesempatan ada
 Fokus pada proses berarti memeriksa cara kebutuhan konsumen dipenuhi atau pengembangan produk baru.
 Menurut kamus Bahasa Inggris Oxford, proses didefinisikan sebagai aktivitas yang umum dan berkelanjutan atau kesuksesan aktivitas, dilakukan dengan perilaku yang terdefinisi, dan menuju pada pencaipaian hasil tertentu.
 
-![Orientasi Proses Bisnis Sumber. Ward. 2009](13.png)
+![Orientasi Proses Bisnis Sumber. Ward. 2009](img/13.png)
 
 ### Identifikasi Proses
 
 Salah satu pendekatan untuk mengidentifikasi proses adalah memeriksa harapan stakeholder dan menetapkan proses yang dibutuhkan untuk menyampaikan harapan tersebut.
 Berikut gambar yang menunjukan hubungan antara strategi, stakeholder, harapan, dan proses.
 
-![Hubungan Strategi, Stakeholder, Harapan, dan Proses. Sumber. Ward. 2009.](14.png)
+![Hubungan Strategi, Stakeholder, Harapan, dan Proses. Sumber. Ward. 2009.](img/14.png)
 
 ### Pentingnya Proses - Penilaian Kinerja
 
@@ -225,11 +225,11 @@ Agar dapat mengidentifikasi kandidat potensial untuk redesign proses bisnis, per
 
 Matriks ini juga dapat digunakan untuk mendapatkan feedback dari stakeholder, baik internal maupun eksternal.
 
-![Matriks Importance-Performance Sumber. Ward. 2009](15.png)
+![Matriks Importance-Performance Sumber. Ward. 2009](img/15.png)
 
 ## Organizational Modelling
 
-![Organizational Modelling Sumber. Ward. 2009.](16.png)
+![Organizational Modelling Sumber. Ward. 2009.](img/16.png)
 
 ### Lingkungan Eksternal
 
