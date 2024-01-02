@@ -85,10 +85,10 @@ Semua ketentuan terpenuhi dan menerapkan minimal 4 saran di atas.
 ## Reources
 
 - Gunakan **endpoint** berikut untuk mendapatkan data dari API, klik untuk melihat contoh penggunaannya.
-  - Search : [https://api.github.com/search/users?q=**{username}**](https://api.github.com/search/users?q=sidiqpermana)
-  - Detail user : [https://api.github.com/users/**{username}**](https://api.github.com/users/sidiqpermana)
-  - List Follower : [https://api.github.com/users/**{username}**/followers](https://api.github.com/users/sidiqpermana/followers)
-  - List Following : [https://api.github.com/users/**{username}**/following](https://api.github.com/users/sidiqpermana/following)
+  - Search : [https://api.github.com/search/users?q=**`{username}`**](https://api.github.com/search/users?q=sidiqpermana)
+  - Detail user : [https://api.github.com/users/**`{username}`**](https://api.github.com/users/sidiqpermana)
+  - List Follower : [https://api.github.com/users/**`{username}`**/followers](https://api.github.com/users/sidiqpermana/followers)
+  - List Following : [https://api.github.com/users/**`{username}`**/following](https://api.github.com/users/sidiqpermana/following)
 - Perlu diketahui bahwa jumlah *request* di GitHub API dibatasi hanya 60 *request* per jam seperti yang tertera [di sini](https://developer.github.com/v3/#rate-limiting). Untuk mendapatkan jumlah yang lebih besar, gunakan *Token* pada *Header* untuk mendapatkan request 5000 *request* per jam. Ikuti tutorial pada tautan berikut untuk mengetahui langkah-langkahnya:
   - [Tutorial GitHub API](https://www.dicoding.com/blog/apa-itu-rate-limit-pada-github-api/)
 
@@ -107,7 +107,7 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
 
 - Anda bisa menggunakan [Latihan LiveData dengan API](https://www.dicoding.com/academies/14/tutorials/19597/) sebagai basis atau membuat project baru dengan konsep yang sama.
 - Coba terlebih dahulu me-request API dengan token di Postman.  
-  [https://api.github.com/search/users?q={username}](https://api.github.com/search/users?q=sidiqpermana)
+  [https://api.github.com/search/users?q=`{username}`](https://api.github.com/search/users?q=sidiqpermana)
 - Buat kelas model dari output API menggunakan RoboPOJOGenerator.  
   ![dos:8e7f7e507d91c5a236b28c2015448fb920230131155546.jpeg](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:8e7f7e507d91c5a236b28c2015448fb920230131155546.jpeg)
 - Sesuaikan base URL pada ApiConfig dan endpoint pada interface ApiService.
@@ -154,12 +154,12 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
 #### Menampilkan Halaman Detail
 
 - Siapkan terlebih dahulu model dengan menggunakan hasil output dari API untuk halaman detail.  
-  [https://api.github.com/users/{username}  
+  [https://api.github.com/users/`{username}`  
   ](https://api.github.com/users/sidiqpermana)![dos:ed938815eb51226ad1a5fc82040cdd1f20230131155546.jpeg](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:ed938815eb51226ad1a5fc82040cdd1f20230131155546.jpeg)
 - Tambahkan fungsi pada ApiSevice untuk mendapatkan endpoint tersebut menggunakan path.
 
 ```kotlin
-  @GET("users/{username}")
+  @GET("users/`{username}`")
   fun getDetailUser(@Path("username") username: String): Call<DetailUserResponse>
 ```
 
@@ -179,6 +179,7 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
 - Buat dua argument yang akan dikirimkan dari Adapter ke Fragment, yaiti position (untuk mengetahui Follower & Following) dan username (untuk request ke API).
 - Buat adapter untuk ViewPager dan buat global variabel username untuk mengirim data dari Activity ke Adapter.
 
+```kotlin
   class SectionsPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
       var username: String = ""
       override fun createFragment(position: Int): Fragment {
@@ -193,10 +194,12 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
           return 2
       }
   }
+```
 
 - Selanjutnya, inisialisasi adapter pada Activity dan set data username. Jangan lupa, untuk menghubungkan ViewPager dengan TabLayout menggunakan TabLayoutMediator
 - Terakhir, buat logic untuk membedakan tampilan Follower dan Following pada Fragment berdasarkan data position yang dikirimkan. Anda bisa mengetes terlebih dahulu menggunakan TextView biasa untuk memeriksa apakah logika dan username terkirim dengan benar.
 
+```kotlin
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
           super.onViewCreated(view, savedInstanceState)
           arguments?.let {
@@ -209,13 +212,15 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
               binding.testUsername.text = "Get Following $username"
           }
       }
+```
 
 - Sampai sini, jika dijalankan akan menjadi seperti ini.  
   ![dos:2c12272eb1a379c23460b09765a4ad1e20230131174109.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:2c12272eb1a379c23460b09765a4ad1e20230131174109.gif)
 - Setelah logika menampilkan username tampil dengan benar. Saatnya mengambil data Follower dan Following dari API dengan membuat service. Biasanya Anda perlu membuat modelnya terlebih dahulu, tetapi coba lihat hasil response dari  
-  [https://api.github.com/users/{username}/followers](https://api.github.com/users/sidiqpermana/followers) dan [https://api.github.com/users/{username}/following](https://api.github.com/users/sidiqpermana/following). Jika diperhatikan hasil dari kedua API tersebut identik dengan hasil dari API pencarian user berikut [https://api.github.com/search/users?q={username}](https://api.github.com/search/users?q=sidiqpermana). Jadi Anda bisa cukup menggunakan satu model yang sama.
+  [https://api.github.com/users/`{username}`/followers](https://api.github.com/users/sidiqpermana/followers) dan [https://api.github.com/users/`{username}`/following](https://api.github.com/users/sidiqpermana/following). Jika diperhatikan hasil dari kedua API tersebut identik dengan hasil dari API pencarian user berikut [https://api.github.com/search/users?q=`{username}`](https://api.github.com/search/users?q=sidiqpermana). Jadi Anda bisa cukup menggunakan satu model yang sama.
 - Selanjutnya, tambahkan service sesuai dengan endpoint yang dibutuhkan. Nah, ada yang menarik di sini. Coba perhatikan hasil API yang dibuat.
 
+```json
   [
     {
       "login": "fuadmuhammad",
@@ -237,14 +242,15 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
       "type": "User",
       "site_admin": false
     },
-    …
+   // …
+```
 
 - Berbeda dengan kasus sebelumnya, pada API ini respons dimulai dengan JSONArray, artinya Anda harus membuat nilai kembalian berupa List seperti ini, bukan object secara langsung seperti sebelumnya.
 
 ```kotlin
-  @GET("users/{username}/followers")
+  @GET("users/`{username}`/followers")
   fun getFollowers(@Path("username") username: String): Call<List<ItemsItem>>
-  @GET("users/{username}/following")
+  @GET("users/`{username}`/following")
   fun getFollowing(@Path("username") username: String): Call<List<ItemsItem>>
 ```
 
@@ -256,6 +262,7 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
 
   Observe LiveData
 
+```kotlin
   viewModel.detailUser.observe(this) {
 
   }
@@ -269,10 +276,11 @@ Nah, mari kita ulas satu per satu langkah-langkahnya.
   binding.rvUsers.layoutManager = LinearLayoutManager(this)
 
   binding.rvFollow.layoutManager = LinearLayoutManager(requireActivity())
+```
 
-  Dengan begitu, hasil akhir dari submission ini akan terlihat seperti ini.  
-  ![dos:fbcb2a0a07dd9aa2955013561f44b1a220230131174131.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:fbcb2a0a07dd9aa2955013561f44b1a220230131174131.gif)  
-  Jangan lupa untuk menambahkan loading untuk setiap prosesnya.
+Dengan begitu, hasil akhir dari submission ini akan terlihat seperti ini.  
+ ![dos:fbcb2a0a07dd9aa2955013561f44b1a220230131174131.gif](https://dicoding-web-img.sgp1.cdn.digitaloceanspaces.com/original/academy/dos:fbcb2a0a07dd9aa2955013561f44b1a220230131174131.gif)  
+ Jangan lupa untuk menambahkan loading untuk setiap prosesnya.
 
 ## Lainnya
 
