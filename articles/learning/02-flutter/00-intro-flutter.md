@@ -21,15 +21,24 @@ flutter build apk
 ```
 
 ```bash
-flutter build apk --obfuscate --split-debug-info=/bank_sampah/build/app/outputs/apk/obfuscate
+flutter build apk --obfuscate --split-debug-info=build/app/outputs/symbols
 ```
 
 ## Debugging Wireless
 
 ```bash
 adb tcpip 5555 # membuka port 5555
+```
+
+```bash
 adb connect <ip-android:port> # adb connect 192.168.1.9:5555 - jika ingin konek
+```
+
+```bash
 adb devices # melihat semua device yang terkoneksi
+```
+
+```bash
 adb kill-server # mematikan server, dan menghapus juga device yang terlah terkoneksi
 ```
 
