@@ -102,3 +102,4 @@ tags: [guide, windows-10]
 | Winbox                                      | Networking                               | Free                        |
 | Peace                                       | Media                                    | Free                        |
 | QTTabBar                                    | Tools                                    | Free                        |
+| Brave                                       | Browser                                  | Free                        | 
