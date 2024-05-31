@@ -95,9 +95,9 @@ const config = {
       [
         '@docusaurus/plugin-content-docs',
         {
-          id: 'sales',
-          path: 'articles/sales',
-          routeBasePath: 'sales',
+          id: 'journal',
+          path: 'articles/journal',
+          routeBasePath: 'journal',
           sidebarPath: require.resolve('./sidebars.js'),
         },
       ],
@@ -187,7 +187,7 @@ const config = {
       prism: {
         theme: prismThemes.oneLight,
         darkTheme: prismThemes.oneDark,
-        additionalLanguages: ['powershell', 'bash', 'php', 'java', 'dart'],
+        additionalLanguages: ['powershell', 'bash', 'php', 'java', 'dart', 'ignore'],
       },
     }),
 };
