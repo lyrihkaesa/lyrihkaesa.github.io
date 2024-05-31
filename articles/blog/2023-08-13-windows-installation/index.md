@@ -8,7 +8,7 @@ tags: [guide, windows-10]
 
 - Nama Initial:
   - ❌ Kaesa Lyrih  
-    Takutnya nanti pathnya user jadi `Kaesa Lyrih`, jika path user terdapat `spasi` nanti akan berdampak `⚠ Warning` pada saat membuat project `Android Studio`. Jadi pastikan usernya disesuaikan sejak awal.
+    Takutnya nanti path-nya user jadi `Kaesa Lyrih`, jika path user terdapat `spasi` nanti akan berdampak `⚠ Warning` pada saat membuat project `Android Studio`. Jadi pastikan usernya disesuaikan sejak awal.
   - ✅ kaesa  
     Nanti path usernya menjadi `kaesa`.
 - Partisi Disk
@@ -102,4 +102,4 @@ tags: [guide, windows-10]
 | Winbox                                      | Networking                               | Free                        |
 | Peace                                       | Media                                    | Free                        |
 | QTTabBar                                    | Tools                                    | Free                        |
-| Brave                                       | Browser                                  | Free                        | 
+| Brave                                       | Browser                                  | Free                        |

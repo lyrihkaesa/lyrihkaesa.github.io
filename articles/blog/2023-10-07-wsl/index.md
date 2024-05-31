@@ -24,7 +24,7 @@ wsl --install
 ```
 
 ```powershell
-wsl --list --oneline
+wsl --list --online
 ```
 
 ```powershell
@@ -35,3 +35,7 @@ wsl --install -d Ubuntu-22.04 # Untuk install distro Ubuntu 22.04 LTS
 
 - Tunggu instalasinya
 - Setelah itu Anda akan dimintai untuk mengisi username (saran huruf kecil semua jangan KAPITAL) dan password yang mudah Anda ketik karena WSL ini biasanya Anda pakai sendiri.
+
+```powershell
+ wsl --set-default Ubuntu-22.04
+```
