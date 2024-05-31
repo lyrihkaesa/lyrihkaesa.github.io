@@ -1,6 +1,6 @@
 # Dependency Injection in Laravel Filament
 
-Source: https://medium.com/@cameron_germein/things-i-wish-someone-had-explained-to-me-dependency-injection-in-laravel-filament-what-does-5dae3bbf8f23
+Source: [https://medium.com/@cameron_germein/things-i-wish-someone-had-explained-to-me-dependency-injection-in-laravel-filament-what-does-5dae3bbf8f23]
 
 Hal-hal yang saya harap seseorang dapat menjelaskan kepada saya: Injeksi Ketergantungan pada Filamen Laravel - Apa yang berhasil dan (lebih spesifiknya) tidak berhasil.
 
@@ -22,17 +22,17 @@ Action::make("undo")
 
 Dalam konteks ini, nilai dari $environment adalah contoh saat ini dari Model Lingkungan. Ini berfungsi dengan sempurna. Jadi, Dependency Injection sepenuhnya dipahami! Yang saya butuhkan sekarang adalah untuk menggali lebih dalam sedikit, dan menemukan cara-cara keren lainnya untuk menggunakannya! Maka saya memulai perjalanan saya ke hasil pencarian Google, dan di antara dokumentasi Laravel, menemukan [Service Container](https://laravel.com/docs/10.x/container). Inilah tempat di mana semuanya mulai terurai.
 
-## Kesalahan pertama: Berpikir bahwa Service Container SELALU digunakan untuk menyuntikkan dependensi.
+## Kesalahan pertama: Berpikir bahwa Service Container SELALU digunakan untuk menyuntikkan dependensi
 
 Ini telah menjadi sumber utama kebingungan saya. Asumsi saya berjalan seperti ini:
 
-1. Filament dapat inject instance Model saat ini (ini benar) 
+1. Filament dapat inject instance Model saat ini (ini benar)
 2. Laravel injects dependencies melalui Service Container (ini juga benar)
-3. Oleh karena itu, Filament harus menggunakan Service Container untuk resolve dan inject instance Model saat ini. (Ini benar-benar salah) 
+3. Oleh karena itu, Filament harus menggunakan Service Container untuk resolve dan inject instance Model saat ini. (Ini benar-benar salah)
 
 Asumsi yang sepenuhnya salah (tetapi pada saat itu tampak masuk akal) ini adalah apa yang telah membuat saya gila selama beberapa minggu terakhir. Saya bisa melihat Model secara otomatis resolved dan injected, dan saya pikir saya mengerti mekanisme yang terlibat, tetapi tidak peduli apa yang saya coba, saya tidak bisa membuatnya berfungsi di luar contoh-contoh tertentu dalam dokumentasi Filament.
 
-## Kesalahan kedua: Berpikir bahwa Service Container dapat resolve Model instances.
+## Kesalahan kedua: Berpikir bahwa Service Container dapat resolve Model instances
 
 Pada saat itu, ini tampaknya sepenuhnya jelas (dengan lompatan logis yang salah di atas), tetapi kebenaran sederhana adalah ini: Service Container tidak dapat secara otomatis menyelesaikan contoh spesifik dari Model Anda, dalam keadaan, skenario, kondisi, atau situasi apa pun, sama sekali tidak. Untuk Service Container mengambil contoh spesifik dari Model, ANDA HARUS memberikan nilai identifikasi kepadanya (seperti ID Model).
 
@@ -47,16 +47,16 @@ $environment = app(Environment::class); //This does not work, returns a blank En
 Ini tidak akan pernah berhasil. Itu akan selalu mengembalikan contoh "kosong/blank" dari Model Anda. Bahkan jika Anda mencobanya dalam konteks yang sama persis dengan tempat kerja injeksi Filamen, itu tetap tidak akan berhasil.
 
 ```php
-Action::make("undo")  
-->button()  
-->requiresConfirmation()  
-->label("Undo")  
-->icon('heroicon-m-x-mark')  
-->color('danger')  
-->action(function (Environment $environment) {  
-\Debugbar::alert($environment); //This works, shows the current Environment  
-\Debugbar::alert(app(Environment::class)); //This does not work, shows a blank Environment  
-return $environment->executeUndo();  
+Action::make("undo")
+->button()
+->requiresConfirmation()
+->label("Undo")
+->icon('heroicon-m-x-mark')
+->color('danger')
+->action(function (Environment $environment) {
+\Debugbar::alert($environment); //This works, shows the current Environment
+\Debugbar::alert(app(Environment::class)); //This does not work, shows a blank Environment
+return $environment->executeUndo();
 });
 ```
 
@@ -103,7 +103,7 @@ Lalu saya berpikir, Filament tampaknya dapat memasukkan Model ke dalam Closures 
 class EnvironmentService
 {
   use Filament\Support\Concerns\EvaluatesClosures;
-  
+
   public function getEnvironment()
   {
     return $this->evaluate(fn (Environment $environment) => $environment);
@@ -124,7 +124,7 @@ Saya menghabiskan waktu berjam-jam bermain-main dengan Closures, mencoba memaham
 
 Untuk memahami bagaimana `Service Container` dapat resolve Model instances (yang sebenarnya tidak), saya percaya (tanpa bukti dukungan yang nyata, selain "tidak ada yang memberi tahu saya sebaliknya"), bahwa mekanisme yang `Service Container` (dan oleh karena itu Filament) harus menggunakan untuk menyelesaikan Model adalah [Route Model Binding](https://laravel.com/docs/10.x/routing#route-model-binding).
 
-Pada permukaannya, ini masuk akal — baik `Service Container`, maupun konsep `Route Model Binding` adalah bagian inti dari Laravel, dan haruslah menemukan Model saat ini *"dengan cara apa pun"*. `Route Model Binding/RMB` tampaknya menjadi tebakan yang masuk akal seperti yang lainnya.
+Pada permukaannya, ini masuk akal — baik `Service Container`, maupun konsep `Route Model Binding` adalah bagian inti dari Laravel, dan haruslah menemukan Model saat ini _"dengan cara apa pun"_. `Route Model Binding/RMB` tampaknya menjadi tebakan yang masuk akal seperti yang lainnya.
 
 Ternyata, saya hampir benar.
 
@@ -137,10 +137,11 @@ Hal lain yang saya salah tentang? Filament menggunakan `Route Model Binding`, ha
 ## Jadi, bagaimana sebenarnya cara kerjanya? (Ini adalah penjelasan TL;DR)
 
 Kunci untuk memahami `Dependency Injection` di Filament adalah sebagai berikut:
+
 1. Dependency Injection di Laravel dilakukan melalui dua komponen terpisah (untuk memahaminya): `Service Container`, dan `Route Model Binding`.
 2. Di Filament, `Service Container` Laravel sepenuhnya tidak disentuh, dan beroperasi persis seperti yang dilakukan dalam Laravel reguler.
 3. Di Filament, `Route Model Binding` Laravel sama sekali tidak digunakan.
-4. Filament telah membuat mekanisme `Dependency Injection` yang sepenuhnya terpisah dan mandiri, yang digunakan untuk menyuntikkan Model (dan objek lain) ke dalam `Closures`. *Injection `Closure` ini unik untuk Filament*. Sebagai pemula dalam Laravel dan Filament, saya sama sekali tidak memiliki pemahaman tentang ini — saya hanya menganggapnya sebagai bagian inti dari Laravel!
+4. Filament telah membuat mekanisme `Dependency Injection` yang sepenuhnya terpisah dan mandiri, yang digunakan untuk menyuntikkan Model (dan objek lain) ke dalam `Closures`. _Injection `Closure` ini unik untuk Filament_. Sebagai pemula dalam Laravel dan Filament, saya sama sekali tidak memiliki pemahaman tentang ini — saya hanya menganggapnya sebagai bagian inti dari Laravel!
 5. `DI extension`Filament menggunakan [Livewire’s Route Model Binding](https://livewire.laravel.com/docs/components#using-route-model-binding), bukan `Route Model Binding` Laravel.
 6. `DI extension`Filament akan melakukannya, jika tidak mampu menyelesaikan objek yang diminta secara mandiri, kembali ke `Service Container` dan mengembalikan apa pun yang dapat ditemukannya. Ini adalah satu-satunya hubungan antara kedua sistem tersebut.
 
@@ -171,7 +172,7 @@ $environment = app(EnvironmentService::class, ['environment' => 34]); //Same thi
 
 Saya yakin praktik terbaik yang diterima secara umum adalah menggunakan `app() facade` sebagai `factory` untuk kelas Anda, bahkan jika Anda harus memberikan ID-nya. Itu masih akan mengelola semua dependensi yang dapat diselesaikan, itu akan menyelesaikan Antarmuka ke dalam kelas-kelas konkret, Anda dapat menggunakannya untuk membangun objek kompleks dengan rantai dependensi - Anda tidak bisa memasukkan sebuah instance Model tanpa memasukkan ID tertentu.
 
-# Tell me more about Filament’s custom Dependency Injection
+## Tell me more about Filament’s custom Dependency Injection
 
 Here is the short version.
 
@@ -187,7 +188,7 @@ Here is the short version.
 
 This explains the “context” of Filament’s DI. It works on classes that extend from \Filament\Support\Components\Component. In order to find the exact list of parameters you can inject, it looks for the resolveDefaultClosureDependencyForEvaluationByName() and resolveDefaultClosureDependencyForEvaluationByType() methods, where you will find the code that defines precisely what can be injected, and where it will be injected from.
 
-# What’s the Long Version?
+## What’s the Long Version?
 
 Here it is, the detailed explanation of exactly how Filament’s DI works. It’s a bit long, but I’ll try and step through it as carefully as I can. For the sake of this explanation, I will be using a View Page for the Environment resource we’ve been using as an example so far, but the same mechanics apply to all the Pages.
 
@@ -207,41 +208,47 @@ The above conditions are met through the following Filament components:
 
 **ONE** — Creating a Page (for our example, a View record — [https://filamentphp.com/docs/3.x/panels/resources/viewing-records](https://filamentphp.com/docs/3.x/panels/resources/viewing-records)). The created class, ViewEnvironment, extends ViewRecord, which extends Page, so on and so on, until eventually you get down to Livewire\Component
 
-class ViewEnvironment extends ViewRecord  
-{  
-  protected static string $resource = EnvironmentResource::class;  
+```php
+class ViewEnvironment extends ViewRecord
+{
+ protected static string $resource = EnvironmentResource::class;
 }
+```
 
 **TWO** — To create the Route, you add your route to the getPages() method in your Resource, as per [https://filamentphp.com/docs/3.x/panels/resources/viewing-records#adding-a-view-page-to-an-existing-resource](https://filamentphp.com/docs/3.x/panels/resources/viewing-records#adding-a-view-page-to-an-existing-resource)
 
-public static function getPages(): array  
-{  
-  return [  
-    'index' => Pages\ListEnvironments::route('/'),  
-    'create' => Pages\CreateEnvironment::route('/create'),  
-    'view' => Pages\ViewEnvironment::route('/{record}'),  
-    'edit' => Pages\EditEnvironment::route('/{record}/edit'),  
-  ];  
+```php
+public static function getPages(): array
+{
+ return [
+'index' => Pages\ListEnvironments::route('/'),
+'create' => Pages\CreateEnvironment::route('/create'),
+'view' => Pages\ViewEnvironment::route('/{record}'),
+'edit' => Pages\EditEnvironment::route('/{record}/edit'),
+];
 }
+```
 
 **THREE** — The class ViewRecord, which our class extends, defines the mount() method, and uses the Concerns\InteractsWithRecord trait, which is where the $record property is defined.
 
-class ViewRecord extends Page  
-{  
-  use Concerns\HasRelationManagers;  
-  use Concerns\InteractsWithRecord;  
-  use InteractsWithFormActions;  
-    
-  // - -  
-  
-  public function mount(int | string $record): void  {  
-    $this->record = $this->resolveRecord($record);  
-    $this->authorizeAccess();  
-    if (! $this->hasInfolist()) {  
-      $this->fillForm();  
-    }  
-  }  
+```php
+class ViewRecord extends Page
+{
+ use Concerns\HasRelationManagers;
+ use Concerns\InteractsWithRecord;
+ use InteractsWithFormActions;
+
+// - -
+
+public function mount(int | string $record): void  {
+    $this->record = $this->resolveRecord($record);
+ $this->authorizeAccess();
+ if (! $this->hasInfolist()) {
+ $this->fillForm();
+ }
+ }
 }
+```
 
 And that’s it — all you need to do, as a developer, is create a Page as per the instructions, and the magic begins!
 
@@ -249,101 +256,113 @@ And that’s it — all you need to do, as a developer, is create a Page as per 
 
 From the Page, the Record is passed through into the Component during creation. In our example, we’re looking at an Infolist on our View Page. This is all done automatically, the Components are initialised during the mount() method of the Page, and .
 
-class ViewRecord extends Page  
-{  
-  // - -  
-    
-  protected function makeInfolist(): Infolist  {  
-    return parent::makeInfolist()  
-      ->record($this->getRecord())  
-      ->columns($this->hasInlineLabels() ? 1 : 2)  
-      ->inlineLabel($this->hasInlineLabels());  
-  }
+```php
+class ViewRecord extends Page
+{
+ // - -
 
-# Now to fetch this Record
+protected function makeInfolist(): Infolist {
+ return parent::makeInfolist()
+ ->record($this->getRecord())
+      ->columns($this->hasInlineLabels() ? 1 : 2)
+ ->inlineLabel($this->hasInlineLabels());
+ }
+```
+
+## Now to fetch this Record
 
 From here, we go right down to the other end of the chain — where the Closure is actually defined, and asks for the Environment to be injected.
 
-public static function infolist(Infolist $infolist): Infolist  
-{  
-  return $infolist  
-    ->schema([  
-      Section::make('Overview')  
-      ->columns(4)  
-      ->heading(fn(Environment $environment) => $environment->name)  
-      ->schema([  
-        // - -  
-    ])  
-  ]);  
+```php
+public static function infolist(Infolist $infolist): Infolist
+{
+ return $infolist
+ ->schema([
+ Section::make('Overview')
+ ->columns(4)
+ ->heading(fn(Environment $environment) => $environment->name)
+ ->schema([
+// - -
+])
+ ]);
 }
+```
 
-# Evaluating the Closure
+## Evaluating the Closure
 
 When, at some later point, Filament needs to display the heading that we’ve set, it calls the evaluate() method to process it.
 
-trait HasHeading  
-{  
-  protected string | Htmlable | Closure | null $heading = null;  
-  
-  public function heading(string | Htmlable | Closure | null $heading = null): static  {  
-    $this->heading = $heading;  
-    return $this;  
-  }  
-  
-  public function getHeading(): string | Htmlable | null  {  
-    return $this->evaluate($this->heading);  
-  }  
+```php
+trait HasHeading
+{
+ protected string | Htmlable | Closure | null $heading = null;
+
+public function heading(string | Htmlable | Closure | null $heading = null): static {
+ $this->heading = $heading;
+ return $this;
+ }
+
+public function getHeading(): string | Htmlable | null {
+ return $this->evaluate($this->heading);
+ }
 }
+```
 
 The evaluate() method is where a lot of the magic happens, but it’s relatively simple in concept — it is able to go and resolve a dependency based either on Name, or on Type. This is why injecting either Environment $environment or Environment $record both work.
 
 Eventually, it gets to the point where it calls the two following methods: resolveDefaultClosureDependencyForEvaluationByName() and resolveDefaultClosureDependencyForEvaluationByType(). Their implementation in the Trait is only a placeholder — they are meant to be implemented further up the chain, in the case of our Infolist, the file is Filament\Infolists\ComponentContainer
 
-# Implementing the Evaluations
+## Implementing the Evaluations
 
 For this example, **I’m hopping over to the implementation in Filament\Forms\Components\Component**, because it’s more interesting than the Infolist one.
 
-protected function resolveDefaultClosureDependencyForEvaluationByName(string $parameterName): array  
-{  
-  return match ($parameterName) {  
-    'context', 'operation' => [$this->getContainer()->getOperation()],  
-    'get' => [$this->getGetCallback()],  
-    'livewire' => [$this->getLivewire()],  
-    'model' => [$this->getModel()],  
-    'record' => [$this->getRecord()],  
-    'set' => [$this->getSetCallback()],  
-    'state' => [$this->getState()],  
-    default => parent::resolveDefaultClosureDependencyForEvaluationByName($parameterName),  
-  };  
+```php
+protected function resolveDefaultClosureDependencyForEvaluationByName(string $parameterName): array
+{
+  return match ($parameterName) {
+ 'context', 'operation' => [$this->getContainer()->getOperation()],
+ 'get' => [$this->getGetCallback()],
+ 'livewire' => [$this->getLivewire()],
+ 'model' => [$this->getModel()],
+ 'record' => [$this->getRecord()],
+ 'set' => [$this->getSetCallback()],
+ 'state' => [$this->getState()],
+ default => parent::resolveDefaultClosureDependencyForEvaluationByName($parameterName),
+ };
 }
+```
 
 As you can see, this is the complete list of parameters you can inject on a form component! Much of this is documented [here](https://filamentphp.com/docs/3.x/forms/advanced#form-component-utility-injection), but by digging into the code itself, you can see a definitive list of what it is you can and cannot inject. For any class that lets you pass in Closures and resolve their dependencies, there will be an implementation of this (and the ByType) method. Go check them out!
 
 Also note — if the parameter you’re trying to inject isn’t in the available list, Filament’s DI will go and ask the Service Container if it has anything. This is the only interaction between the two systems.
 
-# The final piece of the puzzle
+## The final piece of the puzzle
 
 As you may have already seen in the code above… This is where the connection between Filament’s DI and Livewire’s Route Model Binding happens!
 
-'model' => [$this->getModel()],  
+```php
+'model' => [$this->getModel()],
 'record' => [$this->getRecord()],
+```
 
-Filament’s DI isn’t so much _resolving_ the Model instance, it’s just passing on the instance that was set when the Component was first created. And that’s all there is to it! You know have a pretty thorough understanding of exactly where and when you are able to use Filament’s DI, and more importantly, WHY!
+Filament’s DI isn’t so much *resolving* the Model instance, it’s just passing on the instance that was set when the Component was first created. And that’s all there is to it! You know have a pretty thorough understanding of exactly where and when you are able to use Filament’s DI, and more importantly, WHY!
 
-# Why are there two different resolveDefault methods?
+## Why are there two different resolveDefault methods?
 
 The reason there is both a resolveDefaultClosureDependencyForEvaluationBy**Name**() and resolveDefaultClosureDependencyForEvaluationBy**Type**() is the entire reason for Filament’s custom DI to even exist. It allows the injection of records either by name or by type
 
-->action(function (Environment $record) { //here the resolution is by name  
-  return $environment->executeUndo();  
-});  
-->action(function (Environment $environment) { //here the resolution is by type  
-  return $environment->executeUndo();  
+```php
+->action(function (Environment $record) { //here the resolution is by name
+ return $environment->executeUndo();
 });
+->action(function (Environment $environment) { //here the resolution is by type
+ return $environment->executeUndo();
+});
+```
 
 Both of the above examples work perfectly, but being able to resolve by Type is unique to Filament.
 
-# Conclusion
+## Conclusion
 
 I wrote this article because I felt that if I was having these problems coming to grips with Dependency Injection in Filament, then other people might be as well. I don’t pretend to be an amazing programmer, but some of the things I’ve discovered throughout this process haven’t felt particularly obvious to me. It wasn’t until I received the specific guidance on how some of the internals work from one of Filament’s core developers that things started clicking into place ([thanks Dennis](https://github.com/pxlrbt)!) Hopefully this helps someone else getting into Filament for the first time, or at the very least, saves them from making the same stupid mistakes I did!
 
@@ -351,6 +370,6 @@ And as it also turns out, Dan Harris, the creator of Filament, actually has a vi
 
 [https://laracasts.com/series/build-advanced-components-for-filament/episodes/2](https://laracasts.com/series/build-advanced-components-for-filament/episodes/2)
 
-Dan himself also mentioned: _“Filament’s DI ($this->evaluate()) is actually based on Laravel’s own DI feature (app()->call()) which does exactly the same thing to closure functions. the only reason Filament uses $this->evaluate() instead, is because we have a feature where we can inject parameters based on their type as well as their name. so Post $record does the same as Post $post as we tell the evaluation that Post types can be injected as well as $record. laravel cant do that with app()->call(). but what we are doing is basically identical to Laravel, its not really that magic.”_
+Dan himself also mentioned: *“Filament’s DI ($this->evaluate()) is actually based on Laravel’s own DI feature (app()->call()) which does exactly the same thing to closure functions. the only reason Filament uses $this->evaluate() instead, is because we have a feature where we can inject parameters based on their type as well as their name. so Post $record does the same as Post $post as we tell the evaluation that Post types can be injected as well as $record. laravel cant do that with app()->call(). but what we are doing is basically identical to Laravel, its not really that magic.”*
 
 I would counter that it certainly feels like magic to a developer seeing it for the first time, but once you take a peek inside and see behind the curtain, it might not be magic, but it certainly is elegant!
