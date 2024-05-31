@@ -99,6 +99,7 @@ const config = {
           path: 'articles/journal',
           routeBasePath: 'journal',
           sidebarPath: require.resolve('./sidebars.js'),
+          exclude: ['**/exclude/**'],
         },
       ],
     ],
