@@ -13,8 +13,12 @@ flutter clean
 ```bash
 flutter upgrade --force # upgrade paksa
 ```
+## Membuat Proyek Flutter
 
-## Build
+```bash
+flutter create --org id.my.charapon --android-language kotlin --ios-language swift --platforms=web,android,ios kaesa_app
+```
+## Build `apk`
 
 ```bash
 flutter build apk
@@ -159,3 +163,9 @@ Dari `datasoruce` bisa `local` atau `remote`.
 - local = offline atau database local
 - remote = online atau api
   lalu ke `repository` > `usecase` > `bloc` > `page/form`.
+
+---
+
+## Package `cached_network_image`
+
+

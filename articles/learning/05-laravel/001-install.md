@@ -66,4 +66,3 @@ php artisan storage:link
 ```bash
 php artisan make:model
 ```
-

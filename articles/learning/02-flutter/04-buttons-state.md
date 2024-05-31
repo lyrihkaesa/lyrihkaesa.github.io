@@ -138,5 +138,69 @@ class MyScreen extends StatelessWidget {
     );
   }
 }
-
 ```
+
+## Expand Button by Parent's Size
+
+### Menggunakan `CrossAxisAlignment` pada `Row` Widget:
+
+Tambahkan property `crossAxisAlignment: CrossAxisAlignment.stretch` pada widget Row.
+
+```dart
+Row(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    // ... widgets lainnya
+  ],
+)
+```
+
+### Menggunakan `ButtonTheme`:
+Bungkus tombol dengan `ButtonTheme` dan atur `minWidth: double.infinity` untuk memberikan batasan.
+
+```dart
+ButtonTheme(
+  minWidth: double.infinity,
+  child: MaterialButton(
+    onPressed: () {},
+    child: Text('Raised Button'),
+  ),
+)
+```
+
+### Menggunakan `ElevatedButton` dan `Container`:
+Bungkus `ElevatedButton` dengan `Container` yang memiliki lebar infinity.
+
+```dart
+Container(
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: null,
+    child: Text('NEXT'),
+  ),
+)
+```
+
+### Menggunakan `SizedBox` Widget:
+Gunakan `SizedBox` dengan property `width: double.maxFinite`.
+
+```dart
+SizedBox(
+  width: double.maxFinite,
+  child: RaisedButton(
+    // ... properti tombol lainnya
+  ),
+)
+```
+
+### Menggunakan `minWidth` pada `MaterialButton`:
+Atur property `minWidth: double.maxFinite` pada `MaterialButton`.
+
+```dart
+MaterialButton(
+  minWidth: double.maxFinite,
+  onPressed: () {},
+  child: Text("Button"),
+)
+```
+

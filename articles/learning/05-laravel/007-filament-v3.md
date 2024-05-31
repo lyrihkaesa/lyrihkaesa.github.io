@@ -89,6 +89,152 @@ You can also run `php --ini` in a terminal to see which files are used by PHP in
 Alternatively, you can run Composer with `--ignore-platform-req=ext-intl` to temporarily ignore these required extensions.
 ```
 
-![iniimage]](attachments/Pasted%20image%2020231126114202.png)
+![intl](attachments/xampp.png)
 
-![ini image](attachments/Pasted%20image%2020231126114318.png)
+![ini image](attachments/intl.png)
+
+
+## `FileUpload`
+
+`FileUpload` field didasarkan pada  [Filepond](https://pqina.nl/filepond).
+
+```php
+use Filament\Forms\Components\FileUpload;
+
+FileUpload::make('attachment')
+```
+
+![file-upload-attachment](attachments/007-filament-v3-file-upload-attachment.png)
+
+### Mengonfigurasi `disk()` dan `directory()` penyimpanan
+
+Secara default, `File` akan diunggah (uploaded) secara `public` ke disk penyimpanan Anda yang ditentukan dalam file [`config/filament.php`](https://filamentphp.com/docs/3.x/forms/installation#publishing-configuration) . Anda juga dapat mengatur `FILAMENT_FILESYSTEM_DISK` pada `.env`  untuk mengubahnya.
+
+```php title="config/filament.php"
+return [
+	// ... kode lainnya
+    /*
+    |--------------------------------------------------------------------------
+    | Default Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | This is the storage disk Filament will use to put media. You may use any
+    | of the disks defined in the `config/filesystems.php`.
+    |
+    */
+    
+    'default_filesystem_disk' => env('FILAMENT_FILESYSTEM_DISK', 'public'),
+    
+    // ... kode lainnya
+    ];
+```
+
+> **Catatan**
+> Untuk menampilkan (preview) gambar dan file lainnya dengan benar, `FilePond` mengharuskan file diberikan dari domain yang sama dengan aplikasi, atau header `CORS` yang sesuai harus ada. Pastikan variabel lingkungan `APP_URL` sudah benar, atau ubah driver [`filesystem`](https://laravel.com/docs/filesystem) untuk menyetel URL yang benar. Jika Anda hosting file di domain terpisah seperti S3, pastikan header CORS sudah disiapkan.
+> 
+> Jika tidak tampil saat preview gambar, mungkin `storage:link` tidak bekerja dengan benar. Atau `.env` > `APP_URL` tidak sesuai misal menggunakan `http://localhost` atau `http://pondokmbodo.test` atau `https://pondokmbodo.test` pastikan protocol `http`/`https` dan domainnya sesuai.
+
+Untuk mengubah disk dan directory untuk field tertentu, dan visibility file, gunakan method `disk()`, `directory()` dan `visibility()`:
+
+```php
+use Filament\Forms\Components\FileUpload;
+ 
+FileUpload::make('attachment')
+    ->disk('s3')
+    ->directory('form-attachments')
+    ->visibility('private'),
+    
+FileUpload::make('pdf')
+    ->disk('local')
+    ->directory('pdfs'),
+```
+
+> Pengembang bertanggung jawab untuk menghapus file-file ini dari disk jika dihapus, karena Filament tidak mengetahui jika file-file tersebut bergantung pada tempat lain.
+> Salah satu cara untuk melakukan ini secara otomatis adalah dengan observing [model event](https://laravel.com/docs/eloquent#events).
+
+### Rename File
+
+```php
+use \Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+
+Forms\Components\FileUpload::make('avatar')
+	->getUploadedFileNameForStorageUsing(
+        function (TemporaryUploadedFile $file, Forms\Get $get): string {
+            $extension = pathinfo($file->getFileName(), PATHINFO_EXTENSION);
+            return (string) $get('nik') . '-avatar' . '.' . $extension;
+        })
+    ->image()
+    ->downloadable()
+    ->openable()
+    ->directory('avatars')
+```
+
+
+
+![](attachments/migration.png)
+
+
+
+## Forms `Section`
+
+### Section `footerActions(actions: [])`
+
+```php
+Section::make(__('Website and Social Media'))
+	->schema([
+		 Forms\Components\Repeater::make('socialMediaLinks')
+		 ->schema([
+			 // Forms\Components
+		 ]),
+		 // orther component
+    ])
+    ->footerActions([
+		Action::make('saveSocialMediaLinks')
+	        ->action(function ($data, $record, $component, $livewire, Forms\Get $get) {
+	            dd([$data, $record, $component, $livewire, $get('socialMediaLinks')]);
+				// ...
+		    }),
+	]),
+```
+
+![Section Footer 001](attachments/007-filament-v3-form-section-footer-001.png)
+
+
+
+![Service](attachments/007-filament-v3-social-media-service.png)
+
+```bash
+php artisan make:interface Services/SocialMediaLinkService
+```
+
+```bash
+php artisan make:class Services/Impl/SocialMediaLinkServiceImpl
+```
+
+```bash
+php artisan make:provider SocialMediaLinkServiceProvider
+```
+
+```bash
+php artisan config:clear
+```
+
+## Masalah pada Extension `VSCode` `PHP by DEVSENSE`
+
+> Name: PHP
+> Id: DEVSENSE.phptools-vscode
+> Description: All-in-One PHP support - IntelliSense, Debug, Formatter, Code Lenses, Code Fixes, Linting, Refactoring, PHPUnit Tests, Web Server, and more.
+> Version: 1.46.15409
+> Publisher: DEVSENSE
+> VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=DEVSENSE.phptools-vscode
+
+Jika terjadi masalah `PHP2014` itu karena ada tanda kurung kosong `()`. Jadi hapus tanda kurung tersebut. 
+
+![filamentstyles](attachments/filament-styles.gif)
+
+- Atau anda bisa hiraukan (ignore) pada `setting.json` pada Visual Studio Code. Seperti berikut:
+```json
+  "php.problems.exclude" : {
+     "resources/views/livewire/" : [2014], // error dari directive @filamentStyles() and @filamentScripts()
+  }
+```
