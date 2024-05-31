@@ -10,21 +10,38 @@ Kartu Rencana Studi (KRS) menunjukkan rencana mata kuliah yang akan di ambil sem
 
 ---
 
-## ✅ Semester 07 | 12 SKS
+## ✅ Semester 08 | 8 SKS
 
-| Nama Mata Kuliah              | SKS | Kelompok |
-| ----------------------------- | --- | -------- |
-| H.4.1 · Metodologi Penelitian | 2   | A12.6702 |
-| Kulino · Kerja Praktek        | 2   | A12.6701 |
-| Kulino · Bimbingan Karir      | 2   | A12.6701 |
-| Kulino · Tugas Akhir          | 6   | A12.6701 |
+:::info
+Menyelesaikan kegagalan sebelumnya. Q_Q
+:::
+
+| Nama Mata Kuliah       | SKS | Kelompok |
+| ---------------------- | --- | -------- |
+| Kulino · Kerja Praktik | 2   | A12.6701 |
+| Kulino · Tugas Akhir   | 6   | A12.6701 |
+
+---
+
+## 🗃 Semester 07 | 12 SKS | 2💘 · 2💜
+
+:::info
+Gagal dalam mata kuliah `Kerja Praktik` dan `Tugas Akhir` mungkin karena lagi krisis identitas, burnout, atau lainnya.
+:::
+
+| Nama Mata Kuliah              | SKS  | Kelompok |
+| ----------------------------- | ---- | -------- |
+| H.4.1 · Metodologi Penelitian | 2 💜 | A12.6702 |
+| Kulino · Kerja Praktik        | 2 💘 | A12.6701 |
+| Kulino · Bimbingan Karir      | 2 💜 | A12.6701 |
+| Kulino · Tugas Akhir          | 6 💘 | A12.6701 |
 
 ---
 
 ## 🗃 Semester 06 | 22 SKS | 3💛 · 2💙 · 3💜
 
 :::info
-Kaesa mencoba kuliah offline untuk pertama kalinya, karena kebanyakan kuliah dari semester 01 sampai 05 dilakukan secara online.
+Kaesa mencoba kuliah offline untuk pertama kalinya, karena kebanyakan kuliah dari _semester satu sampai lima_ dilakukan secara online.
 :::
 
 | Nama Mata Kuliah                                | SKS  | Kelompok |
