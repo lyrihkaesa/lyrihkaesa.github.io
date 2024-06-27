@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://kaesa.charapon.my.id/blog</id>
+    <title>Kaesa Lyrih Blog</title>
+    <updated>2024-03-20T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://kaesa.charapon.my.id/blog"/>
+    <subtitle>Kaesa Lyrih Blog</subtitle>
+    <icon>https://kaesa.charapon.my.id/img/favicon.ico</icon>
+    <entry>
+        <title type="html"><![CDATA[Extensions Chromium]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium</id>
+        <link href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium"/>
+        <updated>2024-03-20T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Ini adalah daftar ekstensi yang saya pakai di browser chromium base seperti Chrome, Microsoft Edge, dan Brave.]]></summary>
+        <content type="html"><![CDATA[<p>Ini adalah daftar ekstensi yang saya pakai di browser <code>chromium base</code> seperti <code>Chrome</code>, <code>Microsoft Edge</code>, dan <code>Brave</code>.</p>
+<ul>
+<li><a href="chrome://extensions/" target="_blank" rel="noopener noreferrer">Chrome Extensions</a></li>
+<li><a href="edge://extensions/" target="_blank" rel="noopener noreferrer">Edge Extensions</a></li>
+<li><a href="brave://extensions/" target="_blank" rel="noopener noreferrer">Brave Extensions</a></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="bitwarden---free-password-manager"><a href="https://chromewebstore.google.com/detail/bitwarden-pengelola-sandi/nngceckbapebfimnlniiiahkandclblb" target="_blank" rel="noopener noreferrer">Bitwarden - Free Password Manager</a><a href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium#bitwarden---free-password-manager" class="hash-link" aria-label="Direct link to bitwarden---free-password-manager" title="Direct link to bitwarden---free-password-manager">​</a></h2>
+<p>Digunakan untuk mengelola kata sandi akun saya, keluarga, teman, dan tempat kerja saya.</p>
+<p><img loading="lazy" alt="Bitwarden" src="https://kaesa.charapon.my.id/assets/images/bitwarden-da252b93a96a0390129d5d452f728748.png" width="800" height="500" class="img_ev3q"></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="json-formatter"><a href="https://chromewebstore.google.com/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa" target="_blank" rel="noopener noreferrer">JSON Formatter</a><a href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium#json-formatter" class="hash-link" aria-label="Direct link to json-formatter" title="Direct link to json-formatter">​</a></h2>
+<p>Membuat mudah membaca JSON saat <code>GET</code> data lewat browser.</p>
+<p><img loading="lazy" alt="JSON Formatter" src="https://kaesa.charapon.my.id/assets/images/json-formatter-0d59a474f9a4824ac4737da24de419be.png" width="1280" height="800" class="img_ev3q"></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="idm-integration-module"><a href="https://chromewebstore.google.com/detail/idm-integration-module/ngpampappnmepgilojfohadhhmbhlaek" target="_blank" rel="noopener noreferrer">IDM Integration Module</a><a href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium#idm-integration-module" class="hash-link" aria-label="Direct link to idm-integration-module" title="Direct link to idm-integration-module">​</a></h2>
+<p>Supaya bisa menggunakan IDM di browser.</p>
+<p><img loading="lazy" alt="IDM Integration Module" src="https://kaesa.charapon.my.id/assets/images/idm-0f7b5edaf15bbc702287a98510324dcf.png" width="640" height="400" class="img_ev3q"></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="google-translate"><a href="https://chromewebstore.google.com/detail/google-terjemahan/aapbdbdomjkkjkaonfhkkikfgjllcleb" target="_blank" rel="noopener noreferrer">Google Translate</a><a href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium#google-translate" class="hash-link" aria-label="Direct link to google-translate" title="Direct link to google-translate">​</a></h2>
+<p>Yeah buat menerjemahkan bahasa.</p>
+<p><img loading="lazy" alt="Google Translate" src="https://kaesa.charapon.my.id/assets/images/google-translate-49992e64bb119e2918b82c7aa9256f75.png" width="640" height="400" class="img_ev3q"></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="stylish"><a href="https://chromewebstore.google.com/detail/stylish-custom-themes-for/fjnbnpbmkenffdnngjfgmeleoegfcffe?pli=1" target="_blank" rel="noopener noreferrer">Stylish</a><a href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium#stylish" class="hash-link" aria-label="Direct link to stylish" title="Direct link to stylish">​</a></h2>
+<p>Supaya bisa mengedit tema desain website yang sering Saya kunjungi supaya lebih mudah saya gunakan.</p>
+<p>🌟 Used: <code>Chrome</code> &gt; <code>Mahasiswa Profile</code></p>
+<p><img loading="lazy" alt="stylish" src="https://kaesa.charapon.my.id/assets/images/stylish-ef8aac24fcb907700bbd51bd6805a7ac.png" width="1280" height="800" class="img_ev3q"></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="google-meet-attendance-list"><a href="https://chromewebstore.google.com/detail/google-meet-attendance-li/appcnhiefcidclcdjeahgklghghihfok" target="_blank" rel="noopener noreferrer">Google Meet Attendance List</a><a href="https://kaesa.charapon.my.id/blog/2024/03/20/extensions-chromium#google-meet-attendance-list" class="hash-link" aria-label="Direct link to google-meet-attendance-list" title="Direct link to google-meet-attendance-list">​</a></h2>
+<p>Buat absensi di google meet saja.</p>
+<p>🌟 Used: <code>Chrome</code> &gt; <code>Mahasiswa Profile</code></p>
+<p><img loading="lazy" alt="Google Meet Attendance List" src="https://kaesa.charapon.my.id/assets/images/google-meet-attendance-list-2d728364be89b2bb9f7f3feb7f54c5ba.png" width="800" height="500" class="img_ev3q"></p>]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Mengorganisasi File dan Folder Saya]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder</id>
+        <link href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder"/>
+        <updated>2024-02-11T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Karena kaesa pelupa maka harus rapi dalam mengorganisasi file dan folder alias tata letak penempatan file dan folder.]]></summary>
+        <content type="html"><![CDATA[<p>Karena kaesa <code>pelupa</code> maka harus rapi dalam mengorganisasi file dan folder alias tata letak penempatan file dan folder.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="windows">Windows<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#windows" class="hash-link" aria-label="Direct link to Windows" title="Direct link to Windows">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="local-disk-c">Local Disk (C:)<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#local-disk-c" class="hash-link" aria-label="Direct link to Local Disk (C:)" title="Direct link to Local Disk (C:)">​</a></h3>
+<p>Default tempat sistem operasi Windows. Yang perlu ditambahkan mungkin <code>Games</code> dan <code>Program Portable</code>.</p>
+<div class="language-tree codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-tree codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">C:</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Asobimo // toram launcher</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Games // permainan simpan disini</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Program File</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Program File (x86)</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Program Portable // menyimpan program portable</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── embyserver</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── FolderSize</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── FoxidPDFEditorPro</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── hwi // hardware info</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Pichon</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── RevoUninstallerPro</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Tachidesk-Server</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── tportable // telegram portable</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Users</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Windows</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">└── ...</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="local-disk-d">Local Disk (D:)<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#local-disk-d" class="hash-link" aria-label="Direct link to Local Disk (D:)" title="Direct link to Local Disk (D:)">​</a></h3>
+<p>Tempat menyimpan kebutuhan developing. Bisa diberi nama partisi <code>Dev</code> atau <code>Development</code> sesuaikan dengan kebutuhan.</p>
+<ul>
+<li>Tidak boleh ada penamaan menggunakan <code>spasi</code> untuk development karena bisa mengakibatkan error karena spasi. Disarankan menggunakan penamaan:<!-- -->
+<ul>
+<li>CapitalizeEachWord</li>
+<li>kebab-case</li>
+<li>kebab-case.with.dot</li>
+</ul>
+</li>
+</ul>
+<div class="language-tree codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-tree codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">D: Dev</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Archives</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── DevTools</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── android</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── flutter</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── jdk-21.0.1</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Pictures</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Avatars</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── Screenshot</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Projects</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Toram Online</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">└── xampp // path aplikasi XAMPP</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="local-disk-e">Local Disk (E:)<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#local-disk-e" class="hash-link" aria-label="Direct link to Local Disk (E:)" title="Direct link to Local Disk (E:)">​</a></h3>
+<p>Tempat menyimpan data selain kebutuhan development. Bisa diberi nama partisi <code>Data</code>.</p>
+<div class="language-tree codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-tree codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">E: Data</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Kaesa Videos</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Guide</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── Music</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│       ├── Artists</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│       ├── Channels YouTube</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│       ├── Epic or Instrumental</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│       ├── Game and Anime</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│       ├── Mix</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│       └── Z-Lainnnya</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">└── Kaesa Z-Lainnnya</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    ├── Accounts</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    ├── Android</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    └── Kuliah</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="local-disk-g">Local Disk (G:)<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#local-disk-g" class="hash-link" aria-label="Direct link to Local Disk (G:)" title="Direct link to Local Disk (G:)">​</a></h3>
+<p>Digunakan shortcut <code>Google Drive</code>, G artinya google drive.</p>
+<div class="language-tree codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-tree codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">G: Google Drive</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── My Drive</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">└── Shared drives</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="hdd-eksternal-wd-4tb">HDD Eksternal WD 4TB<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#hdd-eksternal-wd-4tb" class="hash-link" aria-label="Direct link to HDD Eksternal WD 4TB" title="Direct link to HDD Eksternal WD 4TB">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="partisi-01">Partisi 01<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#partisi-01" class="hash-link" aria-label="Direct link to Partisi 01" title="Direct link to Partisi 01">​</a></h3>
+<p>Menyimpan data apa pun.</p>
+<div class="language-tree codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-tree codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">F: DATA</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── 01_Projects</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── 02_Areas</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Kuliah</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── Toram Online</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── 03_Resources</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Adobe</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Figma</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── Fonts Family</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── 04_Archives</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Compressed</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Documents</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Games</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Installer</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Portable</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Minecraft</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Steam</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   └── Epic // coming soon</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Musics</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Pictures</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Programs</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── Videos</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Kaesa Apps Windows</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Program Portable</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Compressed</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   ├── Ratiborus KMS Tools 01.16.2019.rar</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   ├── FolderSize.rar</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   ├── FoxitPDFEditorPro.rar</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   ├── Pichon.rar</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   └── RevoUninstallerPro.rar</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Extracted</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   ├── RevoUninstallerPro-v4.0.0</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   │   ├── ...</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   │   ├── RevoUninstallerProPortable.exe</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   │   └── ...</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   │   └── ...</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   └── _Optionals</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Program Installer</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── ...</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   └── _Optionals</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── _Lainnya</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Kaesa _Lainnya</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Accounts</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Android</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Microsoft Products</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Operating System</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   ├── Office</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   │   └── Driver</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Mikrotik</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── Virtual Machine</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">└── README.md</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>Videos</p>
+<ul>
+<li>Musics (Harus selalu sync)</li>
+<li>Guides (Harus selalu sync)</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="partisi-02">Partisi 02<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#partisi-02" class="hash-link" aria-label="Direct link to Partisi 02" title="Direct link to Partisi 02">​</a></h3>
+<p>Menyimpan Anime saja.</p>
+<p>Contoh penamaan <code>folder</code>:</p>
+<ul>
+<li><code>Anime Name Sxx (2020) &lt;720p/1080p&gt;</code></li>
+</ul>
+<p>Contoh penamaan <code>file</code>:</p>
+<ul>
+<li><code>Anime Name SxxEyy &lt;720p/1080p&gt; &lt;BD&gt; &lt;OVA/ONA/Special&gt;</code></li>
+<li><code>Anime Name S01E01 720p BD</code></li>
+<li><code>Anime Name S01E01 720p BD OVA</code></li>
+<li><code>Anime Name S01E01 720p BD ONA</code></li>
+<li><code>Anime Name S01E01 720p BD Special</code></li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="hdd-eksternal-enclosure-farhan-1tb">HDD Eksternal Enclosure Farhan 1TB<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#hdd-eksternal-enclosure-farhan-1tb" class="hash-link" aria-label="Direct link to HDD Eksternal Enclosure Farhan 1TB" title="Direct link to HDD Eksternal Enclosure Farhan 1TB">​</a></h2>
+<p>Hanya ada <code>satu partisi</code> saja yaitu <code>DATA</code>. Difungsikan untuk share data <code>Films</code>, <code>Games</code>, <code>Manga/Manhua/Manhwa</code>, dsb.</p>
+<div class="language-tree codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-tree codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">X: DATA</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Areyon Datas</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Farhan Datas</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Kaesa Anime Unedited</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Kaesa Films</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">├── Kaesa Games</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Installer</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   ├── Portable</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">│   └── README.txt</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">└── Tachidesk</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    ├── downloads</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    │   ├── Bato.to (ID)</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    │   └── Komik Cast (ID)</span><br></span><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">    └── ...</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="kaesa-anime-unedited">Kaesa Anime Unedited<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#kaesa-anime-unedited" class="hash-link" aria-label="Direct link to Kaesa Anime Unedited" title="Direct link to Kaesa Anime Unedited">​</a></h3>
+<ul>
+<li>Hanya untuk penyimpanan anime sementara.</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="kaesa-games">Kaesa Games<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#kaesa-games" class="hash-link" aria-label="Direct link to Kaesa Games" title="Direct link to Kaesa Games">​</a></h3>
+<ul>
+<li><code>Installer</code>
+Perlu menjalankan <code>setup wizard</code> alias install/pasang dulu baru main.</li>
+<li><code>Portable</code>
+Tidak perlu melakukan <code>setup wizard</code> atau install/pemasangan aplikasi, langsung jalankan file game <code>.exe</code> bisa langsung main.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tachidesk">Tachidesk<a href="https://kaesa.charapon.my.id/blog/2024/02/11/my-organization-file-and-folder#tachidesk" class="hash-link" aria-label="Direct link to Tachidesk" title="Direct link to Tachidesk">​</a></h2>
+<ul>
+<li>Ada di <code>Laptop</code> partisi <code>Local Disk E:</code> juga.</li>
+</ul>]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Minecraft]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2024/02/01/minecraft</id>
+        <link href="https://kaesa.charapon.my.id/blog/2024/02/01/minecraft"/>
+        <updated>2024-02-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[| Tanggal | Jenis | Harga |]]></summary>
+        <content type="html"><![CDATA[<table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Harga</th></tr></thead><tbody><tr><td>Default - ???</td><td>PE Android</td><td>109.000</td></tr><tr><td>24 Januari 2024</td><td>PE Android</td><td>15.000</td></tr><tr><td>28 September 2023</td><td>PE Android</td><td>35.500</td></tr><tr><td>10 Mei 2022</td><td>PE Android</td><td>0 (Gratis)</td></tr></tbody></table>]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Kacamata]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2023/11/06/kaca-mata</id>
+        <link href="https://kaesa.charapon.my.id/blog/2023/11/06/kaca-mata"/>
+        <updated>2023-11-06T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Supplier: Optik Pranoto Purwodadi]]></summary>
+        <content type="html"><![CDATA[<p>Supplier: Optik Pranoto Purwodadi</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="2023-11-06-k--f">2023-11-06: K &amp; F<a href="https://kaesa.charapon.my.id/blog/2023/11/06/kaca-mata#2023-11-06-k--f" class="hash-link" aria-label="Direct link to 2023-11-06: K &amp; F" title="Direct link to 2023-11-06: K &amp; F">​</a></h2>
+<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>Merek</td><td>H&amp;M</td></tr><tr><td>Tipe</td><td>HM9917</td></tr><tr><td>Ukuran</td><td>55-17-140</td></tr></tbody></table>
+<p>Frame: Rp300.000 (Harga Asli: 350.000 diskon 10% menjadi 315.000 tapi saya tawar menjadi 300.000)</p>
+<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>Lensa</td><td>Blue Control</td></tr><tr><td>OD</td><td>-4.00</td></tr><tr><td>OS</td><td>-4.00</td></tr></tbody></table>
+<p>Lensa: Rp400.000 (Harga Asli: 450.000 diskon 10% menjadi 405.000 tapi bayar Rp400.000)</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="2021-05-27-f">2021-05-27: F<a href="https://kaesa.charapon.my.id/blog/2023/11/06/kaca-mata#2021-05-27-f" class="hash-link" aria-label="Direct link to 2021-05-27: F" title="Direct link to 2021-05-27: F">​</a></h2>
+<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>Lensa</td><td>Prolens FSV 1.56 Blue Control</td></tr><tr><td>OD</td><td>-4.00</td></tr><tr><td>OS</td><td>-4.00</td></tr></tbody></table>
+<p>Lensa: Rp300.000</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="2019-07-06-k">2019-07-06: K<a href="https://kaesa.charapon.my.id/blog/2023/11/06/kaca-mata#2019-07-06-k" class="hash-link" aria-label="Direct link to 2019-07-06: K" title="Direct link to 2019-07-06: K">​</a></h2>
+<table><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody><tr><td>Frame</td><td>Qishibao 6056 "Black"</td></tr><tr><td>Ukuran</td><td>50-17-140</td></tr><tr><td>Lensa</td><td>Prolens FSV 1.56 Blue Control</td></tr><tr><td>OD</td><td>-6.00</td></tr><tr><td>OS</td><td>-6.00</td></tr><tr><td>PD</td><td>62.</td></tr></tbody></table>
+<p>Lensa: Rp300.000
+Frame: Rp300.000</p>]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Informasi Tentang SIM Card]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2023/11/05/sim-card</id>
+        <link href="https://kaesa.charapon.my.id/blog/2023/11/05/sim-card"/>
+        <updated>2023-11-05T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Telkomsel PraBayar]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="telkomsel-prabayar">Telkomsel PraBayar<a href="https://kaesa.charapon.my.id/blog/2023/11/05/sim-card#telkomsel-prabayar" class="hash-link" aria-label="Direct link to Telkomsel PraBayar" title="Direct link to Telkomsel PraBayar">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="masa-aktif">Masa Aktif<a href="https://kaesa.charapon.my.id/blog/2023/11/05/sim-card#masa-aktif" class="hash-link" aria-label="Direct link to Masa Aktif" title="Direct link to Masa Aktif">​</a></h3>
+<blockquote>
+<p>23 Oktober 2023</p>
+</blockquote>
+<ol>
+<li>
+<p>Penambahan masa aktif melalui pembelian pulsa akan kembali bersifat <strong>akumulasi</strong> dengan maksimal penambahan masa aktif sebanyak <strong>90 hari</strong>.</p>
+</li>
+<li>
+<p>Penambahan masa aktif dengan <strong>pembelian paket data</strong> dan <strong>menerima gift</strong> akan tetap mengikuti masa aktif terpanjang pelanggan <strong>(non-akumulasi)</strong>, terkecuali <strong>Paket Perpanjang Masa Aktif</strong> yang akan memperpanjang masa aktif yang secara akumulatif maksimal <strong>365 hari</strong>.</p>
+</li>
+<li>
+<p>Pembelian Pulsa</p>
+<ol>
+<li>Akumulasi</li>
+<li>Maksimal 90 hari.</li>
+</ol>
+</li>
+<li>
+<p>Pembelian Paket (Kuota Data, Telepon, SMS, dsb.)</p>
+<ol>
+<li>Non Akumulasi (Mengikuti aktif terpanjang)</li>
+</ol>
+</li>
+<li>
+<p>Pembelian Paket Perpanjang Masa Aktif</p>
+<ol>
+<li>Akumulasi</li>
+<li>Maksimal 365 hari.</li>
+</ol>
+</li>
+<li>
+<p>Menerima Hadiah</p>
+<ol>
+<li>Non Akumulasi (Mengikuti aktif terpanjang)</li>
+</ol>
+</li>
+</ol>
+<p>Masa Aktif Ketika Isi Ulang
+Telkomsel PraBayar, simPATI, KARTU As, dan Loop)</p>
+<table><thead><tr><th>Nominal Isi Pulsa</th><th>Penyesuaian Masa Aktif</th><th>N/P</th></tr></thead><tbody><tr><td>Rp5.000</td><td>7 hari</td><td>Rp715/hari</td></tr><tr><td>✅ Rp10.000</td><td>15 hari</td><td>Rp667/hari</td></tr><tr><td>Rp15.000</td><td>20 hari</td><td>Rp750/hari</td></tr><tr><td>✅ Rp20.000</td><td>30 hari</td><td>Rp667/hari</td></tr><tr><td>Rp25.000</td><td>30 hari</td><td>Rp834/hari</td></tr><tr><td>Rp50.000</td><td>45 hari</td><td>Rp1.112/hari</td></tr><tr><td>Rp100.000</td><td>60 hari</td><td>Rp1.667/hari</td></tr><tr><td>Rp150.000</td><td>90 hari</td><td>Rp1.667/hari</td></tr><tr><td>Rp200.000</td><td>90 hari</td><td>Rp2.223/hari</td></tr><tr><td>Rp300.000</td><td>90 hari</td><td>Rp3.334/hari</td></tr><tr><td>Rp500.000</td><td>90 hari</td><td>Rp5.556/hari</td></tr><tr><td>Rp1.000.000</td><td>90 hari</td><td>Rp11.112/hari</td></tr></tbody></table>
+<blockquote>
+<p>07 Maret 2022</p>
+</blockquote>
+<ol>
+<li>Pembelian Pulsa<!-- -->
+<ol>
+<li>Non Akumulasi</li>
+<li>Mulai efektif: 13 Mei 2022</li>
+</ol>
+</li>
+<li>Pembelian Paket (Kuota Data, Telepon, SMS, dsb.)<!-- -->
+<ol>
+<li>Non Akumulasi</li>
+</ol>
+</li>
+<li>Pembelian Paket Perpanjang Masa Aktif<!-- -->
+<ol>
+<li>Akumulasi</li>
+<li>Maksimal 365 hari.</li>
+</ol>
+</li>
+<li>Menerima Hadiah<!-- -->
+<ol>
+<li>Non Akumulasi (Mengikuti aktif terpanjang)</li>
+</ol>
+</li>
+</ol>
+<p>Perpanjang selama 30 hari, apabila ada pemakaian pulsa (Dimulai 13 Mei hingga 30 Jul 2022):</p>
+<ul>
+<li>AS/LOOP<!-- -->
+<ul>
+<li>Minimal Rp1,-</li>
+</ul>
+</li>
+<li>SIMPATI<!-- -->
+<ul>
+<li>Minimal Rp1.000,-</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="smartfren">Smartfren<a href="https://kaesa.charapon.my.id/blog/2023/11/05/sim-card#smartfren" class="hash-link" aria-label="Direct link to Smartfren" title="Direct link to Smartfren">​</a></h2>
+<p>Beli paket yang 1 tahun saja cukup.</p>]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[WSL (Windows Subsystem for Linux)]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2023/10/07/wsl</id>
+        <link href="https://kaesa.charapon.my.id/blog/2023/10/07/wsl"/>
+        <updated>2023-10-07T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Cara Instalasi]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="cara-instalasi">Cara Instalasi<a href="https://kaesa.charapon.my.id/blog/2023/10/07/wsl#cara-instalasi" class="hash-link" aria-label="Direct link to Cara Instalasi" title="Direct link to Cara Instalasi">​</a></h2>
+<ul>
+<li>Buka <strong>Turn Windows: feature on or off</strong>
+<img loading="lazy" alt="Search Turn Windows: feature on or off" src="https://kaesa.charapon.my.id/assets/images/search-windows-feature-d774586772029c5ce41d746aae148250.png" width="788" height="647" class="img_ev3q"></li>
+</ul>
+<p><img loading="lazy" alt="Turn Windows: feature on or off" src="https://kaesa.charapon.my.id/assets/images/windows-feature-fdaaaf5776d57c3a6c113daa540f9537.png" width="411" height="723" class="img_ev3q"></p>
+<p>Pada gambar <strong>Windows Feature</strong> di atas Anda aktifkan fitur:</p>
+<ul class="contains-task-list containsTaskList_mC6p">
+<li>
+<p>[-] Virtual Machine Platform</p>
+</li>
+<li>
+<p>[-] Windows Subsystem for Linux</p>
+</li>
+<li class="task-list-item">
+<p><input type="checkbox" disabled=""> <!-- -->Hyper-V (Tidak wajib diaktifkan jika menggunakan <code>WSL2</code>)</p>
+</li>
+<li>
+<p>Selanjutnya membuka <code>Terminal</code> &gt; <code>PowerShell</code> &gt; <code>Run as Administator</code></p>
+</li>
+<li>
+<p>Pada <code>PowerShell</code> ketik perintah berikut:</p>
+</li>
+</ul>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">wsl </span><span class="token operator" style="color:hsl(221, 87%, 60%)">--</span><span class="token plain">install</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">wsl </span><span class="token operator" style="color:hsl(221, 87%, 60%)">--</span><span class="token plain">list </span><span class="token operator" style="color:hsl(221, 87%, 60%)">--</span><span class="token plain">online</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain">wsl </span><span class="token operator" style="color:hsl(221, 87%, 60%)">--</span><span class="token plain">install </span><span class="token operator" style="color:hsl(221, 87%, 60%)">-</span><span class="token plain">d Ubuntu-22</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">.</span><span class="token plain">04 </span><span class="token comment" style="color:hsl(230, 4%, 64%)"># Untuk install distro Ubuntu 22.04 LTS</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p><img loading="lazy" alt="Windows PowerShell" src="https://kaesa.charapon.my.id/assets/images/windows%20powershell-e5567fbf70642e23009b58d987cd2c0f.png" width="701" height="568" class="img_ev3q"></p>
+<ul>
+<li>Tunggu instalasinya</li>
+<li>Setelah itu Anda akan dimintai untuk mengisi username (saran huruf kecil semua jangan KAPITAL) dan password yang mudah Anda ketik karena WSL ini biasanya Anda pakai sendiri.</li>
+</ul>
+<div class="language-powershell codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-powershell codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token plain"> wsl </span><span class="token operator" style="color:hsl(221, 87%, 60%)">--</span><span class="token function" style="color:hsl(221, 87%, 60%)">set-default</span><span class="token plain"> Ubuntu-22</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">.</span><span class="token plain">04</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <category label="guide" term="guide"/>
+        <category label="windows-10" term="windows-10"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Windows Installation]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2023/08/13/windows-installation</id>
+        <link href="https://kaesa.charapon.my.id/blog/2023/08/13/windows-installation"/>
+        <updated>2023-08-13T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[PC Information]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="pc-information">PC Information<a href="https://kaesa.charapon.my.id/blog/2023/08/13/windows-installation#pc-information" class="hash-link" aria-label="Direct link to PC Information" title="Direct link to PC Information">​</a></h2>
+<ul>
+<li>Nama Initial:<!-- -->
+<ul>
+<li>❌ Kaesa Lyrih<br>
+<!-- -->Takutnya nanti path-nya user jadi <code>Kaesa Lyrih</code>, jika path user terdapat <code>spasi</code> nanti akan berdampak <code>⚠ Warning</code> pada saat membuat project <code>Android Studio</code>. Jadi pastikan usernya disesuaikan sejak awal.</li>
+<li>✅ kaesa<br>
+<!-- -->Nanti path usernya menjadi <code>kaesa</code>.</li>
+</ul>
+</li>
+<li>Partisi Disk<!-- -->
+<ul>
+<li>C: System Windows 10</li>
+<li>D: Development<br>
+<!-- -->Sebaiknya <code>XAMPP</code> di taruh dipasang disini. Dan tentunya data file dan folder proyek simpan pada disk ini. Jika <code>XAMPP</code> dipasang pada disk <code>C:</code> sebaiknya jalankan dalam mode <code>Run as Administator</code>.<br>
+<!-- -->Pada disk ini bisa juga digunakan untuk menyimpan file <code>Google Drive</code>.<!-- -->
+<ul>
+<li><code>D:\GoogleDrive</code> : jangan lupa dihidden</li>
+<li><code>D:\Projects</code> : berisi proyek misal<!-- -->
+<ul>
+<li><code>D:\Projects\Laravel\belajar_laravel_oop</code></li>
+<li><code>D:\Projects\Flutter\kaesa_inventory</code></li>
+<li><code>D:\Projects\NextJS\backend_kaesa_inventory</code></li>
+<li>dst.</li>
+</ul>
+</li>
+<li><code>D:\Program File</code> : untuk menyimpan <code>XAMPP</code> dan program lainnya yang membutuhkan akses <code>Run as Administator</code>.</li>
+</ul>
+</li>
+<li>E: Data<br>
+<!-- -->Untuk menyimpan file seperti <code>Anime</code>, <code>Music Videos</code>, <code>Program</code>, data dari <code>Android</code>, dsb.</li>
+<li>Pasang perangkat lunak paling sering digunakan<!-- -->
+<ul>
+<li>Microsoft Office Home and Student 2019/2021</li>
+<li>Direct-X 12</li>
+<li>Microsoft C++ dari 2005 sampai 2021/sekarang</li>
+<li>Update Driver/Windows Update, terutama driver printer yang sering terlupakan.</li>
+<li>Google Drive for Windows</li>
+<li>QTTabBar, jika Windows 10, belum menguji windows 11.</li>
+<li>Home Dev, khusus Windows 11</li>
+<li>Setting Browser semua Profile yang dibutuhkan [Kaesa, Utama, Organisasi/Sekolah]</li>
+</ul>
+</li>
+<li>Sementara itu dulu...</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="daftar-perangkat-lunak">Daftar Perangkat Lunak<a href="https://kaesa.charapon.my.id/blog/2023/08/13/windows-installation#daftar-perangkat-lunak" class="hash-link" aria-label="Direct link to Daftar Perangkat Lunak" title="Direct link to Daftar Perangkat Lunak">​</a></h2>
+<table><thead><tr><th>Nama</th><th>Keterangan</th><th>Harga</th></tr></thead><tbody><tr><td>Windows 10/11 Pro</td><td>Tentunya OS Windowsnya</td><td>Include Laptop</td></tr><tr><td>Microsoft Office Home and Student 2019/2021</td><td>Yaa biasalah</td><td>Include Laptop or Buy</td></tr><tr><td>Microsoft Visual Studio Code</td><td>Development</td><td>Open Source</td></tr><tr><td>Chrome</td><td>Browser</td><td>Free</td></tr><tr><td>Edge</td><td>Browser</td><td>Free</td></tr><tr><td>Figma</td><td>Development</td><td>Free &amp; Pay</td></tr><tr><td>Notion</td><td>Productivity</td><td>Free &amp; Pay</td></tr><tr><td>Discord</td><td>Social Media</td><td>Free &amp; Pay</td></tr><tr><td>WhataApp</td><td>Social Media</td><td>Free &amp; Pay</td></tr><tr><td>Git Bash</td><td>Development</td><td>Free</td></tr><tr><td>Revo Uninstaller Pro</td><td>Tools</td><td>Pay</td></tr><tr><td>Internet Download Manager</td><td>Tools</td><td>Pay</td></tr><tr><td>Adobe</td><td>Media</td><td>Pay</td></tr><tr><td>PowerToys</td><td>Tools</td><td>Open Source</td></tr><tr><td>PostgreSQL</td><td>Development</td><td>Open Source</td></tr><tr><td>XAMPP</td><td>Development</td><td>Open Source</td></tr><tr><td>Logi Options</td><td>Tools, Mouse</td><td>Free when Buy Mouse Logitec</td></tr><tr><td>Cisco Packet Tracer</td><td>Networking</td><td>??</td></tr><tr><td>Java Development Kit (JDK)</td><td>Development</td><td>Free or Pay</td></tr><tr><td>Google Drive Desktop</td><td>Storage</td><td>Free</td></tr><tr><td>Epic</td><td>Game</td><td>Free</td></tr><tr><td>Steam</td><td>Game</td><td>Free</td></tr><tr><td>Asobimo Game Toram</td><td>Game</td><td>Free</td></tr><tr><td>Obsidian</td><td>Productivity</td><td>Open Source</td></tr><tr><td>VM Virtual Box</td><td>Networking</td><td>Free</td></tr><tr><td>EaseUS Partition Master</td><td>Tools</td><td>???</td></tr><tr><td>WinX HD Video Converter Deluxe</td><td>Media, Tools</td><td>???</td></tr><tr><td>Postman</td><td>Development</td><td>Free</td></tr><tr><td>Python</td><td>Development</td><td>Free</td></tr><tr><td>PotPlayer</td><td>Media</td><td>Free</td></tr><tr><td>Telegram Desktop</td><td>Social Media</td><td>Free</td></tr><tr><td>Insomnia</td><td>Development, Alternative Postman</td><td>Free</td></tr><tr><td>OBS Studio</td><td>Media</td><td>Free</td></tr><tr><td>CodeBlocks</td><td>Development, IDE</td><td>Free</td></tr><tr><td>Epson Driver</td><td>Tools, Drier Printer</td><td>Free</td></tr><tr><td>Direct X</td><td>Game, Development</td><td>Free</td></tr><tr><td>MiniTool Partition Wizart</td><td>Development</td><td>???</td></tr><tr><td>NodeJS</td><td>Development</td><td>Free</td></tr><tr><td>Node Version Manager (NVM for Windows)</td><td>Development, Install ini daripada NodeJS</td><td>Free</td></tr><tr><td>Android Studio</td><td>Development, IDE</td><td>Free</td></tr><tr><td>Equalizer APO</td><td>Media</td><td>Free</td></tr><tr><td>CrystalDiskInfo</td><td>Tools</td><td>Free</td></tr><tr><td>CrystalDiskMark</td><td>Tools</td><td>Free</td></tr><tr><td>ZeroTier One</td><td>Networking</td><td>Free</td></tr><tr><td>VB Cable</td><td>Tools, Media, The Virtual Audo Cable</td><td>Free</td></tr><tr><td>Gif Recorder</td><td>Media</td><td>Free</td></tr><tr><td>Emby Server</td><td>Networking</td><td>Free</td></tr><tr><td>scrcpy (Screen Copy)</td><td>Development</td><td>Free</td></tr><tr><td>Free File Sync</td><td>Tools</td><td>Free</td></tr><tr><td>WingetUI</td><td>Development, Tools</td><td>Free</td></tr><tr><td>Notepad++</td><td>Development</td><td>Free</td></tr><tr><td>Sparx EA (Enterpice Architecture)</td><td>Development</td><td>Pay</td></tr><tr><td>Pichon</td><td>Development</td><td>Pay</td></tr><tr><td>TeamViewer</td><td>Networking</td><td>Free</td></tr><tr><td>Anidesk</td><td>Networking</td><td>Free</td></tr><tr><td>Mendeley</td><td>Productivity</td><td>Free</td></tr><tr><td>Handbreak</td><td>Media</td><td>Free</td></tr><tr><td>Winbox</td><td>Networking</td><td>Free</td></tr><tr><td>Peace</td><td>Media</td><td>Free</td></tr><tr><td>QTTabBar</td><td>Tools</td><td>Free</td></tr><tr><td>Brave</td><td>Browser</td><td>Free</td></tr></tbody></table>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <category label="guide" term="guide"/>
+        <category label="windows-10" term="windows-10"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Organization File and Folder]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2023-05-24-organization-file-and-folder</id>
+        <link href="https://kaesa.charapon.my.id/blog/2023-05-24-organization-file-and-folder"/>
+        <updated>2023-05-24T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Ringkasan]]></summary>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="ringkasan">Ringkasan<a href="https://kaesa.charapon.my.id/blog/2023-05-24-organization-file-and-folder#ringkasan" class="hash-link" aria-label="Direct link to Ringkasan" title="Direct link to Ringkasan">​</a></h2>
+<p>Berikut adalah beberapa tips pengelolaan file yang efisien:</p>
+<p><strong>1. Strukturkan File dengan Hierarki Folder</strong></p>
+<ul>
+<li>Maksimalkan penggunaan folder untuk mengorganisir file.</li>
+<li>Batasi jumlah subfolder menjadi level 5 untuk mencegah kebingungan.</li>
+</ul>
+<p><strong>Contoh Implementasi:</strong></p>
+<ul>
+<li>Buat folder utama untuk setiap kategori utama, misalnya "Pekerjaan", "Pribadi", "Proyek", dll.</li>
+<li>Di dalam setiap folder utama, buat subfolder untuk kategori yang lebih spesifik, seperti "Pekerjaan &gt; Proyek X &gt; Dokumen", "Pribadi &gt; Foto &gt; Liburan", dll.</li>
+</ul>
+<p><strong>2. Beri Nama yang Jelas dan Konsisten</strong></p>
+<ul>
+<li>Berikan nama file yang deskriptif dan singkat.</li>
+<li>Gunakan format penamaan yang konsisten untuk mempermudah pencarian.</li>
+</ul>
+<p><strong>Contoh Implementasi:</strong></p>
+<ul>
+<li>Gunakan format seperti "Tahun-Bulan-Hari_NamaDeskriptif" untuk file yang terkait dengan tanggal, misalnya "2023-01-15_RencanaPesta".</li>
+<li>Jangan menggunakan nama file yang umum atau ambigu seperti "Dokumen1" atau "Catatan".</li>
+</ul>
+<p><strong>3. Gunakan Fitur Pencarian dan Filter</strong></p>
+<ul>
+<li>Manfaatkan fitur pencarian bawaan pengelola file untuk menemukan file dengan cepat.</li>
+<li>Gunakan filter untuk menyempitkan hasil pencarian.</li>
+</ul>
+<p><strong>Contoh Implementasi:</strong></p>
+<ul>
+<li>Di Google Drive, gunakan operator pencarian seperti "type<!-- -->:presentation<!-- -->" untuk mencari file slide Google.</li>
+<li>Gunakan filter "People" untuk mencari file yang telah dibagikan oleh orang tertentu.</li>
+</ul>
+<p><strong>4. Tambahkan Kata Kunci ke File atau Folder</strong></p>
+<ul>
+<li>Tambahkan kata kunci relevan ke deskripsi atau komentar file/folder.</li>
+<li>Gunakan kata kunci saat mencari file untuk hasil yang lebih spesifik.</li>
+</ul>
+<p><strong>Contoh Implementasi:</strong></p>
+<ul>
+<li>Tambahkan kata kunci seperti "grad" dan "Power" ke deskripsi file yang relevan.</li>
+<li>Cari kata kunci "Empower" untuk menemukan file yang terkait.</li>
+</ul>
+<p><strong>5. Prioritaskan File dengan Bintang atau Tanda Flag</strong></p>
+<ul>
+<li>Gunakan fitur bintang atau tanda flag untuk menandai file yang penting atau sering digunakan.</li>
+<li>Batasi jumlah file yang diberi bintang agar tetap terorganisir.</li>
+</ul>
+<p><strong>Contoh Implementasi:</strong></p>
+<ul>
+<li>Beri bintang pada file yang digunakan setiap hari atau perlu diakses dengan cepat.</li>
+<li>Gunakan batasan 5 file yang diberi bintang agar tetap terfokus.</li>
+</ul>
+<p><strong>Catatan:</strong></p>
+<ul>
+<li>Penerapan tips ini bergantung pada platform dan preferensi masing-masing pengguna.</li>
+<li>Pilihan pengelolaan file dapat disesuaikan dengan kebutuhan dan alat yang digunakan.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="jeff-zu">Jeff Zu<a href="https://kaesa.charapon.my.id/blog/2023-05-24-organization-file-and-folder#jeff-zu" class="hash-link" aria-label="Direct link to Jeff Zu" title="Direct link to Jeff Zu">​</a></h2>
+<p>Ketika pertama kali memasuki dunia kerja, ini adalah tampilan pengelolaan file saya. Sejak itu, saya telah mencoba segalanya mulai dari "Ya udah, gak masalah kalau berantakan, tinggal cari aja, bro" hingga "Pernah dengar tentang Sistem Johnny Decimal, ya? Jadi, pertama-tama kamu harus menghafal struktur penomoran yang tidak rumit ini, lalu kamu harus menentukan kategori-kategori yang kamu buat." Tapi kemudian saya menemukan jawaban yang tepat dengan menciptakan keseimbangan yang sehat antara bentuk (seberapa rapi segala sesuatunya terorganisir) dan fungsi (bagaimana cara memberi nama pada file agar mudah dicari). Dalam video ini, kita akan membahas kerangka kerja sederhana yang saya gunakan untuk mengorganisir dan memberi nama pada file saya, serta lima tips pengelolaan file yang sangat bermanfaat. Mari kita mulai.</p>
+<p>Dari segi hierarki file, saya membatasi jumlah tingkat folder maksimum hingga lima, yang berarti tingkat keenam hanya berisi file dan dokumen tanpa ada folder lagi. Namun, setiap tingkat dapat memiliki hingga 99 folder. Misalnya, inilah yang saya lihat pada tingkat nol di Google Drive saya. Kita akan membahas mengapa saya memilih hal ini dalam waktu singkat. Ini adalah tingkat satu, tingkat dua, tingkat tiga, tingkat empat, dan tingkat lima, serta file-filenya. Tentu saja, kamu tidak perlu memiliki lima tingkat, tapi jika lebih dari lima, kita cenderung menjadi bingung. Alasan mengapa setiap tingkat dapat memiliki hingga 99 folder adalah karena penomoran dari nol sampai 99, tapi seperti yang bisa kamu lihat, saya jarang melebihi angka 09. Folder yang saya akses paling sering memiliki angka lebih rendah seperti 01, 02, dan 03 karena mereka berada lebih dekat dengan bagian atas. Angka 99 selalu saya simpan untuk folder arsip di mana saya menyimpan file-file yang sudah tidak digunakan lagi. Namun, saya masih enggan menghapusnya.</p>
+<p>Selanjutnya, bagaimana saya memberi nama pada folder dan dokumen. Ada dua cara yang saya gunakan. Pertama, saya bisa menyertakan tanggal atau meninggalkannya untuk diurutkan secara alfabetis. Contoh penggunaan tanggal dalam penamaan adalah saat dokumen hanya memerlukan tahun seperti "2025 Budget Spreadsheet". Jika ingin lebih spesifik, kita bisa menambahkan kuartal seperti "2025 Q1 Quarterly Business Review". Di tingkat yang lebih rinci, bisa ditambahkan bulan seperti "2025 May Monthly Presentation with Director", dan paling rinci adalah dengan menyertakan tanggal seperti "2025-0505 Inbox Zero Training for the Sales Team". Penamaan dengan tanggal tergantung pada jenis file. Sebagai aturan umum, hanya menyertakan tahun atau kuartal dapat membuat file lebih mudah dicari. Misalnya, "Saya pikir kita sudah membahas ini dalam presentasi Q3, biarkan saya cari dengan cepat" dibandingkan dengan semakin rinci penamaan dengan bulan dan tanggal, semakin banyak yang harus kita ketahui tentang folder induk agar dapat menemukan file yang spesifik. Misalnya, saya sering mengadakan workshop, dan meskipun saya tidak mengingat tanggal untuk setiap workshop, saya tahu bahwa semua workshop berada dalam folder "Jeff's Sharings". Contoh lain adalah untuk faktur dan kwitansi. Kita tidak akan mencari satu per satu, tetapi kita harus tahu di mana mereka berada. Untuk semua folder dan file yang tidak terkait dengan waktu dan memiliki tingkat penting yang sama, seperti tanpa angka 01, 02, 03, saya tinggalkan mereka untuk diurutkan secara alfabetis, tapi yang penting adalah konsisten dalam penamaannya agar dokumen tersebut mudah dicari. Misalnya, sebagian besar file saya memiliki salah satu kata kunci berikut: "doc", "meeting notes", "working tricks", "briefing slides", atau "form". Jadi, sebanyak 90% waktu jika saya menempatkan nama proyek dan salah satu kata kunci tersebut, saya dapat menemukan file yang saya inginkan.</p>
+<p>Ada beberapa konvensi penamaan yang berbeda, dan masing-masing memiliki struktur yang berbeda, tetapi semuanya berfungsi dengan baik karena saya mengikuti struktur yang sama untuk semua file saya. Matthew, yang hebat, menggunakan konvensi penamaan yang agak lebih rumit, tetapi itu berfungsi untuknya karena dia mengikuti struktur yang sama untuk semua file. Tidak ada cara yang benar atau salah dalam hal ini, karena kita mengatur ruang digital kita sendiri.</p>
+<p>Selain itu, saya ingin membicarakan produk-produk dari Okiwood yang saya gunakan untuk membersihkan ruang fisik saya. Mereka menjadi sponsor video ini, tetapi saya akan membahasnya karena saya benar-benar menyukai lini produk Magsafe mereka yang terbaru. Saya sangat suka dengan Shelf Mount mereka karena saya bisa memasangnya di mana saja dengan tepi dan menyembunyikan kabel-kabel di bawah permukaan. Saya memiliki satu di dekat pintu depan bersama dengan stand Apple Watch yang sangat nyaman, dan saya memiliki satu lagi di meja saya agar telepon selalu ada di dekat tanpa harus memakan ruang meja. Selain itu, semua produk mereka memiliki sertifikasi FSC yang berarti kayu yang digunakan diperoleh dari hutan yang dikelola secara berkelanjutan, dan ini menjamin bahwa tidak ada bahan lain yang tercampur secara tidak sengaja dalam produk akhir. Tapi sekarang, kembali ke dunia digital.</p>
+<p>Tips pengelolaan file yang paling bermanfaat dan mengubah permainan datang dari David Allen, yaitu mengorganisir informasi berdasarkan di mana kita akan menggunakannya, bukan di mana kita menemukannya. Misalnya, jika kamu memiliki beberapa proyek di tempat kerja, sebaiknya jangan memiliki folder terpisah untuk semua catatan rapat proyek, meskipun terlihat rapi dan teratur. Sebaiknya kamu memiliki dokumen catatan rapat proyek dalam folder proyek itu sendiri, karena di sanalah kamu kemungkinan besar akan menggunakannya. Kamu membuka folder proyek dan semua dokumen terkait berada di dalamnya.</p>
+<p>Tips pengelolaan file kedua adalah memanfaatkan fitur bawaan pengelola file. Untuk Google Drive, ini berarti kamu dapat menggunakan operator pencarian seperti "type<!-- -->:presentation<!-- -->" untuk mencari cepat file slide Google atau jika itu bukan pilihanmu, lakukan pencarian biasa kemudian gunakan filter untuk menyempitkan hasil pencarian. Tips lanjutan, jika kamu ingin dengan cepat menemukan file yang kamu tahu telah dibagikan denganmu, pergi ke tab "Shared with me" dan masukkan nama atau alamat email pemilik file di bawah filter "People", karena biasanya kita ingat orang yang telah membagikan file tersebut kepada kita. Bagi pengguna Mac, saya sangat merekomendasikan menginstal Alfred atau Raycast, keduanya gratis. Saya memiliki tutorial lengkap tentang cara menggunakan Alfred. Bagi pengguna Windows, saya tidak pernah mencobanya, tetapi saya mendengar bahwa Everything, Listery, dan Wox adalah aplikasi pengelola file yang bagus. Meskipun begitu, saya tetap menggunakan Google Drive.</p>
+<p>Tips pengelolaan file ketiga adalah menambahkan kata kunci ke file atau folder. Misalnya, jika seseorang membagikan folder dengan saya dan saya tidak dapat mengubah namanya, saya bisa menekan "D" untuk membuka tab "Details", lalu menambahkan kata kunci di bagian deskripsi. Sekarang, jika saya mencari kata kunci "grad" dan "Power", hanya beberapa hasil yang ditampilkan. Jika saya mencari "Empower", yang merupakan bagian dari nama folder, akan muncul lebih banyak hasil. Pro tip, jika kamu tidak mengetahui ini sebelumnya, saya merekomendasikan penggunaan pintasan keyboard. Dua pintasan yang sering saya gunakan di Google Drive adalah "P" untuk melihat pratinjau file tanpa membukanya, dan "N" untuk mengubah nama file daripada klik kanan dan pilih "Rename".</p>
+<p>Pro tip untuk pengguna Mac, kamu dapat membuka tampilan detail folder dengan menekan Command + I, dan kamu dapat menambahkan kata kunci di kolom komentar. Sekarang kamu dapat mencarinya secara langsung menggunakan Alfred, Raycast, atau Spotlight. Saya yakin ada hal serupa untuk pengguna Windows juga, jadi pengguna Windows, beri tahu saya di komentar.</p>
+<p>Tips pengelolaan file keempat adalah dengan tegas memprioritaskan folder mana yang harus diberi bintang atau tanda flag. Untuk semua platform, ada cara untuk menandai file agar bisa diakses dengan cepat dari sidebar. Tetapi agar file bisa masuk ke sini, harus lulus tiga tes. Pertama, saya harus menggunakannya setiap hari. Kedua, saya harus bisa mengaksesnya dengan cepat di telepon saya karena ada tab "Start" di sana juga. Dan ketiga, saya hanya boleh memiliki maksimal 5 file yang diberi bintang pada saat yang bersamaan. Karena jika semuanya diberi bintang, maka tidak ada yang diberi bintang.</p>
+<p>Tips pengelolaan file kelima adalah mengetahui kapan harus membuat pintasan. Setiap kali seseorang membagikan folder denganmu di platform penyimpanan awan, kamu harus segera mengambil salah satu dari tiga tindakan. Pertama, membuat salinan file. Kedua, menambahkan pintasan ke file asli. Ketiga, tidak melakukan apa-apa. Saya merekomendasikan tindakan pertama karena kita tidak memiliki kendali atas apa yang dilakukan orang lain. Pada dasarnya, kamu ingin mengontrol salinan file, bukan file aslinya. Pada akhirnya, jika file tersebut terhapus atau berubah, kamu masih memiliki salinannya dan kamu dapat memilih untuk menyimpannya atau menghapusnya jika tidak perlu lagi.</p>
+<p>Itulah lima tips pengelolaan file yang sangat bermanfaat menurut pengalaman saya. Saya harap tips ini dapat membantu kamu dalam mengatur dan mencari file dengan lebih efisien.</p>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <category label="produktif" term="produktif"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Ward and Peppard]]></title>
+        <id>https://kaesa.charapon.my.id/blog/2023/04/10/ward-end-peppard</id>
+        <link href="https://kaesa.charapon.my.id/blog/2023/04/10/ward-end-peppard"/>
+        <updated>2023-04-10T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Metode Ward and Peppard adalah salah satu metode yang digunakan dalam perencanaan strategis sistem informasi [PSSI] yang dikembangkan oleh Ward dan peppard pada tahun 1992.]]></summary>
+        <content type="html"><![CDATA[<p>Metode Ward and Peppard adalah salah satu metode yang digunakan dalam perencanaan strategis sistem informasi [PSSI] yang dikembangkan oleh Ward dan peppard pada tahun 1992.</p>
+<p>Metode ini merupakan salah satu pendekatan yang terstruktur dan sistematis dalam merencanakan strategis sistem informasi yang berfokus pada pengembangan sistem informasi yang sesuai dengan kebutuhan bisnis dan strategi organisasi.</p>
+<p>Metode <code>Ward and Peppard</code> terdiri dari empat tahap utama, yaitu:</p>
+<ol>
+<li>Understanding the Business Environment<br>
+<!-- -->Pada tahap ini bertujuan untuk memahami lingkungan bisnis dan strategi organisasi secara mendalam. Pada tahap ini, perlu dilakukan analisis terhadap kebutuhan bisnis, tujuan organisasi, kondisi industri, dan faktor-faktor lain yang dapat mempengaruhi pengembangan sistem informasi.</li>
+<li>Assesing the Current and Future IS Capabilities<br>
+<!-- -->Pada tahap ini bertujuan untuk melakukan evaluasi terhadap sistem informasi yang sudah ada dan menilai kemampuan sistem informasi yang dikembangkan di masa depan. Pada tahap ini, dilakukan analisis SWOT (strengths, weaknesses, opportunities, and threats) untuk menentukan kekuatan, dan kelemahan sistem informasi yang sudah ada dan mengevaluasi peluang dan ancaman untuk pengembangan sistem informasi yang baru.</li>
+<li>Defening the IS Strategy<br>
+<!-- -->Pada tahap ini bertujuan untuk merumuskan strategi sistem informasi yang sesuai dengan kebutuhan bisnis dan strategi organisasi. Pada tahap ini, dilakukan pemilihan alternatif strategi sistem informasi dan menentukan prioritas dan rencana tindakan yang harus diambil untuk mengimplementasikan strategi tersebut.</li>
+<li>Implementing the IS Strategy<br>
+<!-- -->Pada tahap ini bertujuan untuk mengimplementasikan strategi sistem informasi yang telah dirumuskan pada tahap sebelumnya. Pada tahap ini, dilakukan pengembangan sistem informasi, pengujian, pelatihan pengguna, dan implementasi sistem informasi secara penuh.</li>
+</ol>]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Kulino]]></title>
+        <id>https://kaesa.charapon.my.id/blog/kulino</id>
+        <link href="https://kaesa.charapon.my.id/blog/kulino"/>
+        <updated>2023-03-14T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Kulino (Kuliah Online) adalah sistem manajemen pembelajaran (learning manajemen system) lms] yang dibuat dengan menggunakan [moodle dan dikembangkan oleh UDINUS.]]></summary>
+        <content type="html"><![CDATA[<p>Kulino (Kuliah Online) adalah sistem manajemen pembelajaran (learning manajemen system) [lms] yang dibuat dengan menggunakan <a href="https://moodle.org/" target="_blank" rel="noopener noreferrer">moodle</a> dan dikembangkan oleh UDINUS.</p>
+<p>Disini saya membahas cara memodifikasi kulino seminimalis berdasarkan selera saya.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tampilan-kulino">Tampilan Kulino<a href="https://kaesa.charapon.my.id/blog/kulino#tampilan-kulino" class="hash-link" aria-label="Direct link to Tampilan Kulino" title="Direct link to Tampilan Kulino">​</a></h2>
+<table><thead><tr><th>Default</th><th>Modify</th></tr></thead><tbody><tr><td><img loading="lazy" alt="Home Default" src="https://kaesa.charapon.my.id/assets/images/home-default-57eb99a74c27ee0646d25dc066e48e64.png" width="1366" height="617" class="img_ev3q"></td><td><img loading="lazy" alt="Home Kaesa" src="https://kaesa.charapon.my.id/assets/images/home-kaesa-fe3f05f8ee64089fbeaefa607890c7c3.png" width="1366" height="617" class="img_ev3q"></td></tr><tr><td><img loading="lazy" alt="My Default" src="https://kaesa.charapon.my.id/assets/images/my-default-4b523669594bc788ba2eed82407fcc3f.png" width="1366" height="619" class="img_ev3q"></td><td><img loading="lazy" alt="My Kaesa" src="https://kaesa.charapon.my.id/assets/images/my-kaesa-c6423c2ff401f78340f7cd2b9dcfe009.png" width="1366" height="618" class="img_ev3q"></td></tr></tbody></table>
+<p>Dapat dilihat tampilan yang saya berikan lumayan minimalis:</p>
+<ul>
+<li>Mengurangi mouse scroll. <em>jika benar dalam <code>custom this page</code></em></li>
+<li>Rounded card.</li>
+<li>Image background.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="tutorial">Tutorial<a href="https://kaesa.charapon.my.id/blog/kulino#tutorial" class="hash-link" aria-label="Direct link to Tutorial" title="Direct link to Tutorial">​</a></h2>
+<ul>
+<li>🧩 Install extension <a href="https://chrome.google.com/webstore/detail/stylish-custom-themes-for/fjnbnpbmkenffdnngjfgmeleoegfcffe" target="_blank" rel="noopener noreferrer">Stylish - Custom themes for any website</a> pada Google Chrome atau browser lainnya.</li>
+<li>🎨 Install style <a href="https://userstyles.org/styles/246522/kulino-dinus" target="_blank" rel="noopener noreferrer">Kulino Udinus</a></li>
+<li>Lalu <code>Custom this Page</code> pada kulino sesuaikan dengan selera kalian.</li>
+<li>Jangan lupa aktifkan extension dan style-nya.</li>
+</ul>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <category label="lms" term="lms"/>
+        <category label="learning management system" term="learning management system"/>
+        <category label="kulino" term="kulino"/>
+        <category label="udinus" term="udinus"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Welcome]]></title>
+        <id>https://kaesa.charapon.my.id/blog/welcome</id>
+        <link href="https://kaesa.charapon.my.id/blog/welcome"/>
+        <updated>2021-08-26T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Docusaurus blogging features are powered by the blog plugin.]]></summary>
+        <content type="html"><![CDATA[<p><a href="https://docusaurus.io/docs/blog" target="_blank" rel="noopener noreferrer">Docusaurus blogging features</a> are powered by the <a href="https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-blog" target="_blank" rel="noopener noreferrer">blog plugin</a>.</p>
+<p>Simply add Markdown files (or folders) to the <code>blog</code> directory.</p>
+<p>Regular blog authors can be added to <code>authors.yml</code>.</p>
+<p>The blog post date can be extracted from filenames, such as:</p>
+<ul>
+<li><code>2019-05-30-welcome.md</code></li>
+<li><code>2019-05-30-welcome/index.md</code></li>
+</ul>
+<p>A blog post folder can be convenient to co-locate blog post images:</p>
+<p><img loading="lazy" alt="Docusaurus Plushie" src="https://kaesa.charapon.my.id/assets/images/docusaurus-plushie-banner-a60f7593abca1e3eef26a9afa244e4fb.jpeg" width="1500" height="500" class="img_ev3q"></p>
+<p>The blog supports tags as well!</p>
+<p><strong>And if you don't want a blog</strong>: just delete this directory, and use <code>blog: false</code> in your Docusaurus config.</p>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <author>
+            <name>Farhan Taqi A</name>
+            <uri>https://github.com/ittggrgfthh</uri>
+        </author>
+        <category label="facebook" term="facebook"/>
+        <category label="hello" term="hello"/>
+        <category label="docusaurus" term="docusaurus"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MDX Blog Post]]></title>
+        <id>https://kaesa.charapon.my.id/blog/mdx-blog-post</id>
+        <link href="https://kaesa.charapon.my.id/blog/mdx-blog-post"/>
+        <updated>2021-08-01T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Blog posts support Docusaurus Markdown features, such as MDX.]]></summary>
+        <content type="html"><![CDATA[<p>Blog posts support <a href="https://docusaurus.io/docs/markdown-features" target="_blank" rel="noopener noreferrer">Docusaurus Markdown features</a>, such as <a href="https://mdxjs.com/" target="_blank" rel="noopener noreferrer">MDX</a>.</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>Use the power of React to create interactive blog posts.</p><div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-background-color:hsl(230, 1%, 98%);--prism-color:hsl(230, 8%, 24%)"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-js codeBlock_bY9V thin-scrollbar" style="background-color:hsl(230, 1%, 98%);color:hsl(230, 8%, 24%)"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:hsl(230, 8%, 24%)"><span class="token operator" style="color:hsl(221, 87%, 60%)">&lt;</span><span class="token plain">button onClick</span><span class="token operator" style="color:hsl(221, 87%, 60%)">=</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">{</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">(</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">)</span><span class="token plain"> </span><span class="token arrow operator" style="color:hsl(221, 87%, 60%)">=&gt;</span><span class="token plain"> </span><span class="token function" style="color:hsl(221, 87%, 60%)">alert</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">(</span><span class="token string" style="color:hsl(119, 34%, 47%)">"button clicked!"</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">)</span><span class="token punctuation" style="color:hsl(119, 34%, 47%)">}</span><span class="token operator" style="color:hsl(221, 87%, 60%)">&gt;</span><span class="token maybe-class-name">Click</span><span class="token plain"> me</span><span class="token operator" style="color:hsl(221, 87%, 60%)">!</span><span class="token operator" style="color:hsl(221, 87%, 60%)">&lt;</span><span class="token operator" style="color:hsl(221, 87%, 60%)">/</span><span class="token plain">button</span><span class="token operator" style="color:hsl(221, 87%, 60%)">&gt;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div><button>Click me!</button></div></div>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <category label="docusaurus" term="docusaurus"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Long Blog Post]]></title>
+        <id>https://kaesa.charapon.my.id/blog/long-blog-post</id>
+        <link href="https://kaesa.charapon.my.id/blog/long-blog-post"/>
+        <updated>2019-05-29T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[This is the summary of a very long blog post,]]></summary>
+        <content type="html"><![CDATA[<p>This is the summary of a very long blog post,</p>
+<p>Use a <code>&lt;!--</code> <code>truncate</code> <code>--&gt;</code> comment to limit blog post size in the list view.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>]]></content>
+        <author>
+            <name>Kaesa Lyrih</name>
+            <uri>https://github.com/lyrihkaesa</uri>
+        </author>
+        <category label="hello" term="hello"/>
+        <category label="docusaurus" term="docusaurus"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[First Blog Post]]></title>
+        <id>https://kaesa.charapon.my.id/blog/first-blog-post</id>
+        <link href="https://kaesa.charapon.my.id/blog/first-blog-post"/>
+        <updated>2019-05-28T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet]]></summary>
+        <content type="html"><![CDATA[<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque elementum dignissim ultricies. Fusce rhoncus ipsum tempor eros aliquam consequat. Lorem ipsum dolor sit amet</p>]]></content>
+        <author>
+            <name>Gao Wei</name>
+            <uri>https://github.com/wgao19</uri>
+        </author>
+        <category label="hola" term="hola"/>
+        <category label="docusaurus" term="docusaurus"/>
+    </entry>
+</feed>

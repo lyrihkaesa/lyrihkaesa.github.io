@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[7368],{42201:s=>{s.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"journal"}')}}]);

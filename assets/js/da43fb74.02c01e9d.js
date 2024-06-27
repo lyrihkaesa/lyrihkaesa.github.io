@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[2150],{10869:a=>{a.exports=JSON.parse('{"label":"kulino","permalink":"/blog/tags/kulino","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[1818],{9482:a=>{a.exports=JSON.parse('{"label":"learning management system","permalink":"/blog/tags/learning-management-system","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);

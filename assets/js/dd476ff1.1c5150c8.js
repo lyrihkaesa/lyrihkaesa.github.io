@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[7410],{34118:a=>{a.exports=JSON.parse('[{"label":"daftarevent","permalink":"/toram/tags/daftarevent","count":1},{"label":"daftarevents","permalink":"/toram/tags/daftarevents","count":1},{"label":"daftareventtoram","permalink":"/toram/tags/daftareventtoram","count":1}]')}}]);

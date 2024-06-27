@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunklyrihkaesa_github=self.webpackChunklyrihkaesa_github||[]).push([[6001],{67348:i=>{i.exports=JSON.parse('{"title":"MinIO","slug":"/category/minio","permalink":"/learning/category/minio","navigation":{"previous":{"title":"Ubuntu","permalink":"/learning/casaos/ubuntu"},"next":{"title":"MinIO","permalink":"/learning/minio/minio-intro"}}}')}}]);
