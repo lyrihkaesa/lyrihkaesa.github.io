@@ -28,10 +28,10 @@ Saya ubah dari `D:\DevTools\laragon\www` ke `D:\Projects\www` karena supaya rapi
 
 ## Menambahkan PHP versi lainnya
 
-🌐 Download link: https://windows.php.net/download#php-8.3-ts-vs16-x64
-🔽 Example link: https://windows.php.net/downloads/releases/php-8.3.4-Win32-vs16-x64.zip
-📚 Extract to `php-8.3.4-Win32-vs16-x64`
-✂ Cut to `D:\DevTools\laragon\bin\php`
+🌐 Download link: https://windows.php.net/download#php-8.3-ts-vs16-x64  
+🔽 Example link: https://windows.php.net/downloads/releases/php-8.3.4-Win32-vs16-x64.zip  
+📚 Extract to `php-8.3.4-Win32-vs16-x64`  
+✂ Cut to `D:\DevTools\laragon\bin\php`  
 
 ![Download PHP](attachments/download-php.png)
 
@@ -39,10 +39,10 @@ Saya ubah dari `D:\DevTools\laragon\www` ke `D:\Projects\www` karena supaya rapi
 
 ## Menambahkan versi NGINX
 
-🌐 Download link: https://nginx.org/en/download.html
-🔽 Example link: https://nginx.org/download/nginx-1.24.0.zip
-📚 Extract here `nginx-1.24.0`
-✂ Cut to `D:\DevTools\laragon\bin\nginx`
+🌐 Download link: https://nginx.org/en/download.html  
+🔽 Example link: https://nginx.org/download/nginx-1.24.0.zip  
+📚 Extract here `nginx-1.24.0`  
+✂ Cut to `D:\DevTools\laragon\bin\nginx`  
 
 ![Download NGINX](attachments/download-nginx.png)
 
@@ -66,29 +66,19 @@ mysql-5.7=https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.39-winx64.zip
 dbeaver=https://dbeaver.io/files/dbeaver-ce-latest-win32.win32.x86_64.zip
 ---
 
-
-
 # Node.js
 *yarn=https://github.com/yarnpkg/yarn/releases/download/v1.22.19/yarn-v1.22.19.tar.gz
 
-
-
 # MongoDB https://www.mongodb.com/download-center/community
 mongodb-4=https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.3.zip
- 
- 
 
 # VS Code
 *code=https://go.microsoft.com/fwlink/?Linkid=850641
  http://127.0.0.1:8090/_/ http://127.0.0.1:8090/_/
 
-
-
 # PostgreSQL
 *postgresql-16=https://get.enterprisedb.com/postgresql/postgresql-16.2-1-windows-x64-binaries.zip
 postgresql-14=https://get.enterprisedb.com/postgresql/postgresql-14.5-1-windows-x64-binaries.zip
-
-
 
 ---
 # Golang
@@ -107,9 +97,9 @@ The procedure entry point nghttp2_option_set_no_rcf9113_leading_and_trailing_ws_
 ```
 
 Solusi download apache versi terbaru:
-🌐 Download link: https://www.apachelounge.com/download/
-📚 Extract to `httpd-2.4.58-240131-win64-VS17` jangan lupa pindahkan folder `bin` dari `./httpd-2.4.58-240131-win64-VS17/Apache24` ke folder `./httpd-2.4.58-240131-win64-VS17` langsung.
-🔽 Example link: https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.58-240131-win64-VS17.zip
+🌐 Download link: https://www.apachelounge.com/download/  
+📚 Extract to `httpd-2.4.58-240131-win64-VS17` jangan lupa pindahkan folder `bin` dari `./httpd-2.4.58-240131-win64-VS17/Apache24` ke folder `./httpd-2.4.58-240131-win64-VS17` langsung.  
+🔽 Example link: https://www.apachelounge.com/download/VS17/binaries/httpd-2.4.58-240131-win64-VS17.zip  
  ![Download Apache](attachments/download-apache.png)
 
 
@@ -121,7 +111,7 @@ ngork update
 
 `app\Http\Middleware\TrustProxies.php`
 
-```php
+```php title="app\Http\Middleware\TrustProxies.php"
 <?php
 
 namespace App\Http\Middleware;
@@ -171,6 +161,6 @@ tunnels:
 ./ngrok.exe start --config=conf/pondokmbodo.yml --region=ap laragon
 ```
 
-```bash
+```bash title="D:/DevTools/laragon/bin/ngrok"
 ngrok start --config=conf/pondokmbodo.yml --region=ap laragon
 ```

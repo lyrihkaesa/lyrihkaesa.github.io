@@ -46,6 +46,15 @@ chown www-data:www-data data/
 
 Default Account
 
-|Username|Password|
-|---|---|
-|`admin`|`app/config/default-creds.txt`|
+| Username | Password                       |
+| -------- | ------------------------------ |
+| `admin`  | `app/config/default-creds.txt` |
+
+
+## MariaDB
+
+Default user: `casaos`  
+Default password: `casaos`  
+Default database: `casaos`
+
+Default root password: `casaos`

@@ -196,3 +196,82 @@ Pemakaian pada `posts/index.blade.php`
 	@endpush
 </x-app-layout>
 ```
+
+
+
+
+## Example Blade Component: `button`
+
+- `resource/views/components/button.blade.php`
+```php 
+<button {{ $attributes
+				->merge([
+					'class' => 'rounded bg-black px-3 text-sm font-semibold text-white shadow-sm hover:bg-gray-500'
+				])
+}}>
+	{{ $slot }}
+</button>
+```
+
+- Penggunaan
+```php
+<x-app-layout>
+	<x-button>Submit</x-button>
+</x-app-layout>
+```
+
+## Snippets Custom for Blade Component
+
+- `xxx\snippets\blade.json`
+```json
+{
+	// ...
+	"Make attribute merge class": {
+		"prefix": "attr:class",
+		"body": [
+			"{{ \\$attributes->merge(['class' => '$1',]) }}"
+		]
+	},
+	"Make attribute merge class unsafe": {
+		"prefix": "attr:class!",
+		"body": [
+			"{!! \\$attributes->merge(['class' => '$1',]) !!}"
+		]
+	},
+	"Make variable $slot": {
+		"prefix": "slotvar",
+		"body": [
+			"{{ \\$slot }}"
+		]
+	}
+}
+```
+
+![snippets blade](attachments/snippets-blade.gif)
+
+## Tailwind Merge Laravel
+
+```bash
+composer require gehrisandro/tailwind-merge-laravel
+```
+
+### Snippets Custom for Blade Component twMarge
+
+- `xxx\snippets\blade.json`
+```json
+{
+	// ...
+	"Make attribute twMerge class": {
+		"prefix": "attr:twclass",
+		"body": [
+			"{{ \\$attributes->twMerge(['class' => '$1',]) }}"
+		]
+	},
+	"Make attribute twMerge class unsafe": {
+		"prefix": "attr:twclass!",
+		"body": [
+			"{!! \\$attributes->twMerge(['class' => '$1',]) !!}"
+		]
+	},
+}
+```
