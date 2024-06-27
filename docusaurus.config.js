@@ -102,6 +102,15 @@ const config = {
           exclude: ['**/exclude/**'],
         },
       ],
+      [
+        '@docusaurus/plugin-content-docs',
+        {
+          id: 'toram',
+          path: 'articles/toram',
+          routeBasePath: 'toram',
+          sidebarPath: require.resolve('./sidebars.js'),
+        },
+      ],
     ],
 
   themeConfig:
@@ -132,7 +141,16 @@ const config = {
             label: 'Belajar',
             position: 'left',
           },
-          { to: '/blog', label: 'Blog', position: 'left' },
+          {
+            to: '/toram/',
+            label: 'Toram',
+            position: 'left',
+          },
+          {
+            to: '/blog',
+            label: 'Blog',
+            position: 'left',
+          },
           {
             href: 'https://github.com/lyrihkaesa',
             label: 'GitHub',
