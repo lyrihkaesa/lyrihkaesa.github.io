@@ -1,0 +1,1 @@
+# 📙 Buku Harian Petualang (Adventurer's Diary)

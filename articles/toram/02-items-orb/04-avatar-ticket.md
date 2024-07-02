@@ -1,0 +1,1 @@
+# 🎟 Karcis Avatar (Avatar Ticket)
