@@ -132,25 +132,25 @@ const config = {
           //   label: "Tutorial",
           // },
           {
-            to: '/course/',
-            label: 'Perkuliahan',
-            position: 'left',
-          },
-          {
             to: '/learning/',
             label: 'Belajar',
             position: 'left',
           },
           {
             to: '/toram/',
-            label: 'Toram',
+            label: 'Toram Online',
             position: 'left',
           },
-          {
-            to: '/blog',
-            label: 'Blog',
-            position: 'left',
-          },
+          // {
+          //   to: '/course/',
+          //   label: 'Perkuliahan',
+          //   position: 'left',
+          // },
+          // {
+          //   to: '/blog',
+          //   label: 'Blog',
+          //   position: 'left',
+          // },
           {
             href: 'https://github.com/lyrihkaesa',
             label: 'GitHub',
@@ -187,12 +187,20 @@ const config = {
             title: 'Lainnya',
             items: [
               {
+                label: 'Belajar',
+                to: '/learning',
+              },
+              {
+                label: 'Toram Online',
+                to: '/toram',
+              },
+              {
                 label: 'Blog',
                 to: '/blog',
               },
               {
-                label: 'Belajar',
-                to: '/learning/',
+                label: 'Perkuliahan',
+                to: '/course',
               },
               {
                 label: 'GitHub',
