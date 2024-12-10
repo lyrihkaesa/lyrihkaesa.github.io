@@ -111,6 +111,12 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
         },
       ],
+      [
+        require.resolve('@cmfcmf/docusaurus-search-local'),
+        {
+          // Options here
+        },
+      ],
     ],
 
   themeConfig:
