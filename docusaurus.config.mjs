@@ -2,6 +2,7 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 import { themes as prismThemes } from 'prism-react-renderer';
+import { remarkKroki } from 'remark-kroki';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -46,6 +47,16 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/',
+          remarkPlugins: [
+            [
+              remarkKroki,
+              {
+                // ...options here
+                alias: ['plantuml'],
+                target: 'mdx3',
+              },
+            ],
+          ],
         },
         blog: {
           showReadingTime: true,
@@ -90,6 +101,17 @@ const config = {
           path: 'articles/learning',
           routeBasePath: 'learning',
           sidebarPath: require.resolve('./sidebars.js'),
+          remarkPlugins: [
+            [
+              remarkKroki,
+              {
+                // ...options here
+                alias: ['plantuml'],
+                target: 'mdx3',
+                server: 'https://kroki.io',
+              },
+            ],
+          ],
         },
       ],
       [
@@ -112,9 +134,10 @@ const config = {
         },
       ],
       [
-        require.resolve('@cmfcmf/docusaurus-search-local'),
+        require.resolve('docusaurus-lunr-search'),
         {
-          // Options here
+          // languages: ['id', 'en'], // language codes
+          highlightResult: true,
         },
       ],
     ],
@@ -124,6 +147,11 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/ksa-logo-gradient-blue.png',
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
       navbar: {
         title: 'Kaesa',
         logo: {
