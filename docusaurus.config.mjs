@@ -3,6 +3,8 @@
 
 import { themes as prismThemes } from 'prism-react-renderer';
 import { remarkKroki } from 'remark-kroki';
+import { remarkCodeExample } from 'remark-code-example';
+import { autoTabs } from 'remark-docusaurus';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -48,6 +50,7 @@ const config = {
           // Remove this to remove the "edit this page" links.
           editUrl: 'https://github.com/lyrihkaesa/lyrihkaesa.github.io/tree/main/',
           remarkPlugins: [
+            // [remarkCodeExample],
             [
               remarkKroki,
               {
@@ -101,7 +104,22 @@ const config = {
           path: 'articles/learning',
           routeBasePath: 'learning',
           sidebarPath: require.resolve('./sidebars.js'),
-          remarkPlugins: [
+          beforeDefaultRemarkPlugins: [
+            [
+              remarkCodeExample,
+              {
+                target: 'mdx3',
+              },
+            ],
+            [
+              autoTabs,
+              {
+                labels: {
+                  plantuml: 'Diagram PlantUML',
+                  'plant-uml': 'Kode PlantUML',
+                },
+              },
+            ],
             [
               remarkKroki,
               {
@@ -248,7 +266,7 @@ const config = {
       prism: {
         theme: prismThemes.oneLight,
         darkTheme: prismThemes.oneDark,
-        additionalLanguages: ['powershell', 'bash', 'php', 'java', 'dart', 'ignore'],
+        additionalLanguages: ['powershell', 'bash', 'php', 'java', 'dart', 'ignore', 'plant-uml'],
       },
     }),
 };
