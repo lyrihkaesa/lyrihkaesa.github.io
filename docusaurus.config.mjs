@@ -204,6 +204,11 @@ const config = {
           //   position: 'left',
           // },
           {
+            href: 'https://discord.gg/z5GUceqyhB',
+            label: 'Discord Comunity',
+            position: 'right',
+          },
+          {
             href: 'https://github.com/lyrihkaesa',
             label: 'GitHub',
             position: 'right',
@@ -232,6 +237,10 @@ const config = {
               {
                 label: 'Facebook Kaesa Toram Online',
                 href: 'https://www.facebook.com/groups/kaesatoramonline',
+              },
+              {
+                label: 'Discord Comunity',
+                href: 'https://discord.gg/z5GUceqyhB',
               },
             ],
           },
