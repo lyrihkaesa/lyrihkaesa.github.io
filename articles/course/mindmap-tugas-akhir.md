@@ -1,0 +1,236 @@
+---
+mindmap-plugin: basic
+---
+
+# Sistem Informasi
+
+## PPSI (Tata Kelola Dan Arsitektur Sistem)
+- Problem + Metode
+	- Perancangan
+		- Arsitektur Enterprise (Enterprise Architecture) [EA]
+			- ZACHMAN {15}
+			- TOGAF ADM {29}
+			- EAP (Enterprise Architecture Planning) {2}
+		- Manajemen Insiden
+			- ITIL V3 {2}
+	- Optimalisasi/Perancangan Ulang
+		- BPI (BUSINESS PROCESS IMPROVEMENT) {2}
+		- PIECES (Performance,Information, Economy, Control, Eficiency and Service)
+	- Perencanaan Strategis
+		- Ward and Peppard {2}
+		- ANNITA CASSIDY
+	- SPK/DSS (Sistem Pendukung Keputusan/Decision Support System)
+		- TOPSIS
+		- WEIGHTED PRODUCT (WP)
+		- Mixed Integer Programming
+	- DESIGN THINKING {2}
+	- CONTINUOUS PROCESS IMPROVEMENT (CPI)
+		- DEMING CYCLE
+	- BUSINESS OBJECT ORIENTED MODELLING (BOOM) {5}
+	- WORKFLOW MANAGEMENT
+	- MANAJEMEN PROSES BISNIS
+	- Business Model Canvas
+	- BPR (Business Process Reengineering) {2}
+	- BUSINESS PROCESS MANAGEMENT {3}
+- Object ^5b8d6c5c-9baa-308e
+	- Sistem Informasi ^71256217-39b7-776a
+		- Pemasaran Layanan
+		- Penjualan {7}
+		- PRAKTEK MAHASISWA KOAS
+		- PENJUALAN DAN PERSEDIAAN BARANG
+		- REKAM MEDIS
+		- PERSEDIAAN PRODUK
+		- AFT FISHING TACKLE
+		- ABSENSI SISWA
+		- DIKLAT
+		- Manajemen Darah
+		- PENJUALAN GARAM BERYODIUM
+		- Penjualan dan Monitoring Barang
+		- KEUANGAN
+		- Simpan Pinjam
+		- MONITORING KARYAWAN
+		- PELAYANAN
+		- Manajemen Pengelolaan Armada
+		- Manajemen Logistik
+		- ADMINISTRASI
+		- CUSTOMER RELATIONSHIP MANAGEMENT
+		- DISTRIBUSI SMART BAWANG MERAH
+	- Proses Bisnis
+		- Pengelolaan Stok Bahan Baku
+		- RESERVASI DAN PENJUALAN
+	- Untuk Pemilihan Artis Dalam Event Konser
+- Subject ^02535592-3500-6064
+	- PADA PT. KARYA BERKAH SENTOSA
+	- PADA CV. SEHATI PATI
+	- PADA RUMAH SAKIT UMUM DAERAH LOEKMONO HADI KUDUS
+	- PADA CV. BANDENG CABUT DURI DINASTI
+	- PADA RUMAH BATIK YULIATI WARNO
+	- PADA TAMAN BUNGA CELOSIA SEMARANG
+	- PADA RSUD. DR LOEKMONO HADI KUDUS
+	- PADA UMKM LAUNDRY DI KOTA SEMARANG
+	- PADA UMKM ASPOO JATENG
+	- Pada Batik Smile Semarang
+	- PADA STUFFBYMS
+	- PADA SMA TAMAN MADYA KABUPATEN PATI
+	- KLINIK FIMA BEAUTY AESTHETIC
+	- PADA RUMAH SAKIT UMUM DAERAH DR.LOEKMONO HADI KUDUS
+	- Pada Unit Donor Darah PMI Kabupaten Kendal
+	- PADA  CV. GARAM MAS DI KOTA REMBANG JAWA TENGAH
+	- Pada Sekolah Menengah Atas 1 Ungaran
+	- PADA COFFEESHOP TRADISINE NGOPI
+	- PADA UD. SIRO ASIH
+	- KANTOR CABANG DENGAN PUSAT PADA PT TRANS PACIFIC
+	- Pada Koperasi Karya Manunggal Semarang
+	- PADA RESTORAN PADANG SAHABAT
+	- PADA THE FARMHILL SEMARANG
+	- DINDUKCAPIL KABUPATEN DEMAK
+	- PADA BLU UPTD TRANS SEMARANG
+	- Pada PT Bintang Jaya Transindo
+	- PADA CAFE SAROENGAN DI KOTA SEMARANG
+	- Pada PT Bintang Jaya Transindo
+	- bidang 1 Pada Bkpp Kota Semarang
+	- PADA BIMBEL CABACA BUTI PEKALONGAN
+	- PADA TOKO SEMBAKO GELIS
+	- PADA PETANI BAWANG MERAH PROVINSI JAWA TENGAH
+
+## Data Analisis
+- Problem + Metode
+	- Analisis
+	Pengembangan Aplikasi
+	Implementasi/Penerapan Algoritma
+	Perancangan
+		- Peramalan/Prediksi (Forecasting)
+			- Vector Autoregressive (VAR)
+			- LONG-SHORT TERM MEMORY (LSTM) {3}
+				- +SEQUENCE TO SEQUENCE
+			- CNN-LSTM
+			- REGRESI LINEAR
+			- NORMALIZED DIFFERENCE VEGETATION INDEX (NDVI)
+		- Klasifikasi (Classification)
+			- Decision Tree
+			- Lexicon Based
+			- Naive Bayes {7}
+				- +SUPPORT VECTOR MACHINE
+			- K-MEANS {3}
+			- FUZZY C-MEANS
+			- LATENT DIRICHLET ALLOCATION (LDA)
+			- KNN (K-NEAREST NEIGHBOR) {3}
+			- APRIORI
+			- CONVOLUTION NEURAL NETWORK (CNN)
+			- SVM
+		- Rekomendasi
+			- Fuzzy Tahani
+			- LIGHTGCN
+			- CONTENT-BASED FILTERING DENGAN FITUR TF-IDF
+		- Face Recognition
+		- AUTOREGRESSIVE INTEGRATED MOVING AVERAGE (ARIMA)
+		- Clustering
+			- AGGLOMERATIVE
+			- SELF ORGANIZING MAP (SOM)
+	- Optimisasi Lokasi
+		- MIXED-INTERGER LINEAR PROGRAMMING
+	- Machine Learning
+		- EXTREME GRADIENT BOOSTING (XGBOOST) {3}
+	- Visualisasi
+		- Business Intelligence Dashboard {2}
+- Object ^dc29a2d8-fef8-2357
+	- Harga Bahan Pangan Bawang
+	- DALAM DIAGNOSA PENYAKIT TUBERKULOSIS
+	- DALAM MENGANALISIS SENTIMEN ULASAN PENGGUNA APLIKASI BSTATION
+	- Aplikasi Penentuan Status Gizi
+	- PENJUALAN PRODUK UMKM
+	- TERHADAP LARANGAN JUAL BELI PADA TIKTOK TAHUN 2023
+	- TRAFIK PENUMPANG PESAWAT
+	- UNTUK PEMETAAN WILAYAH RENTAN KASUS DBD
+	- Aplikasi Productivity Pilot
+	- SENTIMEN E-WALLET OVO
+	- SENTIMEN PENGGUNA YOUTUBE TERHADAP KEBIJAKAN TUTUPNYA TIKTOK-SHOP
+	- PENYAKIT TUBERKULOSIS
+	- UNTUK MENDUKUNG PENGENDALIAN PERSEBARAN PENYAKIT DBD
+	- SENTIMEN PERBANDINGAN TIGA REVIEWER TERHADAP ULASAN SKINCARE
+	- TREN HARGA PENUTUP SAHAM PERBANKAN LQ45
+	- PREDIKSI PERMINTAAN STOK DARAH
+	- ANALISIS DATA TIME SERIES LALU LINTAS PENUMPANG DOMESTIK PESAWAT UDARA
+	- Teknik Oversampling dalam Prediksi Penyakit AIDS
+	- PEMODELAN TOPIK TERHADAP ULASAN SKINCARE
+	- MEMPREDIKSI ANGKA HARAPAN HIDUP MASYARAKAT INDONESIA
+	- SENTIMEN TERHADAP ULASAN MASKER KESEHATAN
+	- SENTIMEN DI TWITTER TERHADAP GIBRAN RAKABUMING SEBAGAI BAKAL CALON WAKIL PRESIDEN 2024
+	- MEMPREDIKSI MASA PANEN
+	- POLA PENJUALAN
+- Subject ^0f64a26c-77c8-d03d
+	- DI Platform E-Commerce UMKM
+	- DI KOTA SEMARANG
+	- BILIBILI GOOGLE PLAY STORE
+	- UNTUK MENGOPTIMALKAN MANAJEMEN PERSEDIAAN BAHAN BAKU
+	- MELALUI MEDIA SOSIAL X
+	- DI BANDARA INTERNASIONAL JENDERAL AHMAD YANI SEMARANG
+	- DI KOTA SEMARANG
+	- PADA ULASAN GOOGLE PLAY
+	- PADA PLATFORM YOUTUBE
+	- PADA PASAR MODAL
+	- USAHA ANGKRINGAN
+	- STUDI KASUS PALANG MERAH INDONESIA KOTA SEMARANG
+	- DI BANDARA INTERNASIONAL JENDERAL AHMAD YANI SEMARANG
+	- PADA APLIKASI TOKOPEDIA
+	- Studi Kasus Sawah Bapak Soleh Kendal
+	- CV. ARTHA BUANA
+
+## Digital Bisnis (Aplikasi Digital)
+- Problem + Metode
+	- Perancangan
+	Pengembangan
+	Rancang Bangun
+	Implementasi
+	SDLC (Software Development Life Cycle)
+		- Waterfall {10}
+		- Prototype {14}
+		- RAD (Rapid Application Development) {6}
+		- Scrum
+		- AGILE {2}
+	- Aplikasi
+		- Mobile {3}
+			- Android {2}
+			- Flutter
+		- Web {5}
+		- Back END REST
+	- UI/UX
+		- HUMAN CENTERED DESIGN
+		- EUCS (END USER COMPUTING SATISFACTION)
+		- PACMAD (People At the Center of Mobile Application Development)
+- Object ^75d80ca9-3477-f459
+	- Sistem Informasi
+		- Inventory
+		- pendaftaran dan proses kredit pembiayaan perumahan
+		- POS (Point Of Sale) Kasir
+		- PERSEWAAN
+		- PENJUALAN {3}
+		- Integrated Ticketing System
+		- Antrean
+	- LEGAL TECHNOLOGY UNTUK FIRMA HUKUM
+	- APLIKASI KONSULTASI TELERADIOLOGI UNTUK PENYAKIT GIGI DAN MULUT
+	- DASHBOARD MONITORING ELK STACK
+	- Aplikasi Forecasting Inventori Berbasis Data Historis Transaksi Arifamart
+	- APLIKASI PENJUALAN HASIL PERTANIAN
+	- WEBSITE PERGURUAN TINGGI UNIVERSITAS DIAN NUSWANTORO
+	- PEMESANAN TIKET TRAVEL CAHAYA
+	- PEMESANAN TIKET TRAVEL ONLINE (E-TICKETING)
+	- Aplikasi Mobile EasyMeal Menggunakan Framework ExpressJS
+- Subject ^20ca37c1-7feb-b000
+	- STUDY KASUS PADA UD. SUMBER WAJA KOTA TEGAL
+	- Bank BRI KANWIL JATENG
+	- DI RSI SULTAN AGUNG SEMARANG
+	- PADA UMKM
+	- PADA ARLOGI RENT CAMP SEMARANG
+	- DI KABUPATEN REMBANG
+	- Perusahaan Toko Bangunan Asal Barokah
+	- PADA 99TRANSLINE
+	- PADA TOKO ELS STUDIO
+	- Wisata Pantai Pasir Kencana
+	- untuk Pasien Awskin Beauty Clinic
+	- PADA PENGELOLAAN STOK KEDAI REJAVA.CO SEMARANG
+	- PADA PT. INDOSUNMOTOR GEMILANG
+
+## Undentifided
+- Perancangan Infrastruktur Big Data Pipeline Pada Sistem E-Commerce UMKM dengan Fokus Pemrosesan Sumber Data Menggunakan Orchestration Tools
+- STRATEGI IMPLEMENTASI GITOPS DALAM MANAJEMEN KUBERNETES DENGAN PENERAPAN TEKNIK CANARY RELEASE DAN AUTOMATIC ROLLBACK

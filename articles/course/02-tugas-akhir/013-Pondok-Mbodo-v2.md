@@ -310,3 +310,22 @@ Muhammad Ghufron, setelah menikah, diminta oleh Mbah Hari untuk mengajar ngaji s
 Dengan terus bertambahnya santri yang tinggal di rumah beliau,kemudian beliau melakukan tabarukan di pondok beliau yaitu Darul Falah Jekulo Kudus,dengan hasil tabarukan akhirnya beliaupun memutuskan mendirikan pondok pesantren yang beliau beri nama Darul Falah Ki Ageng Mbodo atau yang kerap disebut Pondok Mbodo.Waktu berjalan,hari berganti,santri yang tinggal di rumah beliau terus bertambah,dengan dukungan guru,orang tua,istri,keluarga dan kerabat beliau membangun sebuah bangunan yang berukuran tidak besar yang diberi tulisan “PONDOK PESANTREN DARUL FALAH KI AGENG MBODO” yang bertempat di Jln.Tombo Ati Dsn.Sendangsari Ds.Tambirejo, RT 05 RW 07 Kec.Toroh Kab.Grobogan Jawa Tengah.
 
 Majelis ahad kliwon yang beliau dirikan semakin lama terus berkembang hingga memiliki beribu-ribu jama'ah yang mengikuti majelis ahad kliwon itu.Karena santri yang masuk pondok pesantren semakin bertambah,Pondok mbodo ini terus berkembang sehingga beliau memutuskan untuk menjadi kiai pesantren yang berdiam di pesantren untuk mendidik para santri-santrinya.
+
+
+EditProfile  
+- Informasi Pribadi  
+- Tautan Web dan Sosial Media  
+- Ganti Kata Sandi  
+- Verifikasi Email  
+- Perangkat yang Masuk  
+- Hapus Akun (SoftDelete dan Menunggu 60 Hari untuk permanen delete)  
+  
+EditProfileStudent  
+- Sama seperti EditStudent, hanya saja StudentStatus, StudentCategory, StudentCurrentSchool, tidak bisa di edit.  
+  
+EditProfileEmployee  
+- Sama seperti `EditEmployee`, hanya saja salery, start_working.  
+  
+  
+GuardianStudentShow  
+- membuat token berserta kadaluarsanya.

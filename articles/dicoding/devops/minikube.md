@@ -29,3 +29,9 @@ minikube stop
 minikube delete
 ```
 
+minikube start --static
+
+
+kubectl namespace karsajobs
+
+minikube service karsajobs --url -n karsajobs

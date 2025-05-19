@@ -76,6 +76,10 @@ adduser lyrih
 ## Install PHP
 
 ```bash
+sudo apt-get install software-properties-common -y
+```
+
+```bash
 sudo add-apt-repository ppa:ondrej/php -y
 ```
 
@@ -151,6 +155,9 @@ php -r "if (hash_file('SHA384', '/tmp/composer-setup.php') === '$HASH') { echo '
 sudo php /tmp/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 ```
 
+```bash
+composer
+```
 ## Install `nginx`
 
 ```bash
@@ -309,7 +316,11 @@ psql
 ```
 
 ```sql
-CREATE USER pondokmbodo WITH PASSWORD 'inipasswordpondokmbodo';
+CREATE USER pondokmbodo WITH PASSWORD 'rahasia';
+```
+
+```sql
+ALTER USER pondokmbodo WITH PASSWORD 'password_baru';
 ```
 
 ```sql
@@ -338,8 +349,4 @@ ls -la
 
 admin@example.com
 
-changeme
 
-Default user: casaos
-Default password: casaos
-Default database: casaos
