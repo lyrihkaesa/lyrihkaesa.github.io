@@ -49,7 +49,7 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve('./sidebars-custom.js'),
           path: 'articles/docs',
           routeBasePath: 'docs',
           // Please change this to your repo.
@@ -68,18 +68,19 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/ksa-logo-gradient-blue.png',
+
+      docs: {
+        sidebar: {
+          autoCollapseCategories: true,
+          hideable: true
+        }
+      },
+
       navbar: {
         title: 'Kaesa',
         logo: {
           alt: 'Kaesa lyrih',
           src: 'img/ksa-logo-gradient-blue.png'
-        },
-
-        docs: {
-          sidebar: {
-            autoCollapseCategories: true,
-            hideable: true
-          }
         },
 
         items: [
@@ -309,7 +310,7 @@ const config = {
         id: 'community',
         path: 'articles/community',
         routeBasePath: 'community',
-        sidebarPath: './sidebars-default.js'
+        sidebarPath: './sidebars.js'
         // ... other options
       }
     ],
