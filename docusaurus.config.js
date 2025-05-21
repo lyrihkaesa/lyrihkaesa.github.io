@@ -85,12 +85,6 @@ const config = {
 
         items: [
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Belajar'
-          },
-          {
             to: '/learning/',
             label: 'Belajar',
             position: 'left'
