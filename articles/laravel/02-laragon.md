@@ -26,7 +26,7 @@ Semenjak Laragon v7.0.0 itu sudah mulai berbayar.
 
 Saya ubah dari `D:\DevTools\laragon\www` ke `D:\Projects\www` karena supaya rapi saja, saat backup semua project cukup folder `Project` yang Saya backup.
 
-![Mengubah document root](./attachments/mengubah-document-root-laragon.gif)
+![Mengubah document root](attachments/mengubah-document-root-laragon.gif)
 
 ## Menambahkan PHP versi lainnya
 
