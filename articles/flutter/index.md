@@ -210,3 +210,43 @@ static int minSdkVersion = 19 // Default flutter versi 3.13.1
 ```
 
 ---
+
+## Create Flutter Project
+
+Membuat proyek flutter dimana saya tidak ingin menggunakan folder `com.example` > `id.my.charapon.inventory`, bahasa pemprograman android menggunakan `java` > `kotlin`, bahasa pemprograman ios menggunakan `swift` dan flutter dapat di compile ke platform `web`, `android`, dan `ios`, saya beri nama `charapon_inventory`:
+
+```bash
+flutter create --org id.my.charapon.inventory --android-language kotlin --ios-language swift --platforms=web,android,ios charapon_inventory
+```
+
+![Flutter Create](attachments/flutter-create.png)
+
+Pindah ke directory app flutter:
+
+```bash
+cd charapon_inventory
+```
+
+Buka di Visual Studio Code:
+
+```bash
+code .
+```
+
+Jalankan project dengan perintah:
+
+- Jika menggunakan flutter default:
+
+```bash
+flutter run
+```
+
+- Jika menggunakan FVM (Flutter Version Manager) atau Anda yakin VS Code anda sudah di setting dengan benar maka anda bisa menjalankan perintah `flutter run` seperti biasa.
+
+```bash
+fvm flutter run
+```
+
+```bash
+fvm flutter create --org io.github.lyrihkaesa.flutterstarterkit --android-language kotlin --ios-language swift --platforms=web,android,ios flutter_starter_kit
+```
