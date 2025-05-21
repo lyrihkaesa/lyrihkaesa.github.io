@@ -61,8 +61,10 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 244 76% 58%;
+    /* Indigo-600 */
+    --primary-foreground: 0 0% 100%;
+    /* White */
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
@@ -90,8 +92,10 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 228 96% 85%;
+    /* Indigo-300 */
+    --primary-foreground: 226 84% 12%;
+    /* Indigo-950 */
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -121,7 +125,7 @@
   --ifm-footer-background-color: #fff;
   --ifm-footer-link-color: #333;
   --ifm-code-font-size: 95%;
-  --ifm-color-primary: #044cc1;
+  --ifm-color-primary: #4f46e5;
   --ifm-h1-font-size: 2.5rem;
   --docusaurus-highlighted-code-line-bg: #0000001a;
   --ifm-global-shadow-tl: 2px 3px 5px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
@@ -144,7 +148,7 @@ html[data-theme='dark'] {
   --ifm-background-color: #14102c;
   --ifm-background-surface-color: #14102c;
   --ifm-footer-link-color: #dadde1;
-  --ifm-color-primary: #16ad8d;
+  --ifm-color-primary: #818cf8;
   --ifm-menu-color-background-active: #ffffff1a;
   --menu-link-active: rgba(255, 255, 255, 0.1);
   --ifm-menu-color-active: var(--ifm-color-primary);
