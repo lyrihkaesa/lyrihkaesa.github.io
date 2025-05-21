@@ -121,6 +121,14 @@ flutter build apk --obfuscate --split-debug-info=build/app/outputs/symbols
 ```
 
 ---
+## Akun Developer Google Play Store
+
+Jika Anda membuat akun Developer baru setelah 13 November 2023, anda memerlukan 12 penguji supaya bisa publish aplikasi Anda ke play store. 
+- Baca selengkapnya disini: https://support.google.com/googleplay/android-developer/answer/14151465?hl=id
+
+Jika Anda tidak memiliki ATM/Kartu Bank Umum anda bisa mendaftar ke Bank Jago dan aktifkan fitur transaksi internasional untuk membuat akun developer google seharga 24$ atau sebesar kurang lebih Rp500.000,-.
+
+---
 ## Build Runner
 
 ### `build_runner watch`
