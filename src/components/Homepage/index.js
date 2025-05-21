@@ -79,11 +79,21 @@ const projects = [
   {
     title: 'Kaesa Laravel Extension Pack',
     desc: 'Laravel Ekstension Pack untuk VS Code.',
-    tech: ['Laravel', 'PHP', 'VSCode'],
+    tech: ['Laravel', 'PHP', 'Extension Pack', 'VSCode'],
     image: '/img/projects/laravel-extension-pack-vscode.png',
     links: {
       live: 'https://marketplace.visualstudio.com/items?itemName=lyrihkaesa.kaesa-laravel-extension-pack',
       repo: 'https://github.com/lyrihkaesa/vscode-laravel-extension-pack'
+    }
+  },
+  {
+    title: 'Mikrotik Hotspot Template',
+    desc: 'Template untuk Mikrotik Hotspot dengan Tailwind CSS dan AlpineJS.',
+    tech: ['Mikrotik', 'Template', 'Hotspot', 'Tailwind CSS', 'AlpineJS'],
+    image: '/img/projects/mikrotik-hotspot-template.png',
+    links: {
+      live: 'https://github.com/lyrihkaesa/mikrotik-hotspot-template',
+      repo: 'https://github.com/lyrihkaesa/mikrotik-hotspot-template'
     }
   },
   {
