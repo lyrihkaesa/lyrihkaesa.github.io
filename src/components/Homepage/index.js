@@ -85,6 +85,16 @@ const projects = [
       live: 'https://marketplace.visualstudio.com/items?itemName=lyrihkaesa.kaesa-laravel-extension-pack',
       repo: 'https://github.com/lyrihkaesa/vscode-laravel-extension-pack'
     }
+  },
+  {
+    title: 'Barberia',
+    desc: 'Aplikasi pemesanan barber.',
+    tech: ['Flutter', 'NextJS', 'Firebase'],
+    image: '/img/projects/barberia.png',
+    links: {
+      live: 'https://barberia-web.vercel.app/',
+      repo: 'https://github.com/C22-024'
+    }
   }
   // ... data proyek lainnya
 ]
