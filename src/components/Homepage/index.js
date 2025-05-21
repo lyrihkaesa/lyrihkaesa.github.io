@@ -61,7 +61,7 @@ const techItems = [
   {
     name: 'PostgreSQL',
     icon: <SiPostgresql className='h-8 w-8 text-blue-600' />,
-    link: 'https://mysql.com'
+    link: 'https://www.postgresql.org/'
   },
   {
     name: 'MySQL',
