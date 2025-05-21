@@ -85,10 +85,23 @@ const config = {
 
         items: [
           {
-            to: '/learning/',
-            label: 'Belajar',
+            to: '/learning',
+            label: 'Learning',
             position: 'left'
           },
+
+          {
+            to: '/laravel',
+            label: 'Laravel',
+            position: 'left'
+          },
+
+          {
+            to: '/flutter',
+            label: 'Flutter',
+            position: 'left'
+          },
+
           {
             to: '/toram/',
             label: 'Toram Online',
