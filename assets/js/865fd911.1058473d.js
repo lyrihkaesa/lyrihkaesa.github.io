@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["5239"],{56947:function(a){a.exports=JSON.parse('{"tags":[{"label":"excalidraw","permalink":"/flutter/tags/excalidraw","count":1}]}')}}]);

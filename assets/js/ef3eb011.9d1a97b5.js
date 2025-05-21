@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["80"],{728:function(t){t.exports=JSON.parse('{"blogTitle":"Blog","blogDescription":"Blog description is here ...","path":"blog","totalPosts":4,"totalRecentPosts":4}')}}]);

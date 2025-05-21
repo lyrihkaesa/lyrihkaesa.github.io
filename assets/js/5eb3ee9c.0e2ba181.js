@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["8524"],{79421:function(a){a.exports=JSON.parse('{"tags":[{"label":"excalidraw","permalink":"/learning/tags/excalidraw","count":2},{"label":"guide","permalink":"/learning/tags/guide","count":2},{"label":"windows-10","permalink":"/learning/tags/windows-10","count":2}]}')}}]);

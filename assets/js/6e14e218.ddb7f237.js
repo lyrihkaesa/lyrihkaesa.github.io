@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["6154"],{25559:function(a){a.exports=JSON.parse('{"tags":[{"label":"excalidraw","permalink":"/laravel/tags/excalidraw","count":2}]}')}}]);

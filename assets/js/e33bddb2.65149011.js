@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["7371"],{37165:function(i){i.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"dicoding"}')}}]);

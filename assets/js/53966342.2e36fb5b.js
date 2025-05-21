@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["6117"],{28497:function(e){e.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"laravel"}')}}]);

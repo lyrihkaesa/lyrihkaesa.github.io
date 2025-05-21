@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkio_github_lyrihkaesa=self.webpackChunkio_github_lyrihkaesa||[]).push([["1159"],{849:function(s){s.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"journal"}')}}]);
