@@ -2,5 +2,5 @@
 
 - https://nixos.org/
 
-## Installation
+Penasaran saja ini makhluk apa.
 
