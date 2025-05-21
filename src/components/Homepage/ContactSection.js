@@ -17,19 +17,19 @@ export default function ContactSection() {
             {
               name: 'GitHub',
               icon: <FiGithub className='h-6 w-6' />,
-              link: 'https://github.com/kaesa',
+              link: 'https://github.com/lyrihkaesa',
               color: 'bg-gray-800 hover:bg-gray-900 dark:bg-gray-100 dark:hover:bg-gray-200'
             },
             {
               name: 'Discord',
               icon: <FaDiscord className='h-6 w-6' />,
-              link: '#',
+              link: 'https://discord.gg/z5GUceqyhB',
               color: 'bg-[#5865F2] hover:bg-[#4752c4]'
             },
             {
               name: 'Email',
               icon: <FiMail className='h-6 w-6' />,
-              link: 'mailto:kaesa@example.com',
+              link: 'mailto:kaesalyrih@gmail.com',
               color: 'bg-red-500 hover:bg-red-600'
             }
           ].map((social) => (
