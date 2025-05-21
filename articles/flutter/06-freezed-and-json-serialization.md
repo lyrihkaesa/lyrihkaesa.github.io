@@ -16,9 +16,9 @@ Semua ini bisa membutuhkan ratusan baris kode, yang rentan terhadap kesalahan da
 
 Package `Freezed` mencoba mengatasi masalah ini dengan mengimplementasikan sebagian besar hal tersebut untuk Anda, sehingga Anda bisa lebih fokus pada definisi model Anda.
 
-| Sebelumnya                                                 | Sesudahnya                                                |
-| ---------------------------------------------------------- | --------------------------------------------------------- |
-| ![before](attachments/Pasted%20image%2020240308193302.png) | ![after](attachments/Pasted%20image%2020240308193324.png) |
+| Sebelumnya                                                            | Sesudahnya                                                  |
+| --------------------------------------------------------------------- | ----------------------------------------------------------- |
+| ![before](../flutter/attachments/Pasted%20image%2020240308193302.png) | ![after](./attachments/Pasted%20image%2020240308193324.png) |
 
 ## Menjalankan Build Runner
 
