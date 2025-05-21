@@ -242,6 +242,8 @@ const config = {
 
   plugins: [
     ['./src/plugins/tailwind-config.js', {}],
+
+    // Dokumentasi Belajar
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -278,16 +280,118 @@ const config = {
       }
     ],
 
+    // Dokumentasi Laravel
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: 'journal',
-        path: 'articles/journal',
-        routeBasePath: 'journal',
+        id: 'laravel',
+        path: 'articles/laravel',
+        routeBasePath: 'laravel',
         sidebarPath: require.resolve('./sidebars.js'),
-        exclude: ['**/exclude/**']
+        beforeDefaultRemarkPlugins: [
+          [
+            remarkCodeExample,
+            {
+              target: 'mdx3'
+            }
+          ],
+          [
+            autoTabs,
+            {
+              labels: {
+                'plantuml': 'Diagram PlantUML',
+                'plant-uml': 'Kode PlantUML'
+              }
+            }
+          ],
+          [
+            remarkKroki,
+            {
+              // ...options here
+              alias: ['plantuml'],
+              target: 'mdx3',
+              server: 'https://kroki.io'
+            }
+          ]
+        ]
       }
     ],
+
+    // Dokumentasi Flutter
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'flutter',
+        path: 'articles/flutter',
+        routeBasePath: 'flutter',
+        sidebarPath: require.resolve('./sidebars.js'),
+        beforeDefaultRemarkPlugins: [
+          [
+            remarkCodeExample,
+            {
+              target: 'mdx3'
+            }
+          ],
+          [
+            autoTabs,
+            {
+              labels: {
+                'plantuml': 'Diagram PlantUML',
+                'plant-uml': 'Kode PlantUML'
+              }
+            }
+          ],
+          [
+            remarkKroki,
+            {
+              // ...options here
+              alias: ['plantuml'],
+              target: 'mdx3',
+              server: 'https://kroki.io'
+            }
+          ]
+        ]
+      }
+    ],
+
+    // Dokumentasi Dicoding
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'dicoding',
+        path: 'articles/dicoding',
+        routeBasePath: 'dicoding',
+        sidebarPath: require.resolve('./sidebars.js'),
+        beforeDefaultRemarkPlugins: [
+          [
+            remarkCodeExample,
+            {
+              target: 'mdx3'
+            }
+          ],
+          [
+            autoTabs,
+            {
+              labels: {
+                'plantuml': 'Diagram PlantUML',
+                'plant-uml': 'Kode PlantUML'
+              }
+            }
+          ],
+          [
+            remarkKroki,
+            {
+              // ...options here
+              alias: ['plantuml'],
+              target: 'mdx3',
+              server: 'https://kroki.io'
+            }
+          ]
+        ]
+      }
+    ],
+
+    // Dokumentasi Toram
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -298,6 +402,19 @@ const config = {
       }
     ],
 
+    // Dokumentasi Jurnal
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'journal',
+        path: 'articles/journal',
+        routeBasePath: 'journal',
+        sidebarPath: require.resolve('./sidebars.js'),
+        exclude: ['**/exclude/**']
+      }
+    ],
+
+    // Comunity (Draft)
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -309,6 +426,7 @@ const config = {
       }
     ],
 
+    // OpenAPI (Draft)
     [
       'docusaurus-plugin-openapi-docs',
       {
@@ -351,6 +469,7 @@ const config = {
         }
       }
     ],
+
     [
       'ideal-image',
       /** @type {import('@docusaurus/plugin-ideal-image').PluginOptions} */
@@ -363,6 +482,7 @@ const config = {
         disableInDev: true
       })
     ],
+
     [
       './src/plugins/blog-plugin',
       {
