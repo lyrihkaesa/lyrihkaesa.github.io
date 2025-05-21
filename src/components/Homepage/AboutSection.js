@@ -13,7 +13,7 @@ export default function AboutSection() {
           Kaesa Lyrih
         </h1>
         <p className='mb-6 text-lg text-slate-600 dark:text-slate-300'>
-          Suka Memberikan Informasi yang Manusiawi 💜.
+          Memberikan Informasi yang Manusiawi 💜.
         </p>
 
         <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>

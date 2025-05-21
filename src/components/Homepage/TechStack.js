@@ -11,10 +11,10 @@ export default function TechStack({ items }) {
             href={tech.link}
             target='_blank'
             rel='noopener noreferrer'
-            className='flex flex-col items-center rounded-xl bg-white p-6 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg dark:bg-slate-800'
+            className='flex flex-col items-center rounded-xl bg-white px-4 pt-3 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg dark:bg-slate-800'
           >
             {tech.icon}
-            <h3 className='mt-3 text-lg font-medium'>{tech.name}</h3>
+            <h3 className='mt-2 text-lg font-medium'>{tech.name}</h3>
           </a>
         ))}
       </div>
