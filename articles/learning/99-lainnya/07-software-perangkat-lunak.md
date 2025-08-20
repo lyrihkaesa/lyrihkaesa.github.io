@@ -61,3 +61,9 @@ Monitoring Resource Linux
 
 Reference: 
 - https://www.youtube.com/watch?v=ODNJokw1ewI
+
+auto hot key
+
+https://mularahul.github.io/keyviz/
+
+

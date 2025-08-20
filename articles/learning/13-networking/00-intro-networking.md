@@ -44,8 +44,9 @@ Ini adalah artikel berupa catatan peralatan perangkat lunak (software) atau pera
 
 ## Software (Perangkat Lunak)
 
-| Nama    |
-| ------- |
-| Winbox  |
-| Mikhmon |
+- WInbox
+- Mikhmon
 
+Local Domain Manajemen Router
+- https://router.miwifi.com/init.html#/home
+- http://tendawifi.com/index.html

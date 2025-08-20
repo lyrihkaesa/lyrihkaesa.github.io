@@ -15,6 +15,5 @@ Selain itu, saya juga mengikuti MSIB pada jalur pembelajaran Multi-Platform dan 
 1. Project Kaesa Inventory
 2. Project Kaesa Benchmark Laptop for Mobile Development
 
-
 Random Note
 15/5/2024 beli Polybag 35x35 2pcs Rp10.000 = Rp20.000 TOKO PAK EKO TANI SEJATI SARJANA PERTANIAN

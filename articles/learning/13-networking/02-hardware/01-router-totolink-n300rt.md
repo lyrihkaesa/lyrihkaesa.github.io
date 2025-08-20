@@ -24,7 +24,7 @@ Lalu:
 	- VID(2-4094) dari `2` menjadi bebas misal: `20`
 	- Priority ubah dari `0` menjadi `1`
   ![iptv-totolink-v3.4.0](attachments/iptv-totolink-v3.4.0.png)
-
+![Setting IPTV v2](attachments/01-router-totolink-n300rt-setting-iptv-v2.png)
 ## Mengatur DHCP Server untuk PPPoE
 `Network` > `LAN Settings`
 - Ip Address: `192.168.1.1` menjadi `192.168.3.1`

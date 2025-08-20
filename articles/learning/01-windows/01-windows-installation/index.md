@@ -64,6 +64,7 @@ tags: [guide, windows-10]
 - [ ] FolderSizePortable
 - [ ] FoxitPDFEditor
 - [ ] [CCT Tools](https://github.com/ChrisTitusTech/winutil)
+- [ ] Stirling PDF
 ## Software Development Tools
 
 - [ ] Visual Studio Code (Open Source & Free) (IDE)

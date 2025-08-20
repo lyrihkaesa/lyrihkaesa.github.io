@@ -2,6 +2,9 @@
 
 Hanya catatan singkat.
 
+Jika ingin belajar bisa disini:
+- [Learn Git Branching](https://learngitbranching.js.org/)
+
 ## Remote Repository
 
 Ketika kita membuat Git Project, secara default, Git tidak tahu tentang Remote Repository. Kita perlu memberi tahu ke git project local yang sudah kita buat tentang lokasi git remote repository.
