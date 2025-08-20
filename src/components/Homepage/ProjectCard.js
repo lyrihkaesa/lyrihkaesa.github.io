@@ -2,7 +2,7 @@ import { FiExternalLink, FiGithub, FiImage } from 'react-icons/fi'
 
 export default function ProjectCard({ project }) {
   return (
-    <div className='group relative w-80 flex-shrink-0 snap-center overflow-hidden rounded-xl bg-white shadow-lg transition-transform duration-300 hover:scale-[1.02] dark:bg-slate-800'>
+    <div className='group relative w-full overflow-hidden rounded-xl bg-white shadow-lg transition-transform duration-300 hover:scale-[1.02] dark:bg-slate-800'>
       {/* Whole card clickable area */}
       <a
         href={project.links?.live || '#'}

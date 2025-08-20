@@ -1,10 +1,10 @@
 import Layout from '@theme/Layout'
-import Heading from '@theme/Heading'
+// import Heading from '@theme/Heading'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 
 // Import ikon-ikon
-import { FiExternalLink, FiGithub, FiMessageSquare, FiMail, FiTwitter } from 'react-icons/fi'
-import { FaDiscord } from 'react-icons/fa6'
+// import { FiExternalLink, FiGithub, FiMessageSquare, FiMail, FiTwitter } from 'react-icons/fi'
+// import { FaDiscord } from 'react-icons/fa6'
 import {
   SiLaravel,
   SiFlutter,
@@ -26,56 +26,86 @@ const techItems = [
   {
     name: 'Laravel',
     icon: <SiLaravel className='h-8 w-8 text-red-500' />,
-    link: 'https://laravel.com'
+    link: '/laravel'
   },
   {
     name: 'Flutter',
     icon: <SiFlutter className='h-8 w-8 text-blue-400' />,
-    link: 'https://flutter.dev'
+    link: '/flutter'
   },
   {
     name: 'Filament',
     icon: <SiFilament className='h-8 w-8 text-amber-500' />,
-    link: 'https://filamentphp.com'
+    link: '#'
   },
   {
     name: 'Livewire',
     icon: <SiLivewire className='h-8 w-8 text-pink-500' />,
-    link: 'https://livewire.laravel.com'
+    link: '#'
   },
   {
     name: 'AlpineJS',
     icon: <SiAlpinedotjs className='h-8 w-8 text-blue-500' />,
-    link: 'https://alpinejs.dev'
+    link: '#'
   },
   {
     name: 'React',
     icon: <SiReact className='h-8 w-8 text-blue-500' />,
-    link: 'https://reactjs.org'
+    link: '#'
   },
   {
     name: 'Tailwind CSS',
     icon: <SiTailwindcss className='h-8 w-8 text-cyan-400' />,
-    link: 'https://tailwindcss.com'
+    link: '#'
   },
   {
     name: 'PostgreSQL',
     icon: <SiPostgresql className='h-8 w-8 text-blue-600' />,
-    link: 'https://www.postgresql.org/'
+    link: '#'
   },
   {
     name: 'MySQL',
     icon: <SiMysql className='h-8 w-8 text-blue-600' />,
-    link: 'https://mysql.com'
+    link: '#'
   },
   {
     name: 'Docker',
     icon: <SiDocker className='h-8 w-8 text-blue-600' />,
-    link: 'https://www.docker.com'
+    link: '#'
   }
 ]
 
 const projects = [
+  {
+    title: 'Flutter Starter Kit',
+    desc: 'Stater Kit Untuk Mempermudah Pembuatan Aplikasi Flutter.',
+    tech: ['Flutter', 'Dart'],
+    image: '/img/images-dark.webp',
+    links: {
+      live: 'https://github.com/lyrihkaesa/flutter-starter-kit',
+      repo: 'https://github.com/lyrihkaesa/flutter-starter-kit'
+    }
+  },
+  {
+    title: '(Flast) Installer Flutter Starter Kit',
+    desc: 'Installer untuk Flutter Starter Kit.',
+    tech: ['Flutter', 'Dart'],
+    image: '/img/images-dark.webp',
+    links: {
+      live: 'https://github.com/lyrihkaesa/flast',
+      repo: 'https://github.com/lyrihkaesa/flast'
+    }
+  },
+  {
+    title: 'Mason Brick Flutter Starter Kit',
+    desc: 'Mason Brick untuk Flutter Starter Kit.',
+    tech: ['Flutter', 'Dart', 'Mason'],
+    image: '/img/images-dark.webp',
+    links: {
+      live: 'https://github.com/lyrihkaesa/bricks_flutter_starter_kit',
+      repo: 'https://github.com/lyrihkaesa/bricks_flutter_starter_kit'
+    }
+  },
   {
     title: 'Kaesa Laravel Extension Pack',
     desc: 'Laravel Ekstension Pack untuk VS Code.',
