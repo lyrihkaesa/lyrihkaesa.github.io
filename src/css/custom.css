@@ -328,3 +328,8 @@ div[class^='docItemContainer_'] article img {
     padding: 0 0.5rem 0 2.25rem;
   }
 }
+
+html {
+  scroll-behavior: smooth;
+  /* smooth scrolling */
+}
