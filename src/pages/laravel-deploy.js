@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react'
 import Layout from '@theme/Layout'
-import TOC from './LaravelDeploy/TOC'
-import SectionInstallPHP from './LaravelDeploy/SectionInstallPHP'
-import SectionInstallDatabase from './LaravelDeploy/SectionInstallDatabase'
-import SectionInstallWebserver from './LaravelDeploy/SectionInstallWebserver'
-import GuideUFW from './LaravelDeploy/GuideUFW'
-import SectionConfigWebserver from './LaravelDeploy/SectionConfigWebserver'
-import SectionInstallComposer from './LaravelDeploy/SectionInstallComposer'
+import TOC from '../components/LaravelDeploy/TOC'
+import SectionInstallPHP from '../components/LaravelDeploy/SectionInstallPHP'
+import SectionInstallDatabase from '../components/LaravelDeploy/SectionInstallDatabase'
+import SectionInstallWebserver from '../components/LaravelDeploy/SectionInstallWebserver'
+import GuideUFW from '../components/LaravelDeploy/GuideUFW'
+import SectionConfigWebserver from '../components/LaravelDeploy/SectionConfigWebserver'
+import SectionInstallComposer from '../components/LaravelDeploy/SectionInstallComposer'
 
 // ---------------- Main Page ----------------
 export default function LaravelDeployPage() {
