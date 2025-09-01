@@ -1,23 +1,22 @@
-name: Deploy Docusaurus
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main # hanya jalan kalau ada perubahan di branch main
+      - main # jalan setiap ada push ke main
 
 jobs:
-  build-deploy:
+  build:
+    name: Build Docusaurus
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -25,8 +24,27 @@ jobs:
       - name: Build website
         run: npm run build
 
+      - name: Upload Build Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+
+    # kasih izin untuk Pages
+    permissions:
+      pages: write
+      id-token: write
+
+    # deploy ke environment github-pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
-        run: npx docusaurus deploy
-        env:
-          GIT_USER: github-actions[bot]
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: deployment
+        uses: actions/deploy-pages@v4
