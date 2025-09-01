@@ -24,8 +24,11 @@ Untuk mempersingkat saya buatkan git alias di `~\.bashrc`
 alias fmason="fvm dart pub global run mason_cli:mason"
 ```
 
-> 📔 Catatan: Jika Anda pengguna Windows tidak bisa menjalankan `mason --version` lewat `git bash` saya sarankan pakai `powershell`
+> 📔 Catatan: Jika Anda pengguna Windows tidak bisa menjalankan `mason --version` lewat `git bash` saya sarankan pakai `powershell` atau anda bisa menambahkan alias ke `~\.bashrc`
 
+```bash
+alias mason="/c/Users/<username>/AppData/Local/Pub/Cache/bin/mason.bat"
+```
 ## Initial Mason
 Perintah ini digunakan untuk initial mason nanti otomatis generate `mason.yaml` yang berisi daftar bricks mason yang digunakan.
 ```bash

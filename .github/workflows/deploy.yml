@@ -1,0 +1,32 @@
+name: Deploy Docusaurus
+
+on:
+  push:
+    branches:
+      - main # hanya jalan kalau ada perubahan di branch main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build website
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        run: npx docusaurus deploy
+        env:
+          GIT_USER: github-actions[bot]
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

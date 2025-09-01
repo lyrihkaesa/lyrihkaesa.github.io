@@ -122,9 +122,9 @@ fvm flutter doctor
 
 * Untuk tools Dart Console (`mason`, `flast`), sebaiknya tambahkan salah satu path FVM global ke environment PATH:
 
-  ```
-  C:\Users\<username>\fvm\versions\<versi>\bin
-  ```
+```
+C:\Users\<username>\fvm\versions\<versi>\bin
+```
 
   Dengan begitu cukup:
 
@@ -143,9 +143,20 @@ fvm dart pub global run mason_cli:mason
 Begitu juga dengan `flast`
 ```bash
 dart pub global activate flast
+```
+
+```bash
 flast create
 ```
+
 Karena `flast` tidak bisa pakai `fvm dart pub global run flast:flast` `create`.
+
+Atau jika ingin memanggil `mason` ataupun `flast` anda bisa membuat alias di `~/bashrc`:
+```bash
+alias mason="/c/Users/<username>/AppData/Local/Pub/Cache/bin/mason.bat"
+alias flast="/c/Users/<username>/AppData/Local/Pub/Cache/bin/flast.bat"
+```
+- Ganti `<username>` dengan Username windows kamu.
 
 ---
 
