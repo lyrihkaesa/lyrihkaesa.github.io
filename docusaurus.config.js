@@ -85,6 +85,12 @@ const config = {
 
         items: [
           {
+            to: '/filament-starter-kit',
+            label: 'Filament Starter Kit',
+            position: 'left'
+          },
+
+          {
             to: '/learning',
             label: 'Learning',
             position: 'left'
