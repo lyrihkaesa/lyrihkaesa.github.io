@@ -2,7 +2,7 @@
 sidebar_position: 0
 ---
 
-# Filament Starter Kit
+# Main
 
 Starter Kit untuk membangun aplikasi berbasis [Laravel](https://laravel.com/) + [Filament](https://filamentphp.com/).  
 Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** dengan praktik terbaik (Action Pattern, custom resource, dsb).
