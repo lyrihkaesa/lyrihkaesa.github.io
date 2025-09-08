@@ -330,6 +330,43 @@ const config = {
       }
     ],
 
+    // Dokumentasi Filament Starter Kit
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'filament-starter-kit',
+        path: 'articles/filament-starter-kit',
+        routeBasePath: 'filament-starter-kit',
+        sidebarPath: require.resolve('./sidebars.js'),
+        beforeDefaultRemarkPlugins: [
+          [
+            remarkCodeExample,
+            {
+              target: 'mdx3'
+            }
+          ],
+          [
+            autoTabs,
+            {
+              labels: {
+                'plantuml': 'Diagram PlantUML',
+                'plant-uml': 'Kode PlantUML'
+              }
+            }
+          ],
+          [
+            remarkKroki,
+            {
+              // ...options here
+              alias: ['plantuml'],
+              target: 'mdx3',
+              server: 'https://kroki.io'
+            }
+          ]
+        ]
+      }
+    ],
+
     // Dokumentasi Flutter
     [
       '@docusaurus/plugin-content-docs',

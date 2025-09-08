@@ -427,3 +427,7 @@ Model lama sering menampung banyak logika (misalnya metode `publish()` pada mo
 Bedanya itu action class hanya menjalankan satu method atau fungsi saja, sedangkan service class itu ada beberapa fungsi atau method seperti controller, saya biasanya gunakan service untuk mengumpulkan logika dari API pihak ketiga misal Google Client, mungkin saya buatkan `GoogleService`, `GoogleCalendarService`, `WhatsAppBotService`, dsb. Jadi untuk API pihak ketiga saya kumpulkan logika bisnisnya dengan service.
 
 Jadi Action yang saya buat dapat melakukan CRUD dari database lewat eloquent model laravel, dan CRUD dari sumber API pihak ketiga lewat Service class.
+
+
+## CQRS
+
