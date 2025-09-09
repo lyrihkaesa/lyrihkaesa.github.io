@@ -17,11 +17,11 @@ Authorization: Bearer {token}
 
 ### Instalasi dan Referensi
 
--   Dokumentasi Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)
--   JWT sebagai alternatif:
+- Dokumentasi Laravel Sanctum: [https://laravel.com/docs/12.x/sanctum](https://laravel.com/docs/12.x/sanctum)
+- JWT sebagai alternatif:
 
-    -   PHP Libraries: [https://www.jwt.io/libraries?programming_language=php](https://www.jwt.io/libraries?programming_language=php)
-    -   Contoh Library Laravel: [https://github.com/lcobucci/jwt](https://github.com/lcobucci/jwt)
+  - PHP Libraries: [https://www.jwt.io/libraries?programming_language=php](https://www.jwt.io/libraries?programming_language=php)
+  - Contoh Library Laravel: [https://github.com/lcobucci/jwt](https://github.com/lcobucci/jwt)
 
 ---
 
@@ -31,33 +31,33 @@ Semua endpoint API pada starter kit ini mengembalikan **response JSON** dengan f
 
 ```json
 {
-    "message": "Deskripsi singkat response",
-    "data": {
-        // objek data spesifik endpoint
-    },
-    "errors": null
+  "message": "Deskripsi singkat response",
+  "data": {
+    // objek data spesifik endpoint
+  },
+  "errors": null
 }
 ```
 
--   **success**: boolean, menandakan apakah request berhasil.
--   **message**: string, deskripsi singkat.
--   **data**: objek berisi data endpoint (bisa kosong `{}` atau array `[]`).
--   **errors**: objek berisi error jika ada; `null` jika tidak ada.
+- **success**: boolean, menandakan apakah request berhasil.
+- **message**: string, deskripsi singkat.
+- **data**: objek berisi data endpoint (bisa kosong `{}` atau array `[]`).
+- **errors**: objek berisi error jika ada; `null` jika tidak ada.
 
 Contoh response sukses login:
 
 ```json
 {
-    "message": "Login berhasil",
-    "data": {
-        "user": {
-            "id": 1,
-            "name": "Kaesa",
-            "email": "kaesa@example.com"
-        },
-        "token": "1|ABCD1234TOKENEXAMPLE"
+  "message": "Login berhasil",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "Kaesa",
+      "email": "kaesa@example.com"
     },
-    "errors": null
+    "token": "1|ABCD1234TOKENEXAMPLE"
+  },
+  "errors": null
 }
 ```
 
@@ -65,11 +65,11 @@ Contoh response gagal login:
 
 ```json
 {
-    "message": "Email atau password salah",
-    "data": {},
-    "errors": {
-        "email": ["Email tidak ditemukan"]
-    }
+  "message": "Email atau password salah",
+  "data": {},
+  "errors": {
+    "email": ["Email tidak ditemukan"]
+  }
 }
 ```
 
@@ -113,11 +113,11 @@ Token yang digunakan akan dicabut, dan client harus login ulang untuk mendapatka
 
 Jika ingin mengganti Sanctum dengan JWT:
 
-1. Baca dokumentasi migrasi pada [`api-jwt.md`](/filament-starter-kit/main/api-jwt.md)
+1. Baca dokumentasi migrasi pada [`api-jwt.md`](../08-api-jwt.md)
 2. Pilih library JWT yang sesuai:
 
-    - [lcobucci/jwt](https://github.com/lcobucci/jwt)
-    - [Alternatif lain](https://www.jwt.io/libraries?programming_language=php)
+   - [lcobucci/jwt](https://github.com/lcobucci/jwt)
+   - [Alternatif lain](https://www.jwt.io/libraries?programming_language=php)
 
 3. Sesuaikan endpoint login, middleware, dan validasi token.
 

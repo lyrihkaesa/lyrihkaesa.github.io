@@ -51,7 +51,7 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
    composer dev
    ```
 
-   Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test]([http://filament-starter-kit.test)
+   Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test](http://filament-starter-kit.test)
 
 5. Login default (automatis input jika `APP_DEBUG=true`):
    - Email: `admin@example.com`
