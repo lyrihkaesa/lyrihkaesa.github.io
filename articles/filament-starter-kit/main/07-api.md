@@ -113,7 +113,7 @@ Token yang digunakan akan dicabut, dan client harus login ulang untuk mendapatka
 
 Jika ingin mengganti Sanctum dengan JWT:
 
-1. Baca dokumentasi migrasi pada [`api-jwt.md`](./api-jwt.md)
+1. Baca dokumentasi migrasi pada [`api-jwt.md`](/filament-starter-kit/main/api-jwt.md)
 2. Pilih library JWT yang sesuai:
 
     - [lcobucci/jwt](https://github.com/lcobucci/jwt)
