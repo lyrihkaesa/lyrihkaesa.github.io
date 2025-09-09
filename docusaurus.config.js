@@ -129,6 +129,11 @@ const config = {
           //   position: 'left',
           //   to: '/docs/category/petstore-versioned-api'
           // },
+          // {
+          //   type: 'docsVersionDropdown',
+          //   position: 'right',
+          //   docsPluginId: 'filament-starter-kit' // penting, pakai id plugin kamu
+          // },
           {
             'href': 'https://discord.gg/z5GUceqyhB',
             'position': 'right',
@@ -344,6 +349,25 @@ const config = {
         path: 'articles/filament-starter-kit',
         routeBasePath: 'filament-starter-kit',
         sidebarPath: require.resolve('./sidebars.js'),
+        lastVersion: 'current', // Rely on this version as default target
+        versions: {
+          current: {
+            label: '1.x',
+            path: '/' // aman tanpa titik; URL: /filament-starter-kit/current/
+          }
+          // '3.x': {
+          //   label: '3.x',
+          //   path: '3.x' // aman tanpa titik; URL: /filament-starter-kit/3x/
+          // },
+          // '2.x': {
+          //   label: '2.x',
+          //   path: '2.x' // aman tanpa titik; URL: /filament-starter-kit/2x/
+          // },
+          // '1.x': {
+          //   label: '1.x',
+          //   path: '1.x' // aman tanpa titik; URL: /filament-starter-kit/1x/
+          // }
+        },
         beforeDefaultRemarkPlugins: [
           [
             remarkCodeExample,
