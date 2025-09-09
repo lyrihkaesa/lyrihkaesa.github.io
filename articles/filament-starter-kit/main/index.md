@@ -54,8 +54,8 @@ Tujuannya adalah menyediakan pondasi siap pakai untuk **admin panel modern** den
     Jika menggunakan `Laravel Herd` langsung saja dibrowser [http://filament-starter-kit.test]([http://filament-starter-kit.test)
 
 5.  Login default (automatis input jika `APP_DEBUG=true`):
-    -   Email: `admin@example.com`
-    -   Password: `password`
+    - Email: `admin@example.com`
+    - Password: `password`
 
 > Jika menggunakan **Laravel Herd**, atur `APP_URL=http://filament-starter-kit.test`.  
 > Jika pakai `composer dev`, gunakan `APP_URL=http://localhost:8000`.

@@ -37,3 +37,10 @@ Saya suka genre music trap, jika kita sama bisa berbagi judul musik join discord
 - https://sci-hub.se/
 
 ---
+
+## Note Tips
+
+Mempercepat video
+```js
+document.querySelector('video').playbackRate = 2.5;
+```
