@@ -1,4 +1,4 @@
-# API (Sanctum)
+# API Sanctum (Default)
 
 > **Catatan:** Starter kit ini menggunakan **Laravel Sanctum** untuk autentikasi API secara default.
 > Jika Anda ingin menggunakan **JWT** sebagai gantinya, silakan baca dokumentasi migrasi pada [`api-jwt.md`](./api-jwt.md).
