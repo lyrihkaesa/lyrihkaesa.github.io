@@ -185,6 +185,31 @@ sudo ufw allow 'Nginx Full'
 ```bash
 sudo ufw allow 8081
 ```
+
+Pada kasus tertentu anda harus allow port tertentu ke ip local misal docker nginx-proxy-manager `172.17.0.1` 
+```bash
+sudo ufw allow from 172.17.0.0/16 to any port 8081
+```
+
+Jika sudah menjalankan perintah diatas, pastikan ip table seperti berikut
+```bash
+sudo iptables -L -n | grep 80
+# ACCEPT     6    --  0.0.0.0/0            172.17.0.2           tcp dpt:80
+# ACCEPT     6    --  0.0.0.0/0            0.0.0.0/0            multiport dports 80,443 /* 'dapp_Nginx%20Full' */
+# ACCEPT     6    --  172.17.0.0/16        0.0.0.0/0            tcp dpt:8081
+# ACCEPT     17   --  172.17.0.0/16        0.0.0.0/0            udp dpt:8081
+
+```
+
+- Test app work di bash punya host, kalau work maka muncul html
+```bash
+curl -H "Host: demo.charapon.my.id" http://172.17.0.1:8081
+```
+
+- Test app work via docker nginx-proxy-manager. nama containernya: `nginxproxymanager` 
+```bash
+docker exec nginxproxymanager curl -H "Host: demo.charapon.my.id" http://172.17.0.1:8081
+```
 ### Mengecek Daftar APP
 ```bash
 sudo ufw app list
@@ -251,6 +276,22 @@ sudo apt install php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-pgsql php8.3
 
 ```bash
 php -v
+```
+
+---
+
+```bash
+sudo apt search php8.4 | more
+```
+
+```bash
+sudo apt install -y \
+php8.4 php8.4-cli php8.4-common php8.4-fpm \
+php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip \
+php8.4-bcmath php8.4-opcache \
+php8.4-pgsql php8.4-sqlite3 \
+php8.4-gd \
+php8.4-mysql
 ```
 
 
@@ -568,4 +609,82 @@ watch fail2ban-client status sshd
 
 ```bash
 iptables -t filter -nvL
+```
+
+
+## Nginx Config Website Laravel 
+
+Config di bawah ini hanya contoh, Kaesa tolong cari tahu kegunaannya dan buatkan panduannya.
+- [**laravel8.conf**](https://gist.github.com/LTroya/c6496075033c8b6e15fdaaf0d9584482#file-laravel8-conf) 
+```conf
+server {
+
+    listen 80;
+    listen [::]:80;
+
+    server_name laravel8.io;
+    root /var/www/learning/laravel8/public;
+    index index.php index.html index.htm;
+
+    gzip on;
+    gzip_comp_level 2;
+    gzip_http_version 1.0;
+    gzip_proxied any;
+    gzip_min_length 1100; gzip_buffers 16 8k;
+    gzip_types text/plain text/html text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # Disable for IE < 6 because there are some known problems
+    gzip_disable "MSIE [1-6].(?!.*SV1)";
+
+    # Add a vary header for downstream proxies to avoid sending cached gzipped files to IE6
+    gzip_vary on;
+
+    location / {
+         try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        try_files $uri /index.php =404;
+
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        Host $http_host;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+
+        fastcgi_pass app:9000;
+        fastcgi_index index.php;
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+        fastcgi_param SCRIPT_FILENAME $request_filename;
+        #fixes timeouts
+        fastcgi_read_timeout 600;
+        include fastcgi_params;
+    }
+
+    # Media: images, icons, video, audio, HTC
+    location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+        expires -1;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    # CSS and Javascript
+    location ~* \.(?:css|js)$ {
+        expires -1;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt/;
+        log_not_found off;
+    }
+
+     error_log /var/log/nginx/credefi_error.log;
+     access_log /var/log/nginx/credefi_access.log;
+}
 ```

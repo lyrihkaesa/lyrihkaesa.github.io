@@ -34,3 +34,32 @@
 - Pasangan siapa? (Suami/Istri)
 - Lokasi
 - Gambar progress makam
+
+
+
+---
+Daftar Dompet/Account/Rekening Pondok Utama
+- BUMP
+- FORMAL 
+- NONFORMAL
+
+Daftar Dompet/Account/Rekening Pondok Lainnya
+- DONATUR
+	- Dompet Pemasukan Dari Donatur 
+- DANA_BOS
+	- Dompet Pemasukan Dari Dana Bos
+- SYSTEM (DAPAT MINUS)
+	- Dompet Pemasukan Dari System Pondok
+- EXPENSE (IMUTABLE)
+	- Dompet Pengeluaran
+- INCOME (DAPAT MINUS)
+	- Dompet Pemasukan Umum
+
+
+Catering
+Laundry
+Formal
+Pondok
+Madin
+Jurusan
+Extra

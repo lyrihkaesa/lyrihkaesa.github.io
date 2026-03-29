@@ -16,7 +16,7 @@ tags: [guide, windows-10]
   - D: Development  
     Sebaiknya `XAMPP` di taruh dipasang disini. Dan tentunya data file dan folder proyek simpan pada disk ini. Jika `XAMPP` dipasang pada disk `C:` sebaiknya jalankan dalam mode `Run as Administator`.  
     Pada disk ini bisa juga digunakan untuk menyimpan file `Google Drive`.
-    - `D:\GoogleDrive` : jangan lupa dihidden
+    - `D:\GoogleDrive` : jangan lupa di sembunyikan *hidden*
     - `D:\Projects` : berisi proyek misal
       - `D:\Projects\Laravel\belajar_laravel_oop`
       - `D:\Projects\Flutter\kaesa_inventory`
@@ -164,3 +164,22 @@ Untuk pengguna PC Desktop tidak itu tergantung karena itu rakitan dan bukan ORM 
 
 
 Backup dan Restore Windows: https://www.youtube.com/watch?v=GMOAT0NHjwA
+
+
+## Windows 11
+
+Ketika sampai onboard `Let's connect you to a network` ini artinya anda disuruh konek internet untuk menggunakan akun online Microsoft, jika ingin pakai akun local/offline harus melakukan hal berikut:
+- `Fn` + `Shift` + `F10` nanti muncul `cmd.exe`
+```cmd
+start ms-cxh:localonly
+```
+
+Nanti akan muncul popup membuat local account.
+
+- Resource: https://www.youtube.com/watch?v=TVJ3gGqkMak
+
+Jangan versi OBS v30.0.0 keatas karena tidak support NVIDIA 740n pakai saja OBS-Studio-29.0-Full-Installer-x64.exe .
+
+## Install Ulang
+
+.....

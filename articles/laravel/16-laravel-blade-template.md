@@ -275,3 +275,15 @@ composer require gehrisandro/tailwind-merge-laravel
 	},
 }
 ```
+
+
+# Include
+| Feature           | `@include()`                    | `x-component`          |
+| ----------------- | ------------------------------- | ---------------------- |
+| Syntax            | `@include('components/button')` | `<x-button />`         |
+| Attribute merging | x Not Supported                 | `$attributes->merge()` |
+| Named slots       | x Not Supported                 | `<x-slot:name>`        |
+| Default slots     | x Not Supported                 | `{{ $slot }}`          |
+| PHP class / props | x Not Supported                 | Full class support     |
+| Pass data         | ~ Array only                    | `@props([])` + `$slot` |
+| Scalability       | ~ Simple partials               | Professional scale     |

@@ -77,13 +77,23 @@ const techItems = [
 
 const projects = [
   {
-    title: 'Flutter Starter Kit',
-    desc: 'Stater Kit Untuk Mempermudah Pembuatan Aplikasi Flutter.',
+    title: 'Filament Starter Kit',
+    desc: 'Stater Kit Untuk mempermudah Pembuatan Aplikasi dengan Laravel dan Filament.',
     tech: ['Flutter', 'Dart'],
     image: '/img/images-dark.webp',
     links: {
-      live: 'https://github.com/lyrihkaesa/flutter-starter-kit',
-      repo: 'https://github.com/lyrihkaesa/flutter-starter-kit'
+      live: 'https://github.com/lyrihkaesa/filament-starter-kit',
+      repo: '/filament-starter-kit'
+    }
+  },
+  {
+    title: 'Flutter Starter Kit',
+    desc: 'Stater Kit Untuk mempermudah Pembuatan Aplikasi Flutter.',
+    tech: ['Flutter', 'Dart'],
+    image: '/img/images-dark.webp',
+    links: {
+      live: 'https://github.com/lyrihkaesa/flutter_starter_kit',
+      repo: '/flutter_starter_kit'
     }
   },
   {
