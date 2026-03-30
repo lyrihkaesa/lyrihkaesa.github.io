@@ -28,8 +28,12 @@ php artisan test
 Jika Anda ingin menguji aplikasi di lingkungan yang identik dengan produksi, Anda bisa menggunakan PostgreSQL.
 
 ### Persiapan
-1.  Buat database khusus untuk pengujian di PostgreSQL Anda, misalnya: `filament_starter_kit_test`.
-2.  Pastikan kredensial di file `.env.testing` sudah benar:
+1.  Salin file `.env.testing.example` menjadi `.env.testing`:
+    ```bash
+    cp .env.testing.example .env.testing
+    ```
+2.  Buat database khusus untuk pengujian di PostgreSQL Anda, misalnya: `filament_starter_kit_test`.
+3.  Pastikan kredensial di file `.env.testing` sudah benar:
     ```env
     DB_CONNECTION=pgsql
     DB_HOST=127.0.0.1
