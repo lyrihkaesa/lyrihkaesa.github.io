@@ -32,6 +32,58 @@ const getDefaultState = () =>
     .sort((a, b) => a.id - b.id)
     .map((item) => ({ ...item, active: true, split: false, dr: '1', v1: 0, v2: 0, ket: '' }))
 
+const clampSplitValue = (value, max) => {
+  const parsed = Number.parseInt(value, 10)
+  if (Number.isNaN(parsed)) return 0
+  return Math.min(Math.max(0, parsed), max)
+}
+
+const toCompactPayload = (state) =>
+  state.map((item) => [
+    item.active ? 1 : 0,
+    item.split ? 1 : 0,
+    item.dr === '2' ? 2 : 1,
+    item.v1 ?? 0,
+    item.v2 ?? 0,
+    item.ket ?? ''
+  ])
+
+const fromCompactPayload = (payload) => {
+  const defaults = getDefaultState()
+  if (!Array.isArray(payload)) return defaults
+
+  return defaults.map((base, index) => {
+    const row = payload[index]
+    if (!Array.isArray(row)) return base
+
+    const [active, split, driver, v1, v2, ket] = row
+    const total = base.pk + base.pb
+    const safeV1 = clampSplitValue(v1, total)
+    const safeV2 = clampSplitValue(v2, total)
+    const useSplit = Boolean(split)
+
+    return {
+      ...base,
+      active: Boolean(active),
+      split: useSplit,
+      dr: driver === 2 ? '2' : '1',
+      v1: useSplit ? safeV1 : 0,
+      v2: useSplit ? Math.min(total - safeV1, safeV2) : 0,
+      ket: typeof ket === 'string' ? ket : ''
+    }
+  })
+}
+
+const decodeSharedState = (sharedValue) => {
+  const parsed = JSON.parse(fromSafeBase64(sharedValue))
+  if (!Array.isArray(parsed)) return getDefaultState()
+  if (parsed.length > 0 && parsed[0] && typeof parsed[0] === 'object' && 'nama' in parsed[0]) {
+    return parsed
+  }
+
+  return fromCompactPayload(parsed)
+}
+
 const toSafeBase64 = (value) => {
   const encoded = encodeURIComponent(value).replace(/%([0-9A-F]{2})/g, (_, p1) =>
     String.fromCharCode(Number.parseInt(p1, 16))
@@ -77,6 +129,10 @@ const categoryTheme = (cat) => {
 export default function JktGiziPage() {
   const [state, setState] = useState([])
   const [isReady, setIsReady] = useState(false)
+  const compactHref = useMemo(() => {
+    const query = `d=${toSafeBase64(JSON.stringify(toCompactPayload(state)))}`
+    return `/jkt-compact?${query}`
+  }, [state])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -87,7 +143,7 @@ export default function JktGiziPage() {
 
     if (shared) {
       try {
-        initial = JSON.parse(fromSafeBase64(shared))
+        initial = decodeSharedState(shared)
       } catch {
         initial = getDefaultState()
       }
@@ -111,7 +167,7 @@ export default function JktGiziPage() {
 
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
 
-    const encoded = toSafeBase64(JSON.stringify(state))
+    const encoded = toSafeBase64(JSON.stringify(toCompactPayload(state)))
     const baseUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`
     window.history.replaceState({}, '', `${baseUrl}?d=${encoded}`)
   }, [isReady, state])
@@ -125,9 +181,18 @@ export default function JktGiziPage() {
     let pb2 = 0
     let l1 = 0
     let l2 = 0
+    let activeCount = 0
+    let nonActiveCount = 0
+    let nonActiveTotal = 0
 
     for (const item of state) {
-      if (!item.active) continue
+      if (!item.active) {
+        nonActiveCount += 1
+        nonActiveTotal += item.pk + item.pb
+        continue
+      }
+
+      activeCount += 1
 
       if (item.split) {
         t1 += item.v1
@@ -159,6 +224,11 @@ export default function JktGiziPage() {
       pb2,
       l1,
       l2,
+      activeCount,
+      nonActiveCount,
+      activeTotal: t1 + t2,
+      nonActiveTotal,
+      totalAll: t1 + t2 + nonActiveTotal,
       diff: Math.abs(t1 - t2)
     }
   }, [state])
@@ -301,7 +371,13 @@ export default function JktGiziPage() {
 
   return (
     <Layout title='Dashboard Porsi Gizi'>
-      <main className='relative min-h-screen overflow-x-hidden bg-slate-100 py-10 dark:bg-slate-950'>
+      <main className='relative min-h-screen overflow-x-hidden bg-slate-100 py-10 pb-36 lg:pb-10 dark:bg-slate-950'>
+        <style>{`
+          .navbar,
+          .footer {
+            display: none !important;
+          }
+        `}</style>
         <div className='pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_10%_20%,rgba(14,165,233,.20),transparent_30%),radial-gradient(circle_at_90%_10%,rgba(16,185,129,.20),transparent_30%),radial-gradient(circle_at_50%_80%,rgba(245,158,11,.15),transparent_35%)] dark:opacity-60' />
 
         <div className='relative mx-auto max-w-7xl px-4'>
@@ -317,6 +393,14 @@ export default function JktGiziPage() {
               </div>
 
               <div className='flex flex-wrap gap-2'>
+                <a
+                  href={compactHref}
+                  target='_blank'
+                  rel='noreferrer'
+                  className='rounded-xl border border-sky-300 bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-900 transition hover:bg-sky-200 dark:border-sky-500/40 dark:bg-sky-400/10 dark:text-sky-200 dark:hover:bg-sky-400/20'
+                >
+                  View Compact
+                </a>
                 <button
                   type='button'
                   onClick={copyUrl}
@@ -575,7 +659,7 @@ export default function JktGiziPage() {
                 </div>
               </div>
 
-              <aside className='mt-6 space-y-4 lg:sticky lg:top-24 lg:mt-0 lg:self-start'>
+              <aside className='mt-6 hidden space-y-4 lg:sticky lg:top-24 lg:mt-0 lg:block lg:self-start'>
                 <article className='rounded-2xl bg-gradient-to-br from-sky-600 to-blue-700 p-4 text-white shadow-lg shadow-blue-900/20'>
                   <h2 className='text-sm font-semibold tracking-wider text-blue-100 uppercase'>
                     Driver 1
@@ -629,8 +713,20 @@ export default function JktGiziPage() {
                   </button>
                 </article>
 
-                <div className='rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-center text-sm font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'>
-                  Selisih: {summary.diff} {summary.diff === 0 ? '(Sempurna)' : ''}
+                <div className='rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'>
+                  <div className='flex flex-wrap gap-x-4 gap-y-1'>
+                    <span>Total: {summary.totalAll}</span>
+                    <span className='text-slate-300 dark:text-slate-600'>|</span>
+                    <span className='text-green-600 dark:text-green-400'>
+                      Aktif ({summary.activeCount}): {summary.activeTotal}
+                    </span>
+                    <span className='text-slate-300 dark:text-slate-600'>|</span>
+                    <span className='text-red-600 dark:text-red-400'>
+                      Non-Aktif ({summary.nonActiveCount}): {summary.nonActiveTotal}
+                    </span>
+                    <span className='text-slate-300 dark:text-slate-600'>|</span>
+                    <span>Selisih: {summary.diff}</span>
+                  </div>
                 </div>
 
                 <button
@@ -649,6 +745,63 @@ export default function JktGiziPage() {
               </aside>
             </div>
           </section>
+        </div>
+
+        <div className='fixed inset-x-0 bottom-0 z-40 border-t border-slate-300/80 bg-white/95 p-2 backdrop-blur lg:hidden dark:border-slate-700 dark:bg-slate-900/95'>
+          <div className='mx-auto max-w-7xl space-y-2 px-1'>
+            <div className='grid grid-cols-2 gap-2'>
+              <button
+                type='button'
+                onClick={() =>
+                  copyText(buildDriverTableText('1'), 'Data Driver 1 berhasil disalin.')
+                }
+                className='rounded-xl border border-sky-300 bg-sky-100 px-2 py-2 text-left text-sky-900'
+              >
+                <p className='text-[11px] font-bold uppercase'>Driver 1</p>
+                <p className='text-lg leading-none font-extrabold'>{summary.t1}</p>
+                <p className='text-[10px] font-semibold'>
+                  {summary.pk1}/{summary.pb1} • {summary.l1} lokasi
+                </p>
+              </button>
+              <button
+                type='button'
+                onClick={() =>
+                  copyText(buildDriverTableText('2'), 'Data Driver 2 berhasil disalin.')
+                }
+                className='rounded-xl border border-emerald-300 bg-emerald-100 px-2 py-2 text-left text-emerald-900'
+              >
+                <p className='text-[11px] font-bold uppercase'>Driver 2</p>
+                <p className='text-lg leading-none font-extrabold'>{summary.t2}</p>
+                <p className='text-[10px] font-semibold'>
+                  {summary.pk2}/{summary.pb2} • {summary.l2} lokasi
+                </p>
+              </button>
+            </div>
+            <div className='flex items-center justify-between gap-2 rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100'>
+              <span className='text-sm leading-tight font-semibold'>
+                <span>TOTAL: {summary.totalAll}</span>
+                <span className='text-slate-400 dark:text-slate-500'> | </span>
+                <span className='text-green-600 dark:text-green-400'>
+                  AKTIF ({summary.activeCount}): {summary.activeTotal}
+                </span>
+                <span className='text-slate-400 dark:text-slate-500'> | </span>
+                <span className='text-red-600 dark:text-red-400'>
+                  NON-AKTIF ({summary.nonActiveCount}): {summary.nonActiveTotal}
+                </span>
+                <span className='text-slate-400 dark:text-slate-500'> | </span>
+                <span className='text-slate-800 dark:text-slate-100'>SELISIH: {summary.diff}</span>
+              </span>
+              <button
+                type='button'
+                onClick={() =>
+                  copyText(buildAllDriversTableText(), 'Semua data driver berhasil disalin.')
+                }
+                className='rounded-md border border-slate-300 bg-white px-2 py-0.5 text-[10px] font-bold dark:border-slate-600 dark:bg-slate-900'
+              >
+                Copy Semua
+              </button>
+            </div>
+          </div>
         </div>
       </main>
     </Layout>
