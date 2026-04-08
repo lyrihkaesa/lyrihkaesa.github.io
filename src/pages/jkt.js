@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import Layout from '@theme/Layout'
 
 const STORAGE_KEY = 'gizi_url_v1'
 
@@ -370,440 +369,432 @@ export default function JktGiziPage() {
   }
 
   return (
-    <Layout title='Dashboard Porsi Gizi'>
-      <main className='relative min-h-screen overflow-x-hidden bg-slate-100 py-10 pb-36 lg:pb-10 dark:bg-slate-950'>
-        <style>{`
+    <main className='relative min-h-screen overflow-x-hidden bg-slate-100 py-10 pb-36 lg:pb-10 dark:bg-slate-950'>
+      <style>{`
           .navbar,
           .footer {
             display: none !important;
           }
         `}</style>
-        <div className='pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_10%_20%,rgba(14,165,233,.20),transparent_30%),radial-gradient(circle_at_90%_10%,rgba(16,185,129,.20),transparent_30%),radial-gradient(circle_at_50%_80%,rgba(245,158,11,.15),transparent_35%)] dark:opacity-60' />
+      <div className='pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_10%_20%,rgba(14,165,233,.20),transparent_30%),radial-gradient(circle_at_90%_10%,rgba(16,185,129,.20),transparent_30%),radial-gradient(circle_at_50%_80%,rgba(245,158,11,.15),transparent_35%)] dark:opacity-60' />
 
-        <div className='relative mx-auto max-w-7xl px-4'>
-          <section className='rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-white/10 dark:bg-slate-900/70'>
-            <div className='mb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between'>
-              <div>
-                <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100'>
-                  Sistem Distribusi Porsi
-                </h1>
-                <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>
-                  Link URL otomatis sinkron dengan data pembagian saat ini.
-                </p>
-              </div>
+      <div className='relative mx-auto max-w-7xl px-4'>
+        <section className='rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur dark:border-white/10 dark:bg-slate-900/70'>
+          <div className='mb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between'>
+            <div>
+              <h1 className='mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100'>
+                Sistem Distribusi Porsi
+              </h1>
+              <p className='mt-1 text-sm text-slate-600 dark:text-slate-300'>
+                Link URL otomatis sinkron dengan data pembagian saat ini.
+              </p>
+            </div>
 
-              <div className='flex flex-wrap gap-2'>
-                <a
-                  href={compactHref}
-                  target='_blank'
-                  rel='noreferrer'
-                  className='rounded-xl border border-sky-300 bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-900 transition hover:bg-sky-200 dark:border-sky-500/40 dark:bg-sky-400/10 dark:text-sky-200 dark:hover:bg-sky-400/20'
-                >
-                  View Compact
-                </a>
-                <button
-                  type='button'
-                  onClick={copyUrl}
-                  className='rounded-xl border border-amber-300 bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-200 dark:border-amber-500/40 dark:bg-amber-400/10 dark:text-amber-200 dark:hover:bg-amber-400/20'
-                >
-                  Salin Link Share
-                </button>
-                <button
-                  type='button'
-                  onClick={resetAll}
-                  className='rounded-xl border border-rose-300 bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-900 transition hover:bg-rose-200 dark:border-rose-500/40 dark:bg-rose-400/10 dark:text-rose-200 dark:hover:bg-rose-400/20'
-                >
-                  Reset Sistem
-                </button>
+            <div className='flex flex-wrap gap-2'>
+              <a
+                href={compactHref}
+                target='_blank'
+                rel='noreferrer'
+                className='rounded-xl border border-sky-300 bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-900 transition hover:bg-sky-200 dark:border-sky-500/40 dark:bg-sky-400/10 dark:text-sky-200 dark:hover:bg-sky-400/20'
+              >
+                View Compact
+              </a>
+              <button
+                type='button'
+                onClick={copyUrl}
+                className='rounded-xl border border-amber-300 bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-200 dark:border-amber-500/40 dark:bg-amber-400/10 dark:text-amber-200 dark:hover:bg-amber-400/20'
+              >
+                Salin Link Share
+              </button>
+              <button
+                type='button'
+                onClick={resetAll}
+                className='rounded-xl border border-rose-300 bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-900 transition hover:bg-rose-200 dark:border-rose-500/40 dark:bg-rose-400/10 dark:text-rose-200 dark:hover:bg-rose-400/20'
+              >
+                Reset Sistem
+              </button>
+            </div>
+          </div>
+
+          <div className='lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6'>
+            <div className='space-y-2 lg:hidden'>
+              {state.map((item, index) => {
+                const theme = categoryTheme(item.cat)
+                return (
+                  <article
+                    key={item.id}
+                    className={`rounded-xl border p-3 ${
+                      item.active
+                        ? 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'
+                        : 'border-rose-200 bg-rose-50/70 opacity-80 dark:border-rose-900/50 dark:bg-rose-950/20'
+                    }`}
+                  >
+                    <div className='flex items-start justify-between gap-3'>
+                      <div>
+                        <p className='text-xs font-semibold text-slate-500 dark:text-slate-400'>
+                          ID #{item.id}
+                        </p>
+                        <p className={`mt-0.5 text-xs font-semibold ${theme.text}`}>{item.nama}</p>
+                        <span
+                          className={`mt-1.5 inline-flex rounded-md px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase ${theme.badge}`}
+                        >
+                          {item.cat}
+                        </span>
+                      </div>
+                      <label className='inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200'>
+                        <input
+                          type='checkbox'
+                          checked={item.active}
+                          onChange={() => toggleActive(index)}
+                          className='h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500'
+                        />
+                        Aktif
+                      </label>
+                    </div>
+
+                    <div className='mt-2 grid grid-cols-3 gap-1.5 text-[11px] text-slate-700 dark:text-slate-200'>
+                      <p>Kecil: {item.pk}</p>
+                      <p>Besar: {item.pb}</p>
+                      <p className='font-semibold'>Total: {item.pk + item.pb}</p>
+                    </div>
+
+                    <div className='mt-2 flex flex-wrap items-center gap-2'>
+                      <label className='inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200'>
+                        <input
+                          type='checkbox'
+                          checked={item.split}
+                          disabled={!item.active}
+                          onChange={() => toggleSplit(index)}
+                          className='h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-40'
+                        />
+                        Split
+                      </label>
+
+                      {item.active && !item.split ? (
+                        <div className='flex gap-2 text-xs text-slate-700 dark:text-slate-200'>
+                          <label className='inline-flex items-center gap-1'>
+                            <input
+                              type='radio'
+                              name={`driver-mobile-${index}`}
+                              checked={item.dr === '1'}
+                              onChange={() => setDriver(index, '1')}
+                            />
+                            D1
+                          </label>
+                          <label className='inline-flex items-center gap-1'>
+                            <input
+                              type='radio'
+                              name={`driver-mobile-${index}`}
+                              checked={item.dr === '2'}
+                              onChange={() => setDriver(index, '2')}
+                            />
+                            D2
+                          </label>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {item.active && item.split ? (
+                      <div className='mt-2 grid grid-cols-2 gap-1.5'>
+                        <input
+                          type='number'
+                          min='0'
+                          value={item.v1}
+                          onChange={(event) => setSplitValue(index, 'v1', event.target.value)}
+                          className='w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
+                          aria-label={`Split Driver 1 ${item.nama}`}
+                        />
+                        <input
+                          type='number'
+                          min='0'
+                          value={item.v2}
+                          onChange={(event) => setSplitValue(index, 'v2', event.target.value)}
+                          className='w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
+                          aria-label={`Split Driver 2 ${item.nama}`}
+                        />
+                      </div>
+                    ) : null}
+
+                    <input
+                      type='text'
+                      value={item.ket}
+                      onChange={(event) => setKeterangan(index, event.target.value)}
+                      placeholder='Catatan...'
+                      className='mt-2 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs ring-slate-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'
+                    />
+                  </article>
+                )
+              })}
+            </div>
+
+            <div className='hidden rounded-2xl border border-slate-200 bg-white lg:block dark:border-slate-700 dark:bg-slate-900'>
+              <div className='max-h-[calc(100vh-12rem)] overflow-auto'>
+                <table className='min-w-[980px] text-sm'>
+                  <thead className='sticky top-0 z-10'>
+                    <tr className='bg-slate-900 text-left text-xs tracking-wide text-slate-100 uppercase dark:bg-slate-800'>
+                      <th className='px-3 py-3'>ID</th>
+                      <th className='px-3 py-3'>Aktif</th>
+                      <th className='px-3 py-3'>Penerima</th>
+                      <th className='px-3 py-3'>Porsi</th>
+                      <th className='px-3 py-3'>Split</th>
+                      <th className='px-3 py-3'>Driver</th>
+                      <th className='px-3 py-3'>Keterangan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {state.map((item, index) => {
+                      const theme = categoryTheme(item.cat)
+                      return (
+                        <tr
+                          key={item.id}
+                          className={`border-t border-slate-200 dark:border-slate-800 ${
+                            item.active
+                              ? 'bg-white dark:bg-slate-900'
+                              : 'bg-rose-50/70 opacity-65 dark:bg-rose-950/20'
+                          }`}
+                        >
+                          <td className='px-3 py-3 font-semibold text-slate-700 dark:text-slate-200'>
+                            {item.id}
+                          </td>
+                          <td className='px-3 py-3'>
+                            <input
+                              type='checkbox'
+                              checked={item.active}
+                              onChange={() => toggleActive(index)}
+                              className='h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500'
+                            />
+                          </td>
+                          <td className='px-3 py-3'>
+                            <div className='space-y-1'>
+                              <p className={`font-semibold ${theme.text}`}>{item.nama}</p>
+                              <span
+                                className={`inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${theme.badge}`}
+                              >
+                                {item.cat}
+                              </span>
+                            </div>
+                          </td>
+                          <td className='px-5 py-3 text-xs text-slate-600 dark:text-slate-300'>
+                            Kecil: {item.pk} | Besar: {item.pb}
+                            <p className='mt-1 font-semibold text-slate-800 dark:text-slate-100'>
+                              Total: {item.pk + item.pb}
+                            </p>
+                          </td>
+                          <td className='px-3 py-3'>
+                            <input
+                              type='checkbox'
+                              checked={item.split}
+                              disabled={!item.active}
+                              onChange={() => toggleSplit(index)}
+                              className='h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-40'
+                            />
+                          </td>
+                          <td className='px-3 py-3'>
+                            {item.active && !item.split ? (
+                              <div className='flex gap-3 text-xs text-slate-700 dark:text-slate-200'>
+                                <label className='inline-flex items-center gap-1'>
+                                  <input
+                                    type='radio'
+                                    name={`driver-${index}`}
+                                    checked={item.dr === '1'}
+                                    onChange={() => setDriver(index, '1')}
+                                  />
+                                  D1
+                                </label>
+                                <label className='inline-flex items-center gap-1'>
+                                  <input
+                                    type='radio'
+                                    name={`driver-${index}`}
+                                    checked={item.dr === '2'}
+                                    onChange={() => setDriver(index, '2')}
+                                  />
+                                  D2
+                                </label>
+                              </div>
+                            ) : null}
+
+                            {item.active && item.split ? (
+                              <div className='flex gap-2'>
+                                <input
+                                  type='number'
+                                  min='0'
+                                  value={item.v1}
+                                  onChange={(event) =>
+                                    setSplitValue(index, 'v1', event.target.value)
+                                  }
+                                  className='w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
+                                  aria-label={`Split Driver 1 ${item.nama}`}
+                                />
+                                <input
+                                  type='number'
+                                  min='0'
+                                  value={item.v2}
+                                  onChange={(event) =>
+                                    setSplitValue(index, 'v2', event.target.value)
+                                  }
+                                  className='w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
+                                  aria-label={`Split Driver 2 ${item.nama}`}
+                                />
+                              </div>
+                            ) : null}
+                          </td>
+                          <td className='px-3 py-3'>
+                            <input
+                              type='text'
+                              value={item.ket}
+                              onChange={(event) => setKeterangan(index, event.target.value)}
+                              placeholder='Catatan...'
+                              className='w-full min-w-48 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs ring-slate-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'
+                            />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <div className='lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-6'>
-              <div className='space-y-2 lg:hidden'>
-                {state.map((item, index) => {
-                  const theme = categoryTheme(item.cat)
-                  return (
-                    <article
-                      key={item.id}
-                      className={`rounded-xl border p-3 ${
-                        item.active
-                          ? 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'
-                          : 'border-rose-200 bg-rose-50/70 opacity-80 dark:border-rose-900/50 dark:bg-rose-950/20'
-                      }`}
-                    >
-                      <div className='flex items-start justify-between gap-3'>
-                        <div>
-                          <p className='text-xs font-semibold text-slate-500 dark:text-slate-400'>
-                            ID #{item.id}
-                          </p>
-                          <p className={`mt-0.5 text-xs font-semibold ${theme.text}`}>
-                            {item.nama}
-                          </p>
-                          <span
-                            className={`mt-1.5 inline-flex rounded-md px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase ${theme.badge}`}
-                          >
-                            {item.cat}
-                          </span>
-                        </div>
-                        <label className='inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200'>
-                          <input
-                            type='checkbox'
-                            checked={item.active}
-                            onChange={() => toggleActive(index)}
-                            className='h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500'
-                          />
-                          Aktif
-                        </label>
-                      </div>
-
-                      <div className='mt-2 grid grid-cols-3 gap-1.5 text-[11px] text-slate-700 dark:text-slate-200'>
-                        <p>Kecil: {item.pk}</p>
-                        <p>Besar: {item.pb}</p>
-                        <p className='font-semibold'>Total: {item.pk + item.pb}</p>
-                      </div>
-
-                      <div className='mt-2 flex flex-wrap items-center gap-2'>
-                        <label className='inline-flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200'>
-                          <input
-                            type='checkbox'
-                            checked={item.split}
-                            disabled={!item.active}
-                            onChange={() => toggleSplit(index)}
-                            className='h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-40'
-                          />
-                          Split
-                        </label>
-
-                        {item.active && !item.split ? (
-                          <div className='flex gap-2 text-xs text-slate-700 dark:text-slate-200'>
-                            <label className='inline-flex items-center gap-1'>
-                              <input
-                                type='radio'
-                                name={`driver-mobile-${index}`}
-                                checked={item.dr === '1'}
-                                onChange={() => setDriver(index, '1')}
-                              />
-                              D1
-                            </label>
-                            <label className='inline-flex items-center gap-1'>
-                              <input
-                                type='radio'
-                                name={`driver-mobile-${index}`}
-                                checked={item.dr === '2'}
-                                onChange={() => setDriver(index, '2')}
-                              />
-                              D2
-                            </label>
-                          </div>
-                        ) : null}
-                      </div>
-
-                      {item.active && item.split ? (
-                        <div className='mt-2 grid grid-cols-2 gap-1.5'>
-                          <input
-                            type='number'
-                            min='0'
-                            value={item.v1}
-                            onChange={(event) => setSplitValue(index, 'v1', event.target.value)}
-                            className='w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
-                            aria-label={`Split Driver 1 ${item.nama}`}
-                          />
-                          <input
-                            type='number'
-                            min='0'
-                            value={item.v2}
-                            onChange={(event) => setSplitValue(index, 'v2', event.target.value)}
-                            className='w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
-                            aria-label={`Split Driver 2 ${item.nama}`}
-                          />
-                        </div>
-                      ) : null}
-
-                      <input
-                        type='text'
-                        value={item.ket}
-                        onChange={(event) => setKeterangan(index, event.target.value)}
-                        placeholder='Catatan...'
-                        className='mt-2 w-full rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs ring-slate-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'
-                      />
-                    </article>
-                  )
-                })}
-              </div>
-
-              <div className='hidden rounded-2xl border border-slate-200 bg-white lg:block dark:border-slate-700 dark:bg-slate-900'>
-                <div className='max-h-[calc(100vh-12rem)] overflow-auto'>
-                  <table className='min-w-[980px] text-sm'>
-                    <thead className='sticky top-0 z-10'>
-                      <tr className='bg-slate-900 text-left text-xs tracking-wide text-slate-100 uppercase dark:bg-slate-800'>
-                        <th className='px-3 py-3'>ID</th>
-                        <th className='px-3 py-3'>Aktif</th>
-                        <th className='px-3 py-3'>Penerima</th>
-                        <th className='px-3 py-3'>Porsi</th>
-                        <th className='px-3 py-3'>Split</th>
-                        <th className='px-3 py-3'>Driver</th>
-                        <th className='px-3 py-3'>Keterangan</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {state.map((item, index) => {
-                        const theme = categoryTheme(item.cat)
-                        return (
-                          <tr
-                            key={item.id}
-                            className={`border-t border-slate-200 dark:border-slate-800 ${
-                              item.active
-                                ? 'bg-white dark:bg-slate-900'
-                                : 'bg-rose-50/70 opacity-65 dark:bg-rose-950/20'
-                            }`}
-                          >
-                            <td className='px-3 py-3 font-semibold text-slate-700 dark:text-slate-200'>
-                              {item.id}
-                            </td>
-                            <td className='px-3 py-3'>
-                              <input
-                                type='checkbox'
-                                checked={item.active}
-                                onChange={() => toggleActive(index)}
-                                className='h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500'
-                              />
-                            </td>
-                            <td className='px-3 py-3'>
-                              <div className='space-y-1'>
-                                <p className={`font-semibold ${theme.text}`}>{item.nama}</p>
-                                <span
-                                  className={`inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase ${theme.badge}`}
-                                >
-                                  {item.cat}
-                                </span>
-                              </div>
-                            </td>
-                            <td className='px-5 py-3 text-xs text-slate-600 dark:text-slate-300'>
-                              Kecil: {item.pk} | Besar: {item.pb}
-                              <p className='mt-1 font-semibold text-slate-800 dark:text-slate-100'>
-                                Total: {item.pk + item.pb}
-                              </p>
-                            </td>
-                            <td className='px-3 py-3'>
-                              <input
-                                type='checkbox'
-                                checked={item.split}
-                                disabled={!item.active}
-                                onChange={() => toggleSplit(index)}
-                                className='h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 disabled:cursor-not-allowed disabled:opacity-40'
-                              />
-                            </td>
-                            <td className='px-3 py-3'>
-                              {item.active && !item.split ? (
-                                <div className='flex gap-3 text-xs text-slate-700 dark:text-slate-200'>
-                                  <label className='inline-flex items-center gap-1'>
-                                    <input
-                                      type='radio'
-                                      name={`driver-${index}`}
-                                      checked={item.dr === '1'}
-                                      onChange={() => setDriver(index, '1')}
-                                    />
-                                    D1
-                                  </label>
-                                  <label className='inline-flex items-center gap-1'>
-                                    <input
-                                      type='radio'
-                                      name={`driver-${index}`}
-                                      checked={item.dr === '2'}
-                                      onChange={() => setDriver(index, '2')}
-                                    />
-                                    D2
-                                  </label>
-                                </div>
-                              ) : null}
-
-                              {item.active && item.split ? (
-                                <div className='flex gap-2'>
-                                  <input
-                                    type='number'
-                                    min='0'
-                                    value={item.v1}
-                                    onChange={(event) =>
-                                      setSplitValue(index, 'v1', event.target.value)
-                                    }
-                                    className='w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
-                                    aria-label={`Split Driver 1 ${item.nama}`}
-                                  />
-                                  <input
-                                    type='number'
-                                    min='0'
-                                    value={item.v2}
-                                    onChange={(event) =>
-                                      setSplitValue(index, 'v2', event.target.value)
-                                    }
-                                    className='w-20 rounded-lg border border-slate-300 bg-white px-2 py-1 text-xs ring-cyan-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800'
-                                    aria-label={`Split Driver 2 ${item.nama}`}
-                                  />
-                                </div>
-                              ) : null}
-                            </td>
-                            <td className='px-3 py-3'>
-                              <input
-                                type='text'
-                                value={item.ket}
-                                onChange={(event) => setKeterangan(index, event.target.value)}
-                                placeholder='Catatan...'
-                                className='w-full min-w-48 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs ring-slate-300 outline-none focus:ring dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'
-                              />
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+            <aside className='mt-6 hidden space-y-4 lg:sticky lg:top-24 lg:mt-0 lg:block lg:self-start'>
+              <article className='rounded-2xl bg-gradient-to-br from-sky-600 to-blue-700 p-4 text-white shadow-lg shadow-blue-900/20'>
+                <h2 className='text-sm font-semibold tracking-wider text-blue-100 uppercase'>
+                  Driver 1
+                </h2>
+                <p className='text-4xl font-bold'>{summary.t1}</p>
+                <div className='flex items-center justify-between border-t border-white/20 text-sm text-blue-100'>
+                  <span>Kecil/Besar</span>
+                  <span className='font-semibold'>
+                    {summary.pk1}/{summary.pb1}
+                  </span>
                 </div>
-              </div>
-
-              <aside className='mt-6 hidden space-y-4 lg:sticky lg:top-24 lg:mt-0 lg:block lg:self-start'>
-                <article className='rounded-2xl bg-gradient-to-br from-sky-600 to-blue-700 p-4 text-white shadow-lg shadow-blue-900/20'>
-                  <h2 className='text-sm font-semibold tracking-wider text-blue-100 uppercase'>
-                    Driver 1
-                  </h2>
-                  <p className='text-4xl font-bold'>{summary.t1}</p>
-                  <div className='flex items-center justify-between border-t border-white/20 text-sm text-blue-100'>
-                    <span>Kecil/Besar</span>
-                    <span className='font-semibold'>
-                      {summary.pk1}/{summary.pb1}
-                    </span>
-                  </div>
-                  <div className='flex items-center justify-between text-sm text-blue-100'>
-                    <span>Lokasi</span>
-                    <span className='font-semibold'>{summary.l1}</span>
-                  </div>
-                  <button
-                    type='button'
-                    onClick={() =>
-                      copyText(buildDriverTableText('1'), 'Data Driver 1 berhasil disalin.')
-                    }
-                    className='mt-4 inline-flex w-full items-center justify-center rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/20'
-                  >
-                    Copy Driver 1
-                  </button>
-                </article>
-
-                <article className='rounded-2xl bg-gradient-to-br from-emerald-600 to-green-700 p-4 text-white shadow-lg shadow-green-900/20'>
-                  <h2 className='text-sm font-semibold tracking-wider text-emerald-100 uppercase'>
-                    Driver 2
-                  </h2>
-                  <p className='text-4xl font-bold'>{summary.t2}</p>
-
-                  <div className='flex items-center justify-between border-t border-white/20 text-sm text-emerald-100'>
-                    <span>Kecil/Besar</span>
-                    <span className='font-semibold'>
-                      {summary.pk2}/{summary.pb2}
-                    </span>
-                  </div>
-                  <div className='flex items-center justify-between text-sm text-emerald-100'>
-                    <span>Lokasi</span>
-                    <span className='font-semibold'>{summary.l2}</span>
-                  </div>
-                  <button
-                    type='button'
-                    onClick={() =>
-                      copyText(buildDriverTableText('2'), 'Data Driver 2 berhasil disalin.')
-                    }
-                    className='mt-4 inline-flex w-full items-center justify-center rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/20'
-                  >
-                    Copy Driver 2
-                  </button>
-                </article>
-
-                <div className='rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'>
-                  <div className='flex flex-wrap gap-x-4 gap-y-1'>
-                    <span>Total: {summary.totalAll}</span>
-                    <span className='text-slate-300 dark:text-slate-600'>|</span>
-                    <span className='text-green-600 dark:text-green-400'>
-                      Aktif ({summary.activeCount}): {summary.activeTotal}
-                    </span>
-                    <span className='text-slate-300 dark:text-slate-600'>|</span>
-                    <span className='text-red-600 dark:text-red-400'>
-                      Non-Aktif ({summary.nonActiveCount}): {summary.nonActiveTotal}
-                    </span>
-                    <span className='text-slate-300 dark:text-slate-600'>|</span>
-                    <span>Selisih: {summary.diff}</span>
-                  </div>
+                <div className='flex items-center justify-between text-sm text-blue-100'>
+                  <span>Lokasi</span>
+                  <span className='font-semibold'>{summary.l1}</span>
                 </div>
-
                 <button
                   type='button'
                   onClick={() =>
-                    copyText(buildAllDriversTableText(), 'Semua data driver berhasil disalin.')
+                    copyText(buildDriverTableText('1'), 'Data Driver 1 berhasil disalin.')
                   }
-                  className='inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800'
+                  className='mt-4 inline-flex w-full items-center justify-center rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/20'
                 >
-                  Copy Semua Driver
+                  Copy Driver 1
                 </button>
+              </article>
 
-                {!isReady ? (
-                  <p className='text-sm text-slate-500 dark:text-slate-400'>Memuat data...</p>
-                ) : null}
-              </aside>
-            </div>
-          </section>
-        </div>
+              <article className='rounded-2xl bg-gradient-to-br from-emerald-600 to-green-700 p-4 text-white shadow-lg shadow-green-900/20'>
+                <h2 className='text-sm font-semibold tracking-wider text-emerald-100 uppercase'>
+                  Driver 2
+                </h2>
+                <p className='text-4xl font-bold'>{summary.t2}</p>
 
-        <div className='fixed inset-x-0 bottom-0 z-40 border-t border-slate-300/80 bg-white/95 p-2 backdrop-blur lg:hidden dark:border-slate-700 dark:bg-slate-900/95'>
-          <div className='mx-auto max-w-7xl space-y-2 px-1'>
-            <div className='grid grid-cols-2 gap-2'>
-              <button
-                type='button'
-                onClick={() =>
-                  copyText(buildDriverTableText('1'), 'Data Driver 1 berhasil disalin.')
-                }
-                className='rounded-xl border border-sky-300 bg-sky-100 px-2 py-2 text-left text-sky-900'
-              >
-                <p className='text-[11px] font-bold uppercase'>Driver 1</p>
-                <p className='text-lg leading-none font-extrabold'>{summary.t1}</p>
-                <p className='text-[10px] font-semibold'>
-                  {summary.pk1}/{summary.pb1} • {summary.l1} lokasi
-                </p>
-              </button>
-              <button
-                type='button'
-                onClick={() =>
-                  copyText(buildDriverTableText('2'), 'Data Driver 2 berhasil disalin.')
-                }
-                className='rounded-xl border border-emerald-300 bg-emerald-100 px-2 py-2 text-left text-emerald-900'
-              >
-                <p className='text-[11px] font-bold uppercase'>Driver 2</p>
-                <p className='text-lg leading-none font-extrabold'>{summary.t2}</p>
-                <p className='text-[10px] font-semibold'>
-                  {summary.pk2}/{summary.pb2} • {summary.l2} lokasi
-                </p>
-              </button>
-            </div>
-            <div className='flex items-center justify-between gap-2 rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100'>
-              <span className='text-sm leading-tight font-semibold'>
-                <span>TOTAL: {summary.totalAll}</span>
-                <span className='text-slate-400 dark:text-slate-500'> | </span>
-                <span className='text-green-600 dark:text-green-400'>
-                  AKTIF ({summary.activeCount}): {summary.activeTotal}
-                </span>
-                <span className='text-slate-400 dark:text-slate-500'> | </span>
-                <span className='text-red-600 dark:text-red-400'>
-                  NON-AKTIF ({summary.nonActiveCount}): {summary.nonActiveTotal}
-                </span>
-                <span className='text-slate-400 dark:text-slate-500'> | </span>
-                <span className='text-slate-800 dark:text-slate-100'>SELISIH: {summary.diff}</span>
-              </span>
+                <div className='flex items-center justify-between border-t border-white/20 text-sm text-emerald-100'>
+                  <span>Kecil/Besar</span>
+                  <span className='font-semibold'>
+                    {summary.pk2}/{summary.pb2}
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-sm text-emerald-100'>
+                  <span>Lokasi</span>
+                  <span className='font-semibold'>{summary.l2}</span>
+                </div>
+                <button
+                  type='button'
+                  onClick={() =>
+                    copyText(buildDriverTableText('2'), 'Data Driver 2 berhasil disalin.')
+                  }
+                  className='mt-4 inline-flex w-full items-center justify-center rounded-lg border border-white/30 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/20'
+                >
+                  Copy Driver 2
+                </button>
+              </article>
+
+              <div className='rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100'>
+                <div className='flex flex-wrap gap-x-4 gap-y-1'>
+                  <span>Total: {summary.totalAll}</span>
+                  <span className='text-slate-300 dark:text-slate-600'>|</span>
+                  <span className='text-green-600 dark:text-green-400'>
+                    Aktif ({summary.activeCount}): {summary.activeTotal}
+                  </span>
+                  <span className='text-slate-300 dark:text-slate-600'>|</span>
+                  <span className='text-red-600 dark:text-red-400'>
+                    Non-Aktif ({summary.nonActiveCount}): {summary.nonActiveTotal}
+                  </span>
+                  <span className='text-slate-300 dark:text-slate-600'>|</span>
+                  <span>Selisih: {summary.diff}</span>
+                </div>
+              </div>
+
               <button
                 type='button'
                 onClick={() =>
                   copyText(buildAllDriversTableText(), 'Semua data driver berhasil disalin.')
                 }
-                className='rounded-md border border-slate-300 bg-white px-2 py-0.5 text-[10px] font-bold dark:border-slate-600 dark:bg-slate-900'
+                className='inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-800 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800'
               >
-                Copy Semua
+                Copy Semua Driver
               </button>
-            </div>
+
+              {!isReady ? (
+                <p className='text-sm text-slate-500 dark:text-slate-400'>Memuat data...</p>
+              ) : null}
+            </aside>
+          </div>
+        </section>
+      </div>
+
+      <div className='fixed inset-x-0 bottom-0 z-40 border-t border-slate-300/80 bg-white/95 p-2 backdrop-blur lg:hidden dark:border-slate-700 dark:bg-slate-900/95'>
+        <div className='mx-auto max-w-7xl space-y-2 px-1'>
+          <div className='grid grid-cols-2 gap-2'>
+            <button
+              type='button'
+              onClick={() => copyText(buildDriverTableText('1'), 'Data Driver 1 berhasil disalin.')}
+              className='rounded-xl border border-sky-300 bg-sky-100 px-2 py-2 text-left text-sky-900'
+            >
+              <p className='text-[11px] font-bold uppercase'>Driver 1</p>
+              <p className='text-lg leading-none font-extrabold'>{summary.t1}</p>
+              <p className='text-[10px] font-semibold'>
+                {summary.pk1}/{summary.pb1} • {summary.l1} lokasi
+              </p>
+            </button>
+            <button
+              type='button'
+              onClick={() => copyText(buildDriverTableText('2'), 'Data Driver 2 berhasil disalin.')}
+              className='rounded-xl border border-emerald-300 bg-emerald-100 px-2 py-2 text-left text-emerald-900'
+            >
+              <p className='text-[11px] font-bold uppercase'>Driver 2</p>
+              <p className='text-lg leading-none font-extrabold'>{summary.t2}</p>
+              <p className='text-[10px] font-semibold'>
+                {summary.pk2}/{summary.pb2} • {summary.l2} lokasi
+              </p>
+            </button>
+          </div>
+          <div className='flex items-center justify-between gap-2 rounded-lg bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-800 dark:bg-slate-800 dark:text-slate-100'>
+            <span className='text-sm leading-tight font-semibold'>
+              <span>TOTAL: {summary.totalAll}</span>
+              <span className='text-slate-400 dark:text-slate-500'> | </span>
+              <span className='text-green-600 dark:text-green-400'>
+                AKTIF ({summary.activeCount}): {summary.activeTotal}
+              </span>
+              <span className='text-slate-400 dark:text-slate-500'> | </span>
+              <span className='text-red-600 dark:text-red-400'>
+                NON-AKTIF ({summary.nonActiveCount}): {summary.nonActiveTotal}
+              </span>
+              <span className='text-slate-400 dark:text-slate-500'> | </span>
+              <span className='text-slate-800 dark:text-slate-100'>SELISIH: {summary.diff}</span>
+            </span>
+            <button
+              type='button'
+              onClick={() =>
+                copyText(buildAllDriversTableText(), 'Semua data driver berhasil disalin.')
+              }
+              className='rounded-md border border-slate-300 bg-white px-2 py-0.5 text-[10px] font-bold dark:border-slate-600 dark:bg-slate-900'
+            >
+              Copy Semua
+            </button>
           </div>
         </div>
-      </main>
-    </Layout>
+      </div>
+    </main>
   )
 }
