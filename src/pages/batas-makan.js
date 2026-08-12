@@ -64,6 +64,14 @@ export default function BatasMakanPage() {
   const [wrapMode, setWrapMode] = useState('auto')
   const [colorMode, setColorMode] = useState('color') // 'color' or 'bw'
 
+  // Per-Input Custom Font Sizes (in pt)
+  const [fontHeader, setFontHeader] = useState(10)
+  const [fontTanggal, setFontTanggal] = useState(13)
+  const [fontJam, setFontJam] = useState(14)
+  const [fontMenu, setFontMenu] = useState(8.5)
+  const [fontPorsi, setFontPorsi] = useState(8)
+  const [fontCatatan, setFontCatatan] = useState(7.5)
+
   // Batch List for printing multiple different menus in one run
   const [items, setItems] = useState([])
 
@@ -80,6 +88,25 @@ export default function BatasMakanPage() {
     const h = String(dateObj.getHours()).padStart(2, '0')
     const min = String(dateObj.getMinutes()).padStart(2, '0')
     return `${h}.${min} WIB`
+  }
+
+  // Reset Font Sizes helper
+  const handleResetFontSizes = (h = heightMm) => {
+    if (h <= 32) {
+      setFontHeader(8.5)
+      setFontTanggal(10.5)
+      setFontJam(11.5)
+      setFontMenu(7.5)
+      setFontPorsi(7)
+      setFontCatatan(6.5)
+    } else {
+      setFontHeader(10)
+      setFontTanggal(13)
+      setFontJam(14)
+      setFontMenu(8.5)
+      setFontPorsi(8)
+      setFontCatatan(7.5)
+    }
   }
 
   // Set default date & time on mount
@@ -122,7 +149,13 @@ export default function BatasMakanPage() {
       jumlah: Number(jumlah) || 1,
       separator,
       wrapMode,
-      colorMode
+      colorMode,
+      fontHeader,
+      fontTanggal,
+      fontJam,
+      fontMenu,
+      fontPorsi,
+      fontCatatan
     }
 
     setItems((prev) => [...prev, newItem])
@@ -161,7 +194,13 @@ export default function BatasMakanPage() {
       catatan: (catatan || 'TIDAK UNTUK DIBAWA PULANG').toUpperCase().trim(),
       separator,
       wrapMode,
-      colorMode
+      colorMode,
+      fontHeader,
+      fontTanggal,
+      fontJam,
+      fontMenu,
+      fontPorsi,
+      fontCatatan
     }
 
     const list = []
@@ -170,7 +209,24 @@ export default function BatasMakanPage() {
       list.push(single)
     }
     return list
-  }, [items, tanggal, jam, namaMenu, porsiMenu, catatan, jumlah, separator, wrapMode, colorMode])
+  }, [
+    items,
+    tanggal,
+    jam,
+    namaMenu,
+    porsiMenu,
+    catatan,
+    jumlah,
+    separator,
+    wrapMode,
+    colorMode,
+    fontHeader,
+    fontTanggal,
+    fontJam,
+    fontMenu,
+    fontPorsi,
+    fontCatatan
+  ])
 
   // Open Clean Window Printer (Pure white page without any UI, background colors or theme elements)
   const handleOpenCleanPrintWindow = () => {
@@ -183,38 +239,40 @@ export default function BatasMakanPage() {
       return
     }
 
-    const isSmallHeight = heightMm <= 32
-
     const labelsHtml = activeLabels
       .map((lbl) => {
         const isBW = (lbl.colorMode || colorMode) === 'bw'
         const headerBg = isBW ? 'background: #000000; color: #ffffff;' : 'background: #16a34a; color: #ffffff;'
         const noteColor = isBW ? 'color: #000000;' : 'color: #dc2626;'
 
-        const headerFontSize = isSmallHeight ? '8.5pt' : '10pt'
+        const ftHeader = lbl.fontHeader || fontHeader
+        const ftTanggal = lbl.fontTanggal || fontTanggal
+        const ftJam = lbl.fontJam || fontJam
+        const ftMenu = lbl.fontMenu || fontMenu
+        const ftPorsi = lbl.fontPorsi || fontPorsi
+        const ftCatatan = lbl.fontCatatan || fontCatatan
+
+        const isSmallHeight = heightMm <= 32
         const headerPadding = isSmallHeight ? '1px 0' : '2px 0'
-        const dateFontSize = isSmallHeight ? '10.5pt' : '13pt'
-        const jamFontSize = isSmallHeight ? '11.5pt' : '14pt'
-        const noteFontSize = isSmallHeight ? '6.5pt' : '7.5pt'
         const notePadding = isSmallHeight ? '1px 0' : '2px 0'
 
         let menuPorsiContent = ''
         if (lbl.wrapMode === 'wrap') {
           menuPorsiContent = `
             <div style="line-height:1.1;">
-              <div style="font-size:${isSmallHeight ? '7.5pt' : '8.5pt'}; font-weight:800; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#000;">${lbl.namaMenu}</div>
-              <div style="font-size:${isSmallHeight ? '7pt' : '8pt'}; font-weight:700; text-transform:uppercase; color:#1e293b;">${lbl.separator !== 'none' ? lbl.separator + ' ' : ''}${lbl.porsiMenu}</div>
+              <div style="font-size:${ftMenu}pt; font-weight:800; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#000;">${lbl.namaMenu}</div>
+              <div style="font-size:${ftPorsi}pt; font-weight:700; text-transform:uppercase; color:#1e293b;">${lbl.separator !== 'none' ? lbl.separator + ' ' : ''}${lbl.porsiMenu}</div>
             </div>
           `
         } else if (lbl.wrapMode === 'single') {
           menuPorsiContent = `
-            <div style="font-size:${isSmallHeight ? '7.5pt' : '8.5pt'}; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#000;">
+            <div style="font-size:${ftMenu}pt; font-weight:700; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#000;">
               ${lbl.namaMenu} ${lbl.separator !== 'none' ? lbl.separator : ''} ${lbl.porsiMenu}
             </div>
           `
         } else {
           menuPorsiContent = `
-            <div style="font-size:${isSmallHeight ? '7pt' : '8pt'}; font-weight:800; text-transform:uppercase; word-break:break-word; line-height:1.1; color:#000;">
+            <div style="font-size:${ftMenu}pt; font-weight:800; text-transform:uppercase; word-break:break-word; line-height:1.1; color:#000;">
               ${lbl.namaMenu} ${lbl.separator !== 'none' ? lbl.separator : ''} ${lbl.porsiMenu}
             </div>
           `
@@ -222,18 +280,18 @@ export default function BatasMakanPage() {
 
         return `
           <div class="label-card" style="width:${widthMm}mm; height:${heightMm}mm; border:2px solid #000000; border-radius:9px; background:#ffffff; color:#000000; box-sizing:border-box; padding:2.5px; display:flex; flex-direction:column; justify-content:space-between; page-break-inside:avoid; break-inside:avoid; margin:0; overflow:hidden;">
-            <div style="${headerBg} text-align:center; font-weight:900; border-top-left-radius:6px; border-top-right-radius:6px; border-bottom-left-radius:2px; border-bottom-right-radius:2px; padding:${headerPadding}; font-size:${headerFontSize}; letter-spacing:0.5px; flex-shrink:0;">
+            <div style="${headerBg} text-align:center; font-weight:900; border-top-left-radius:6px; border-top-right-radius:6px; border-bottom-left-radius:2px; border-bottom-right-radius:2px; padding:${headerPadding}; font-size:${ftHeader}pt; letter-spacing:0.5px; flex-shrink:0;">
               BATAS MAKAN
             </div>
             <div style="text-align:center; margin:auto 0; padding:1px 0; flex-grow:1; display:flex; flex-direction:column; justify-content:center;">
-              <div style="font-size:${dateFontSize}; font-weight:800; line-height:1; color:#000000;">${lbl.tanggal}</div>
-              <div style="font-size:${jamFontSize}; font-weight:900; line-height:1; color:#000000; margin-top:1px;">${lbl.jam}</div>
+              <div style="font-size:${ftTanggal}pt; font-weight:800; line-height:1; color:#000000;">${lbl.tanggal}</div>
+              <div style="font-size:${ftJam}pt; font-weight:900; line-height:1; color:#000000; margin-top:1px;">${lbl.jam}</div>
               <div style="border-top:1px solid #cbd5e1; margin-top:2px; padding-top:2px; text-align:center;">
                 ${menuPorsiContent}
               </div>
             </div>
             <div style="border-top:1px solid ${isBW ? '#000000' : '#fca5a5'}; padding:${notePadding}; text-align:center; flex-shrink:0;">
-              <div style="font-size:${noteFontSize}; font-weight:900; ${noteColor} text-transform:uppercase; line-height:1;">
+              <div style="font-size:${ftCatatan}pt; font-weight:900; ${noteColor} text-transform:uppercase; line-height:1;">
                 ${lbl.catatan}
               </div>
             </div>
@@ -552,6 +610,204 @@ export default function BatasMakanPage() {
                   </div>
                 </div>
 
+                {/* Custom Font Size Per Input Section */}
+                <div className="bg-emerald-50/60 dark:bg-emerald-950/20 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-extrabold text-emerald-900 dark:text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+                      <span>🔤 Pengaturan Font Size (Ukuran Font) Tiap Input (pt)</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => handleResetFontSizes()}
+                      className="text-[11px] font-bold text-emerald-700 hover:underline dark:text-emerald-400 cursor-pointer"
+                    >
+                      ↺ Reset ke Standar
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {/* Header (Batas Makan) */}
+                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                        FONT SIZE HEADER
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setFontHeader((prev) => Math.max(5, prev - 0.5))}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={fontHeader}
+                          onChange={(e) => setFontHeader(Number(e.target.value) || 10)}
+                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFontHeader((prev) => prev + 0.5)}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Tanggal */}
+                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                        FONT SIZE TANGGAL
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setFontTanggal((prev) => Math.max(5, prev - 0.5))}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={fontTanggal}
+                          onChange={(e) => setFontTanggal(Number(e.target.value) || 12)}
+                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFontTanggal((prev) => prev + 0.5)}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Jam */}
+                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                        FONT SIZE JAM
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setFontJam((prev) => Math.max(5, prev - 0.5))}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={fontJam}
+                          onChange={(e) => setFontJam(Number(e.target.value) || 13)}
+                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFontJam((prev) => prev + 0.5)}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Nama Menu */}
+                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                        FONT SIZE NAMA MENU
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setFontMenu((prev) => Math.max(4, prev - 0.5))}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={fontMenu}
+                          onChange={(e) => setFontMenu(Number(e.target.value) || 8)}
+                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFontMenu((prev) => prev + 0.5)}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Porsi */}
+                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                        FONT SIZE PORSI
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setFontPorsi((prev) => Math.max(4, prev - 0.5))}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={fontPorsi}
+                          onChange={(e) => setFontPorsi(Number(e.target.value) || 7.5)}
+                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFontPorsi((prev) => prev + 0.5)}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Catatan */}
+                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
+                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                        FONT SIZE CATATAN
+                      </span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setFontCatatan((prev) => Math.max(4, prev - 0.5))}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={fontCatatan}
+                          onChange={(e) => setFontCatatan(Number(e.target.value) || 7)}
+                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFontCatatan((prev) => prev + 0.5)}
+                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Catatan / Warning */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
@@ -634,6 +890,7 @@ export default function BatasMakanPage() {
                           onClick={() => {
                             setWidthMm(s.width)
                             setHeightMm(s.height)
+                            handleResetFontSizes(s.height)
                           }}
                           className={`rounded-lg border p-2 text-left transition font-semibold ${
                             widthMm === s.width && heightMm === s.height
@@ -666,7 +923,11 @@ export default function BatasMakanPage() {
                       <input
                         type="number"
                         value={heightMm}
-                        onChange={(e) => setHeightMm(Number(e.target.value) || 40)}
+                        onChange={(e) => {
+                          const h = Number(e.target.value) || 40
+                          setHeightMm(h)
+                          handleResetFontSizes(h)
+                        }}
                         className="w-16 rounded border border-slate-300 px-2 py-1 text-center font-bold dark:border-slate-600 dark:bg-slate-900"
                       />
                     </div>
@@ -698,18 +959,28 @@ export default function BatasMakanPage() {
                     {/* Header Pill */}
                     <div
                       className={`shrink-0 text-center font-black rounded-t-[8px] rounded-b-[3px] uppercase shadow-xs ${
-                        isSmallHeight ? 'py-0.5 text-[10px]' : 'py-1 text-[12px]'
-                      } ${colorMode === 'bw' ? 'bg-black text-white' : 'bg-[#16a34a] text-white'}`}
+                        colorMode === 'bw' ? 'bg-black text-white' : 'bg-[#16a34a] text-white'
+                      }`}
+                      style={{
+                        fontSize: `${fontHeader * 1.05}pt`,
+                        padding: isSmallHeight ? '1px 0' : '2px 0'
+                      }}
                     >
                       BATAS MAKAN
                     </div>
 
                     {/* Date & Time */}
                     <div className="text-center my-auto py-0.5 overflow-hidden flex flex-col justify-center flex-grow">
-                      <div className={`font-extrabold leading-none text-slate-950 tracking-tight ${isSmallHeight ? 'text-[12px]' : 'text-[15px]'}`}>
+                      <div
+                        className="font-extrabold leading-none text-slate-950 tracking-tight"
+                        style={{ fontSize: `${fontTanggal * 1.05}pt` }}
+                      >
                         {tanggal || '11/08/2026'}
                       </div>
-                      <div className={`font-black leading-none text-slate-950 tracking-tight mt-0.5 ${isSmallHeight ? 'text-[13px]' : 'text-[16px]'}`}>
+                      <div
+                        className="font-black leading-none text-slate-950 tracking-tight mt-0.5"
+                        style={{ fontSize: `${fontJam * 1.05}pt` }}
+                      >
                         {jam || '15.00 WIB'}
                       </div>
 
@@ -717,20 +988,32 @@ export default function BatasMakanPage() {
                       <div className="border-t border-slate-200 pt-0.5 mt-0.5 text-center px-1">
                         {wrapMode === 'wrap' ? (
                           <div className="leading-tight">
-                            <div className={`font-extrabold text-slate-900 tracking-wide uppercase truncate ${isSmallHeight ? 'text-[8.5px]' : 'text-[10px]'}`}>
+                            <div
+                              className="font-extrabold text-slate-900 tracking-wide uppercase truncate"
+                              style={{ fontSize: `${fontMenu * 1.05}pt` }}
+                            >
                               {namaMenu || 'AYAM KECAP'}
                             </div>
-                            <div className={`font-bold text-slate-600 uppercase tracking-wide ${isSmallHeight ? 'text-[7.5px]' : 'text-[9px]'}`}>
+                            <div
+                              className="font-bold text-slate-600 uppercase tracking-wide"
+                              style={{ fontSize: `${fontPorsi * 1.05}pt` }}
+                            >
                               {separator !== 'none' ? `${separator} ` : ''}{porsiMenu || 'PORSI BESAR'}
                             </div>
                           </div>
                         ) : wrapMode === 'single' ? (
-                          <div className={`font-bold text-slate-600 tracking-wide uppercase truncate ${isSmallHeight ? 'text-[8px]' : 'text-[9.5px]'}`}>
+                          <div
+                            className="font-bold text-slate-600 tracking-wide uppercase truncate"
+                            style={{ fontSize: `${fontMenu * 1.05}pt` }}
+                          >
                             {(namaMenu || 'AYAM KECAP').toUpperCase()} {separator !== 'none' ? separator : ''} {(porsiMenu || 'PORSI BESAR').toUpperCase()}
                           </div>
                         ) : (
                           /* Auto wrap mode */
-                          <div className={`font-bold text-slate-700 leading-tight tracking-tight uppercase break-words ${isSmallHeight ? 'text-[7.5px]' : 'text-[9px]'}`}>
+                          <div
+                            className="font-bold text-slate-700 leading-tight tracking-tight uppercase break-words"
+                            style={{ fontSize: `${fontMenu * 1.05}pt` }}
+                          >
                             {(namaMenu || 'AYAM KECAP').toUpperCase()} {separator !== 'none' ? separator : ''} {(porsiMenu || 'PORSI BESAR').toUpperCase()}
                           </div>
                         )}
@@ -740,9 +1023,10 @@ export default function BatasMakanPage() {
                     {/* Footer Warning */}
                     <div className="shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center">
                       <div
-                        className={`font-black tracking-tight uppercase leading-none ${isSmallHeight ? 'text-[7.5px]' : 'text-[9px]'} ${
+                        className={`font-black tracking-tight uppercase leading-none ${
                           colorMode === 'bw' ? 'text-black' : 'text-red-600'
                         }`}
+                        style={{ fontSize: `${fontCatatan * 1.05}pt` }}
                       >
                         {(catatan || 'TIDAK UNTUK DIBAWA PULANG').toUpperCase()}
                       </div>
@@ -777,6 +1061,7 @@ export default function BatasMakanPage() {
                       <th className="p-2">Tanggal / Jam</th>
                       <th className="p-2">Nama Menu</th>
                       <th className="p-2">Porsi & Format</th>
+                      <th className="p-2">Ukuran Font (pt)</th>
                       <th className="p-2">Catatan</th>
                       <th className="p-2 text-center">Jumlah</th>
                       <th className="p-2 text-right">Aksi</th>
@@ -790,6 +1075,9 @@ export default function BatasMakanPage() {
                         <td className="p-2 font-bold uppercase">{item.namaMenu}</td>
                         <td className="p-2 font-semibold text-emerald-700 dark:text-emerald-400">
                           {item.porsiMenu} <span className="text-slate-400">({item.separator}, {item.wrapMode})</span>
+                        </td>
+                        <td className="p-2 font-mono text-[11px] text-slate-500">
+                          Hdr:{item.fontHeader} | Tgl:{item.fontTanggal} | Jam:{item.fontJam} | Mnu:{item.fontMenu}
                         </td>
                         <td className="p-2 font-semibold text-red-600">{item.catatan}</td>
                         <td className="p-2 text-center font-bold text-sm">{item.jumlah} pcs</td>
@@ -853,6 +1141,13 @@ export default function BatasMakanPage() {
               >
                 {activeLabels.map((lbl, idx) => {
                   const isBW = (lbl.colorMode || colorMode) === 'bw'
+                  const ftHeader = lbl.fontHeader || fontHeader
+                  const ftTanggal = lbl.fontTanggal || fontTanggal
+                  const ftJam = lbl.fontJam || fontJam
+                  const ftMenu = lbl.fontMenu || fontMenu
+                  const ftPorsi = lbl.fontPorsi || fontPorsi
+                  const ftCatatan = lbl.fontCatatan || fontCatatan
+
                   return (
                     <div
                       key={idx}
@@ -868,18 +1163,28 @@ export default function BatasMakanPage() {
                       {/* Header Pill */}
                       <div
                         className={`shrink-0 text-center font-black rounded-t-[6px] rounded-b-[2px] uppercase leading-tight shadow-xs ${
-                          isSmallHeight ? 'py-0.5 text-[9px]' : 'py-0.5 text-[11px]'
-                        } ${isBW ? 'bg-black text-white' : 'bg-[#16a34a] text-white'}`}
+                          isBW ? 'bg-black text-white' : 'bg-[#16a34a] text-white'
+                        }`}
+                        style={{
+                          fontSize: `${ftHeader}pt`,
+                          padding: isSmallHeight ? '1px 0' : '2px 0'
+                        }}
                       >
                         BATAS MAKAN
                       </div>
 
                       {/* Date & Time */}
                       <div className="text-center my-auto py-0.5 overflow-hidden flex flex-col justify-center flex-grow">
-                        <div className={`font-extrabold leading-none text-slate-950 tracking-tight ${isSmallHeight ? 'text-[11px]' : 'text-[14px]'}`}>
+                        <div
+                          className="font-extrabold leading-none text-slate-950 tracking-tight"
+                          style={{ fontSize: `${ftTanggal}pt` }}
+                        >
                           {lbl.tanggal}
                         </div>
-                        <div className={`font-black leading-none text-slate-950 tracking-tight mt-0.5 ${isSmallHeight ? 'text-[12px]' : 'text-[15px]'}`}>
+                        <div
+                          className="font-black leading-none text-slate-950 tracking-tight mt-0.5"
+                          style={{ fontSize: `${ftJam}pt` }}
+                        >
                           {lbl.jam}
                         </div>
 
@@ -887,20 +1192,32 @@ export default function BatasMakanPage() {
                         <div className="border-t border-slate-200 pt-0.5 mt-0.5 text-center px-0.5">
                           {lbl.wrapMode === 'wrap' ? (
                             <div className="leading-tight">
-                              <div className={`font-extrabold text-slate-950 tracking-tight uppercase truncate ${isSmallHeight ? 'text-[7.5px]' : 'text-[8.5px]'}`}>
+                              <div
+                                className="font-extrabold text-slate-950 tracking-tight uppercase truncate"
+                                style={{ fontSize: `${ftMenu}pt` }}
+                              >
                                 {lbl.namaMenu}
                               </div>
-                              <div className={`font-bold text-slate-700 uppercase tracking-tight ${isSmallHeight ? 'text-[7px]' : 'text-[8px]'}`}>
+                              <div
+                                className="font-bold text-slate-700 uppercase tracking-tight"
+                                style={{ fontSize: `${ftPorsi}pt` }}
+                              >
                                 {lbl.separator !== 'none' ? `${lbl.separator} ` : ''}{lbl.porsiMenu}
                               </div>
                             </div>
                           ) : lbl.wrapMode === 'single' ? (
-                            <div className={`font-bold text-slate-700 tracking-wide uppercase truncate ${isSmallHeight ? 'text-[7.5px]' : 'text-[8.5px]'}`}>
+                            <div
+                              className="font-bold text-slate-700 tracking-wide uppercase truncate"
+                              style={{ fontSize: `${ftMenu}pt` }}
+                            >
                               {lbl.namaMenu} {lbl.separator !== 'none' ? lbl.separator : ''} {lbl.porsiMenu}
                             </div>
                           ) : (
                             /* Auto Wrap mode */
-                            <div className={`font-extrabold text-slate-900 leading-tight tracking-tight uppercase break-words ${isSmallHeight ? 'text-[7px]' : 'text-[8px]'}`}>
+                            <div
+                              className="font-extrabold text-slate-900 leading-tight tracking-tight uppercase break-words"
+                              style={{ fontSize: `${ftMenu}pt` }}
+                            >
                               {lbl.namaMenu} {lbl.separator !== 'none' ? lbl.separator : ''} {lbl.porsiMenu}
                             </div>
                           )}
@@ -910,9 +1227,10 @@ export default function BatasMakanPage() {
                       {/* Footer Warning */}
                       <div className="shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center">
                         <div
-                          className={`font-black tracking-tight uppercase leading-none ${isSmallHeight ? 'text-[7px]' : 'text-[8px]'} ${
+                          className={`font-black tracking-tight uppercase leading-none ${
                             isBW ? 'text-black' : 'text-red-600'
                           }`}
+                          style={{ fontSize: `${ftCatatan}pt` }}
                         >
                           {lbl.catatan}
                         </div>
