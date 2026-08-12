@@ -1,8 +1,6 @@
 # Audit Trail (Activity Log)
 
-Starter Kit ini menggunakan **Spatie Laravel Activitylog v5** sebagai engine pendata aktivitas (audit trail). 
-
-**PENTING:** Untuk mendukung konsistensi identifier, starter kit ini menggunakan **UUID v7** untuk tabel `activity_log`. Hal ini dicapai dengan menggunakan custom model `App\Models\Activity` yang meng-override model bawaan Spatie.
+Starter Kit ini menggunakan **Spatie Laravel Activitylog v5** sebagai engine pendata aktivitas (audit trail). Fitur ini telah ditingkatkan untuk menggunakan implementasi **Native Filament Resource** guna fleksibilitas dan kompatibilitas jangka panjang dengan Laravel 12.
 
 ## Fitur Utama
 
@@ -67,17 +65,3 @@ Anda dapat mengakses seluruh log aktivitas melalui menu **Activities** di sideba
 
 ## Referensi
 - [Spatie Activitylog v5 Documentation](https://spatie.be/docs/laravel-activitylog/v5/introduction)
-
-## Update Behavior Resource Activity
-
-Resource Activity sekarang menerapkan pembatasan visibilitas berbasis role:
-
-- `super_admin` dan `admin`: dapat melihat seluruh aktivitas.
-- `member`: hanya melihat aktivitas miliknya sendiri.
-
-Implementasi query juga kompatibel dengan data lama dan baru pada kolom `causer_type`:
-
-- alias morph map (`user`)
-- FQCN model (`App\\Models\\User`)
-
-Dengan pendekatan ini, policy lebih konsisten untuk audit trail dan perilaku test member scope menjadi deterministic.

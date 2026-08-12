@@ -92,13 +92,7 @@ Hal ini memungkinkan Admin untuk memiliki semua permission (misalnya `Update:Cur
 
 #### Proteksi Integritas
 
-Aksi **Delete** dan **Force Delete** akan diblokir jika media masih digunakan, **kecuali** user memiliki permission override khusus.
-
-Permission override yang dipakai:
-- `DeleteUsed:CuratorMedia`
-- `ForceDeleteUsed:CuratorMedia`
-
-Integritas ini dijaga lewat `CheckMediaUsageAction` + `CuratorMediaPolicy`.
+Aksi **Delete** dan **Force Delete** akan selalu diblokir jika media tersebut masih tercatat digunakan oleh model lain, meskipun user memiliki permission lengkap. Hal ini dijamin melalui `CheckMediaUsageAction`.
 
 ---
 
@@ -159,24 +153,12 @@ resolve(SyncMediaUsageAction::class)->handle($model, 'field_name', $curatorId);
 Melakukan Soft Delete pada media dan mencatat siapa yang melakukan penghapusan (`deleted_by`):
 
 ```php
-resolve(DeleteCuratorMediaAction::class)->handle(
-    media: $media,
-    deleterId: $user->id,
-    allowDeleteWhenUsed: false,
-);
+resolve(DeleteCuratorMediaAction::class)->handle($media, $user);
 ```
 
 #### 3. `DeleteAllMediaUsagesAction`
 
 Membersihkan catatan penggunaan media saat model pemilik (User/Post) benar-benar dihapus (Force Delete).
-
-#### 4. `ListCuratorMediaUsagesAction`
-
-Mengambil daftar lokasi penggunaan media untuk kebutuhan audit di UI Curator:
-
-```php
-resolve(ListCuratorMediaUsagesAction::class)->handle($media);
-```
 
 ---
 
@@ -184,8 +166,7 @@ resolve(ListCuratorMediaUsagesAction::class)->handle($media);
 
 `App\Policies\CuratorMediaPolicy` menerapkan aturan industri:
 
-- **Cegah Penghapusan Default:** Media tidak dapat di-*delete* atau di-*force delete* jika statusnya masih tercatat digunakan (`CheckMediaUsageAction`).
-- **Override Terbatas:** Penghapusan media in-use hanya boleh lewat permission override (`DeleteUsed:CuratorMedia` / `ForceDeleteUsed:CuratorMedia`) atau permission global yang setara.
+- **Cegah Penghapusan:** Media tidak dapat di-*delete* atau di-*force delete* jika statusnya masih tercatat digunakan (`CheckMediaUsageAction`).
 - **Otomatis Tersembunyi:** Karena menggunakan `SoftDeletes` pada model `CuratorMedia`, relasi Eloquent (seperti `$user->avatarMedia`) secara otomatis akan mengembalikan `null` jika media tersebut sedang berada di "Recycle Bin" (di-*soft delete*). Jika di-*restore*, maka akan muncul kembali secara otomatis.
 
 Selain proteksi di policy, starter kit ini juga menambahkan proteksi langsung di layer Filament Curator:
@@ -197,26 +178,10 @@ Selain proteksi di policy, starter kit ini juga menambahkan proteksi langsung di
 Jadi proteksinya berlapis:
 
 1. UI memberi warning dan mencegah aksi yang salah.
-2. Policy menolak delete in-use jika user tidak punya override.
-3. `DeleteCuratorMediaAction` tetap aman by default (`allowDeleteWhenUsed=false`).
+2. Policy tetap menolak delete jika media masih dipakai.
+3. `DeleteCuratorMediaAction` tetap mengembalikan `false` jika usage masih ada.
 
 Pendekatan ini dibuat defensif supaya integritas aset tidak bergantung pada satu lapisan saja.
-
-## Orkestrasi Wajib Lewat Action (Tanpa Observer)
-
-Project ini sengaja tidak mengandalkan observer untuk sinkronisasi usage media agar alur bisnis lebih eksplisit dan mudah di-maintain.
-
-Pola yang dipakai:
-
-1. **Create/Update domain model** memanggil Action domain (`CreatePostAction`, `UpdatePostAction`, `CreateUserAction`, `UpdateUserAction`).
-2. Action domain tersebut memanggil `SyncMediaUsageAction`.
-3. **Delete domain model** memanggil Action delete domain (`DeletePostAction`, dll) yang memanggil `DeleteAllMediaUsagesAction`.
-
-Keuntungan:
-
-- Alur mudah ditelusuri dari controller/API/Filament.
-- Behavior konsisten antara panel dan API.
-- Tidak ada side-effect tersembunyi dari observer.
 
 ### Catatan Naming di Closure Action Filament
 
