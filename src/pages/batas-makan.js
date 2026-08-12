@@ -53,6 +53,13 @@ const SIZE_PRESETS = [
   { label: '50 × 30 mm (Kecil)', width: 50, height: 30 }
 ]
 
+const GAP_PRESETS = [
+  { label: '0 mm (Rapat / 1x Gunting)', value: 0 },
+  { label: '1 mm', value: 1 },
+  { label: '2 mm', value: 2 },
+  { label: '3 mm (Longgar)', value: 3 }
+]
+
 const SEPARATOR_OPTIONS = [
   { label: 'Titik ( · )', value: '·' },
   { label: 'Bintang ( * )', value: '*' },
@@ -82,9 +89,10 @@ export default function BatasMakanPage() {
   const [namaMenu, setNamaMenu] = useState('AYAM KECAP')
   const [porsiMenu, setPorsiMenu] = useState('PORSI BESAR')
   const [catatan, setCatatan] = useState('TIDAK UNTUK DIBAWA PULANG')
-  const [jumlah, setJumlah] = useState(18) // Default 18 label (1 lembar A4 @ 3x6)
+  const [jumlah, setJumlah] = useState(21) // Default 21 label (1 lembar A4)
   const [widthMm, setWidthMm] = useState(60)
   const [heightMm, setHeightMm] = useState(40)
+  const [gridGapMm, setGridGapMm] = useState(0) // Default 0 mm (Rapat / Sekali gunting)
 
   // Formatting & Color Options
   const [separator, setSeparator] = useState('·')
@@ -174,6 +182,7 @@ export default function BatasMakanPage() {
       if (loaded.n) setJumlah(loaded.n)
       if (loaded.w) setWidthMm(loaded.w)
       if (loaded.h) setHeightMm(loaded.h)
+      if (typeof loaded.gap === 'number') setGridGapMm(loaded.gap)
       if (loaded.sep) setSeparator(loaded.sep)
       if (loaded.wrap) setWrapMode(loaded.wrap)
       if (loaded.col) setColorMode(loaded.col)
@@ -205,6 +214,7 @@ export default function BatasMakanPage() {
       n: jumlah,
       w: widthMm,
       h: heightMm,
+      gap: gridGapMm,
       sep: separator,
       wrap: wrapMode,
       col: colorMode,
@@ -238,6 +248,7 @@ export default function BatasMakanPage() {
     jumlah,
     widthMm,
     heightMm,
+    gridGapMm,
     separator,
     wrapMode,
     colorMode,
@@ -380,7 +391,9 @@ export default function BatasMakanPage() {
     const labelsHtml = activeLabels
       .map((lbl) => {
         const isBW = (lbl.colorMode || colorMode) === 'bw'
-        const headerBg = isBW ? 'background: #000000; color: #ffffff;' : 'background: #16a34a; color: #ffffff;'
+        const headerBg = isBW
+          ? 'background: #000000; color: #ffffff;'
+          : 'background: #16a34a; color: #ffffff;'
         const noteColor = isBW ? 'color: #000000;' : 'color: #dc2626;'
 
         const ftHeader = lbl.fontHeader || fontHeader
@@ -465,7 +478,7 @@ export default function BatasMakanPage() {
             .grid-sheet {
               display: grid;
               grid-template-columns: repeat(auto-fill, ${widthMm}mm);
-              gap: 3mm;
+              gap: ${gridGapMm}mm;
               justify-content: center;
               align-content: start;
               width: 100%;
@@ -503,55 +516,56 @@ export default function BatasMakanPage() {
 
   return (
     <Layout
-      title="Cetak Label Batas Makan"
-      description="Generator & Cetak Label Batas Makan 40x60 mm SPPG BGN (Badan Gizi Nasional)"
+      title='Cetak Label Batas Makan'
+      description='Generator & Cetak Label Batas Makan 40x60 mm SPPG BGN (Badan Gizi Nasional)'
     >
-      <main className="min-h-screen bg-slate-50 p-4 dark:bg-slate-900 text-slate-800 dark:text-slate-100 sm:p-6 print:p-0 print:bg-white">
+      <main className='min-h-screen bg-slate-50 p-4 text-slate-800 sm:p-6 dark:bg-slate-900 dark:text-slate-100 print:bg-white print:p-0'>
         {/* Top Header Controls (Hidden on Print) */}
-        <div className="mx-auto max-w-6xl no-print">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+        <div className='no-print mx-auto max-w-6xl'>
+          <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white">
+              <div className='flex items-center gap-2'>
+                <span className='inline-block rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-bold text-white'>
                   BGN SPPG
                 </span>
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                <h1 className='text-2xl font-bold tracking-tight sm:text-3xl'>
                   Cetak Label Batas Makan
                 </h1>
               </div>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Fitur generator cetak label batas makan wadah / ompreng gizi (Ukuran 40 × 60 mm / A4 Grid).
+              <p className='mt-1 text-sm text-slate-500 dark:text-slate-400'>
+                Fitur generator cetak label batas makan wadah / ompreng gizi (Ukuran 40 × 60 mm / A4
+                Grid).
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className='flex flex-wrap items-center gap-2'>
               <a
-                href="/jkt"
-                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                href='/jkt'
+                className='inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
               >
                 ← SPPG Jeketro
               </a>
 
               <button
-                type="button"
+                type='button'
                 onClick={handleCopyShareLink}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800 shadow-xs hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 cursor-pointer"
-                title="Salin URL link konfigurasi label ini untuk dibagikan"
+                className='inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800 shadow-xs hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                title='Salin URL link konfigurasi label ini untuk dibagikan'
               >
                 {copiedLink ? '✓ Link Tersalin!' : '🔗 Salin Link Share'}
               </button>
 
               <button
-                type="button"
+                type='button'
                 onClick={handlePrint}
-                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 active:scale-95 cursor-pointer"
+                className='inline-flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-700 active:scale-95'
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
                     strokeWidth={2}
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h10z"
+                    d='M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h10z'
                   />
                 </svg>
                 🖨️ CETAK HALAMAN POLOS ({activeLabels.length} Label)
@@ -560,36 +574,36 @@ export default function BatasMakanPage() {
           </div>
 
           {/* Form & Config Panel */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 mb-8">
+          <div className='mb-8 grid grid-cols-1 gap-6 lg:grid-cols-12'>
             {/* Form Input Section */}
-            <div className="lg:col-span-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800">
-              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 text-xs">
+            <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-7 dark:border-slate-800 dark:bg-slate-800'>
+              <h2 className='mb-4 flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white'>
+                <span className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-xs text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'>
                   1
                 </span>
                 Input Data Label
               </h2>
 
-              <div className="space-y-4 text-sm">
+              <div className='space-y-4 text-sm'>
                 {/* Tanggal & Jam */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className='mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300'>
                       TANGGAL (Batas Makan)
                     </label>
-                    <div className="flex gap-2">
+                    <div className='flex gap-2'>
                       <input
-                        type="text"
+                        type='text'
                         value={tanggal}
                         onChange={(e) => setTanggal(e.target.value)}
-                        placeholder="DD/MM/YYYY (contoh: 11/08/2026)"
-                        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold dark:border-slate-600 dark:bg-slate-900"
+                        placeholder='DD/MM/YYYY (contoh: 11/08/2026)'
+                        className='w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold dark:border-slate-600 dark:bg-slate-900'
                       />
                       <button
-                        type="button"
+                        type='button'
                         onClick={setNowTime}
-                        className="shrink-0 rounded-lg border border-slate-300 bg-slate-100 px-2.5 py-1 text-xs font-bold hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-700"
-                        title="Set tanggal & jam sekarang"
+                        className='shrink-0 rounded-lg border border-slate-300 bg-slate-100 px-2.5 py-1 text-xs font-bold hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-700'
+                        title='Set tanggal & jam sekarang'
                       >
                         Hari Ini
                       </button>
@@ -597,27 +611,27 @@ export default function BatasMakanPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className='mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300'>
                       JAM (Batas Makan)
                     </label>
                     <input
-                      type="text"
+                      type='text'
                       value={jam}
                       onChange={(e) => setJam(e.target.value)}
-                      placeholder="HH.mm WIB (contoh: 15.00 WIB)"
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold dark:border-slate-600 dark:bg-slate-900"
+                      placeholder='HH.mm WIB (contoh: 15.00 WIB)'
+                      className='w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold dark:border-slate-600 dark:bg-slate-900'
                     />
                     {/* Quick Time Adders */}
-                    <div className="mt-1.5 flex flex-wrap gap-1">
-                      <span className="text-[10px] text-slate-400 font-medium self-center mr-1">
+                    <div className='mt-1.5 flex flex-wrap gap-1'>
+                      <span className='mr-1 self-center text-[10px] font-medium text-slate-400'>
                         +Durasi:
                       </span>
                       {[2, 3, 4, 5].map((h) => (
                         <button
                           key={h}
-                          type="button"
+                          type='button'
                           onClick={() => addHoursToNow(h)}
-                          className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-emerald-900"
+                          className='rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-emerald-900'
                         >
                           +{h} Jam
                         </button>
@@ -628,22 +642,22 @@ export default function BatasMakanPage() {
 
                 {/* Nama Menu */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label className='mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300'>
                     NAMA MENU
                   </label>
                   <input
-                    type="text"
+                    type='text'
                     value={namaMenu}
                     onChange={(e) => setNamaMenu(e.target.value)}
-                    placeholder="Contoh: AYAM KECAP"
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold uppercase dark:border-slate-600 dark:bg-slate-900"
+                    placeholder='Contoh: AYAM KECAP'
+                    className='w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold uppercase dark:border-slate-600 dark:bg-slate-900'
                   />
                   {/* Presets */}
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <div className='mt-1.5 flex flex-wrap gap-1.5'>
                     {MENU_PRESETS.map((m) => (
                       <button
                         key={m}
-                        type="button"
+                        type='button'
                         onClick={() => setNamaMenu(m)}
                         className={`rounded-md px-2 py-0.5 text-[11px] font-semibold transition ${
                           namaMenu.toUpperCase() === m
@@ -659,18 +673,18 @@ export default function BatasMakanPage() {
 
                 {/* Porsi Menu */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label className='mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300'>
                     PORSI MENU
                   </label>
-                  <div className="flex flex-wrap gap-2">
+                  <div className='flex flex-wrap gap-2'>
                     {PORSI_OPTIONS.map((p) => (
                       <button
                         key={p}
-                        type="button"
+                        type='button'
                         onClick={() => setPorsiMenu(p)}
-                        className={`rounded-lg px-3 py-1.5 text-xs font-bold transition border ${
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
                           porsiMenu.toUpperCase() === p
-                            ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-500'
+                            ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300'
                             : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
                         }`}
                       >
@@ -678,31 +692,31 @@ export default function BatasMakanPage() {
                       </button>
                     ))}
                     <input
-                      type="text"
+                      type='text'
                       value={porsiMenu}
                       onChange={(e) => setPorsiMenu(e.target.value)}
-                      placeholder="Atau ketik porsi..."
-                      className="rounded-lg border border-slate-300 px-3 py-1 text-xs font-bold uppercase dark:border-slate-600 dark:bg-slate-900"
+                      placeholder='Atau ketik porsi...'
+                      className='rounded-lg border border-slate-300 px-3 py-1 text-xs font-bold uppercase dark:border-slate-600 dark:bg-slate-900'
                     />
                   </div>
                 </div>
 
                 {/* Mode Warna & Formatting */}
-                <div className="space-y-3 bg-slate-50 p-3 rounded-xl dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
+                <div className='space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900/60'>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    <label className='mb-1 block text-[11px] font-bold text-slate-700 dark:text-slate-200'>
                       MODE CETAK / WARNA (Guna Menghemat Tinta Print):
                     </label>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className='flex flex-wrap gap-1.5'>
                       {COLOR_MODE_OPTIONS.map((c) => (
                         <button
                           key={c.value}
-                          type="button"
+                          type='button'
                           onClick={() => setColorMode(c.value)}
                           className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
                             colorMode === c.value
                               ? 'bg-slate-900 text-white dark:bg-emerald-600'
-                              : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                              : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
                           }`}
                         >
                           {c.label}
@@ -711,21 +725,21 @@ export default function BatasMakanPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-1 border-t border-slate-200 dark:border-slate-800">
+                  <div className='grid grid-cols-1 gap-3 border-t border-slate-200 pt-1 sm:grid-cols-2 dark:border-slate-800'>
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1">
+                      <label className='mb-1 block text-[11px] font-bold text-slate-700 dark:text-slate-200'>
                         PEMISAH PORSI MENU
                       </label>
-                      <div className="flex flex-wrap gap-1">
+                      <div className='flex flex-wrap gap-1'>
                         {SEPARATOR_OPTIONS.map((s) => (
                           <button
                             key={s.value}
-                            type="button"
+                            type='button'
                             onClick={() => setSeparator(s.value)}
                             className={`rounded px-2 py-1 text-xs font-bold transition ${
                               separator === s.value
                                 ? 'bg-emerald-600 text-white'
-                                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
                             }`}
                           >
                             {s.label}
@@ -735,19 +749,19 @@ export default function BatasMakanPage() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1">
+                      <label className='mb-1 block text-[11px] font-bold text-slate-700 dark:text-slate-200'>
                         TAMPILAN BARIS (WRAP)
                       </label>
-                      <div className="flex flex-wrap gap-1">
+                      <div className='flex flex-wrap gap-1'>
                         {WRAP_OPTIONS.map((w) => (
                           <button
                             key={w.value}
-                            type="button"
+                            type='button'
                             onClick={() => setWrapMode(w.value)}
                             className={`rounded px-2 py-1 text-xs font-bold transition ${
                               wrapMode === w.value
                                 ? 'bg-emerald-600 text-white'
-                                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
                             }`}
                           >
                             {w.label}
@@ -759,45 +773,45 @@ export default function BatasMakanPage() {
                 </div>
 
                 {/* Custom Font Size Per Input Section */}
-                <div className="bg-emerald-50/60 dark:bg-emerald-950/20 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/50 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-extrabold text-emerald-900 dark:text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+                <div className='space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-3.5 dark:border-emerald-900/50 dark:bg-emerald-950/20'>
+                  <div className='flex items-center justify-between'>
+                    <label className='flex items-center gap-1.5 text-xs font-extrabold tracking-wide text-emerald-900 uppercase dark:text-emerald-300'>
                       <span>🔤 Pengaturan Font Size (Ukuran Font) Tiap Input (pt)</span>
                     </label>
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => handleResetFontSizes()}
-                      className="text-[11px] font-bold text-emerald-700 hover:underline dark:text-emerald-400 cursor-pointer"
+                      className='cursor-pointer text-[11px] font-bold text-emerald-700 hover:underline dark:text-emerald-400'
                     >
                       ↺ Reset ke Standar
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
                     {/* Header (Batas Makan) */}
-                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
                         FONT SIZE HEADER
                       </span>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className='mt-1 flex items-center gap-1'>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontHeader((prev) => Math.max(5, prev - 0.5))}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           -
                         </button>
                         <input
-                          type="number"
-                          step="0.5"
+                          type='number'
+                          step='0.5'
                           value={fontHeader}
                           onChange={(e) => setFontHeader(Number(e.target.value) || 10)}
-                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontHeader((prev) => prev + 0.5)}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           +
                         </button>
@@ -805,29 +819,29 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Tanggal */}
-                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
                         FONT SIZE TANGGAL
                       </span>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className='mt-1 flex items-center gap-1'>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontTanggal((prev) => Math.max(5, prev - 0.5))}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           -
                         </button>
                         <input
-                          type="number"
-                          step="0.5"
+                          type='number'
+                          step='0.5'
                           value={fontTanggal}
                           onChange={(e) => setFontTanggal(Number(e.target.value) || 12)}
-                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontTanggal((prev) => prev + 0.5)}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           +
                         </button>
@@ -835,29 +849,29 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Jam */}
-                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
                         FONT SIZE JAM
                       </span>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className='mt-1 flex items-center gap-1'>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontJam((prev) => Math.max(5, prev - 0.5))}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           -
                         </button>
                         <input
-                          type="number"
-                          step="0.5"
+                          type='number'
+                          step='0.5'
                           value={fontJam}
                           onChange={(e) => setFontJam(Number(e.target.value) || 13)}
-                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontJam((prev) => prev + 0.5)}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           +
                         </button>
@@ -865,29 +879,29 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Nama Menu */}
-                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
                         FONT SIZE NAMA MENU
                       </span>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className='mt-1 flex items-center gap-1'>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontMenu((prev) => Math.max(4, prev - 0.5))}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           -
                         </button>
                         <input
-                          type="number"
-                          step="0.5"
+                          type='number'
+                          step='0.5'
                           value={fontMenu}
                           onChange={(e) => setFontMenu(Number(e.target.value) || 8)}
-                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontMenu((prev) => prev + 0.5)}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           +
                         </button>
@@ -895,29 +909,29 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Porsi */}
-                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
                         FONT SIZE PORSI
                       </span>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className='mt-1 flex items-center gap-1'>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontPorsi((prev) => Math.max(4, prev - 0.5))}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           -
                         </button>
                         <input
-                          type="number"
-                          step="0.5"
+                          type='number'
+                          step='0.5'
                           value={fontPorsi}
                           onChange={(e) => setFontPorsi(Number(e.target.value) || 7.5)}
-                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontPorsi((prev) => prev + 0.5)}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           +
                         </button>
@@ -925,29 +939,29 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Catatan */}
-                    <div className="bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-800">
-                      <span className="block text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
                         FONT SIZE CATATAN
                       </span>
-                      <div className="flex items-center gap-1 mt-1">
+                      <div className='mt-1 flex items-center gap-1'>
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontCatatan((prev) => Math.max(4, prev - 0.5))}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           -
                         </button>
                         <input
-                          type="number"
-                          step="0.5"
+                          type='number'
+                          step='0.5'
                           value={fontCatatan}
                           onChange={(e) => setFontCatatan(Number(e.target.value) || 7)}
-                          className="w-full text-center font-bold text-xs bg-transparent border-0"
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => setFontCatatan((prev) => prev + 0.5)}
-                          className="px-1.5 py-0.5 rounded bg-slate-100 font-bold hover:bg-slate-200 dark:bg-slate-800 text-xs"
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
                         >
                           +
                         </button>
@@ -958,23 +972,23 @@ export default function BatasMakanPage() {
 
                 {/* Catatan / Warning */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label className='mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300'>
                     CATATAN PERINGATAN (Red Note)
                   </label>
                   <input
-                    type="text"
+                    type='text'
                     value={catatan}
                     onChange={(e) => setCatatan(e.target.value)}
-                    placeholder="Contoh: TIDAK UNTUK DIBAWA PULANG"
-                    className="w-full rounded-lg border border-red-300 bg-red-50/50 px-3 py-2 text-sm font-bold text-red-700 uppercase dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300"
+                    placeholder='Contoh: TIDAK UNTUK DIBAWA PULANG'
+                    className='w-full rounded-lg border border-red-300 bg-red-50/50 px-3 py-2 text-sm font-bold text-red-700 uppercase dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300'
                   />
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <div className='mt-1.5 flex flex-wrap gap-1.5'>
                     {NOTE_PRESETS.map((n) => (
                       <button
                         key={n}
-                        type="button"
+                        type='button'
                         onClick={() => setCatatan(n)}
-                        className="rounded bg-red-100/70 px-2 py-0.5 text-[10px] font-bold text-red-800 hover:bg-red-200 dark:bg-red-950/40 dark:text-red-300"
+                        className='rounded bg-red-100/70 px-2 py-0.5 text-[10px] font-bold text-red-800 hover:bg-red-200 dark:bg-red-950/40 dark:text-red-300'
                       >
                         {n}
                       </button>
@@ -983,29 +997,27 @@ export default function BatasMakanPage() {
                 </div>
 
                 {/* Jumlah & Actions */}
-                <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className='flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-2 dark:border-slate-700'>
+                  <div className='flex items-center gap-2'>
+                    <label className='text-xs font-bold text-slate-700 dark:text-slate-300'>
                       JUMLAH LABEL:
                     </label>
                     <input
-                      type="number"
-                      min="1"
-                      max="200"
+                      type='number'
+                      min='1'
+                      max='200'
                       value={jumlah}
                       onChange={(e) => setJumlah(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-center text-sm font-bold dark:border-slate-600 dark:bg-slate-900"
+                      className='w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-center text-sm font-bold dark:border-slate-600 dark:bg-slate-900'
                     />
-                    <span className="text-xs text-slate-500">
-                      (1 lembar A4 ≈ 18 label)
-                    </span>
+                    <span className='text-xs text-slate-500'>(1 lembar A4 ≈ 18 label)</span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className='flex items-center gap-2'>
                     <button
-                      type="button"
+                      type='button'
                       onClick={handleAddItem}
-                      className="rounded-xl border border-emerald-600 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 cursor-pointer"
+                      className='cursor-pointer rounded-xl border border-emerald-600 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300'
                     >
                       + Tambah ke Daftar Batch
                     </button>
@@ -1015,34 +1027,34 @@ export default function BatasMakanPage() {
             </div>
 
             {/* Config & Single Label Preview */}
-            <div className="lg:col-span-5 flex flex-col gap-6">
+            <div className='flex flex-col gap-6 lg:col-span-5'>
               {/* Size & Layout Config */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300 text-xs">
+              <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800'>
+                <h2 className='mb-3 flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white'>
+                  <span className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-xs text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'>
                     2
                   </span>
-                  Ukuran & Orientation Label
+                  Ukuran & Jarak Grid Label
                 </h2>
 
-                <div className="space-y-3 text-xs">
+                <div className='space-y-4 text-xs'>
                   <div>
-                    <label className="block font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className='mb-1 block font-semibold text-slate-600 dark:text-slate-300'>
                       PILIH UKURAN LABEL:
                     </label>
-                    <div className="grid grid-cols-1 gap-2">
+                    <div className='grid grid-cols-1 gap-2'>
                       {SIZE_PRESETS.map((s) => (
                         <button
                           key={s.label}
-                          type="button"
+                          type='button'
                           onClick={() => {
                             setWidthMm(s.width)
                             setHeightMm(s.height)
                             handleResetFontSizes(s.height)
                           }}
-                          className={`rounded-lg border p-2 text-left transition font-semibold ${
+                          className={`rounded-lg border p-2 text-left font-semibold transition ${
                             widthMm === s.width && heightMm === s.height
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-500'
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-800 dark:border-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-300'
                               : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
                           }`}
                         >
@@ -1052,31 +1064,70 @@ export default function BatasMakanPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 pt-2">
+                  <div className='flex items-center gap-3 pt-1'>
                     <div>
-                      <span className="block font-semibold text-slate-600 dark:text-slate-300">
+                      <span className='block font-semibold text-slate-600 dark:text-slate-300'>
                         Lebar (mm):
                       </span>
                       <input
-                        type="number"
+                        type='number'
                         value={widthMm}
                         onChange={(e) => setWidthMm(Number(e.target.value) || 60)}
-                        className="w-16 rounded border border-slate-300 px-2 py-1 text-center font-bold dark:border-slate-600 dark:bg-slate-900"
+                        className='w-16 rounded border border-slate-300 px-2 py-1 text-center font-bold dark:border-slate-600 dark:bg-slate-900'
                       />
                     </div>
                     <div>
-                      <span className="block font-semibold text-slate-600 dark:text-slate-300">
+                      <span className='block font-semibold text-slate-600 dark:text-slate-300'>
                         Tinggi (mm):
                       </span>
                       <input
-                        type="number"
+                        type='number'
                         value={heightMm}
                         onChange={(e) => {
                           const h = Number(e.target.value) || 40
                           setHeightMm(h)
                           handleResetFontSizes(h)
                         }}
-                        className="w-16 rounded border border-slate-300 px-2 py-1 text-center font-bold dark:border-slate-600 dark:bg-slate-900"
+                        className='w-16 rounded border border-slate-300 px-2 py-1 text-center font-bold dark:border-slate-600 dark:bg-slate-900'
+                      />
+                    </div>
+                  </div>
+
+                  {/* Grid Gap / Jarak Antar Label */}
+                  <div className='border-t border-slate-200 pt-3 dark:border-slate-700'>
+                    <label className='mb-1 block font-bold text-slate-700 dark:text-slate-200'>
+                      JARAK ANTAR LABEL / GAP CETAK (mm):
+                    </label>
+                    <p className='mb-2 text-[10px] text-slate-500'>
+                      Atur <strong className='text-emerald-700 dark:text-emerald-400'>0 mm</strong>{' '}
+                      agar label rapat menempel sehingga <strong>1x potong/gunting</strong> langsung
+                      memotong 2 sisi label sekaligus!
+                    </p>
+                    <div className='mb-2 flex flex-wrap gap-1.5'>
+                      {GAP_PRESETS.map((g) => (
+                        <button
+                          key={g.value}
+                          type='button'
+                          onClick={() => setGridGapMm(g.value)}
+                          className={`rounded-lg border px-2.5 py-1 text-xs font-bold transition ${
+                            gridGapMm === g.value
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-800 dark:border-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-300'
+                              : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          }`}
+                        >
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className='flex items-center gap-2'>
+                      <span className='text-[11px] text-slate-500'>Custom Jarak (mm):</span>
+                      <input
+                        type='number'
+                        min='0'
+                        max='20'
+                        value={gridGapMm}
+                        onChange={(e) => setGridGapMm(Math.max(0, Number(e.target.value) || 0))}
+                        className='w-16 rounded border border-slate-300 px-2 py-1 text-center font-bold dark:border-slate-600 dark:bg-slate-900'
                       />
                     </div>
                   </div>
@@ -1084,20 +1135,20 @@ export default function BatasMakanPage() {
               </div>
 
               {/* Single Label Preview (Card Display) */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              <div className='rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800'>
+                <div className='mb-3 flex items-center justify-between'>
+                  <h3 className='text-xs font-bold tracking-wider text-slate-500 uppercase'>
                     Preview 1 Label ({widthMm} × {heightMm} mm)
                   </h3>
-                  <span className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950 dark:text-emerald-300">
+                  <span className='rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300'>
                     {colorMode === 'bw' ? '🖤 Hitam-Putih' : '🎨 Warna BGN'}
                   </span>
                 </div>
 
-                <div className="flex justify-center p-4 bg-slate-100 rounded-xl dark:bg-slate-950 overflow-auto">
+                <div className='flex justify-center overflow-auto rounded-xl bg-slate-100 p-4 dark:bg-slate-950'>
                   {/* Single Label Render */}
                   <div
-                    className="relative bg-white text-slate-900 border-2 border-black rounded-[12px] overflow-hidden flex flex-col justify-between shadow-md"
+                    className='relative flex flex-col justify-between overflow-hidden rounded-[12px] border-2 border-black bg-white text-slate-900 shadow-md'
                     style={{
                       width: `${widthMm * 3.5}px`,
                       height: `${heightMm * 3.5}px`,
@@ -1106,7 +1157,7 @@ export default function BatasMakanPage() {
                   >
                     {/* Header Pill */}
                     <div
-                      className={`shrink-0 text-center font-black rounded-t-[8px] rounded-b-[3px] uppercase shadow-xs ${
+                      className={`shrink-0 rounded-t-[8px] rounded-b-[3px] text-center font-black uppercase shadow-xs ${
                         colorMode === 'bw' ? 'bg-black text-white' : 'bg-[#16a34a] text-white'
                       }`}
                       style={{
@@ -1118,60 +1169,65 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Date & Time */}
-                    <div className="text-center my-auto py-0.5 overflow-hidden flex flex-col justify-center flex-grow">
+                    <div className='my-auto flex flex-grow flex-col justify-center overflow-hidden py-0.5 text-center'>
                       <div
-                        className="font-extrabold leading-none text-slate-950 tracking-tight"
+                        className='leading-none font-extrabold tracking-tight text-slate-950'
                         style={{ fontSize: `${fontTanggal * 1.05}pt` }}
                       >
                         {tanggal || '11/08/2026'}
                       </div>
                       <div
-                        className="font-black leading-none text-slate-950 tracking-tight mt-0.5"
+                        className='mt-0.5 leading-none font-black tracking-tight text-slate-950'
                         style={{ fontSize: `${fontJam * 1.05}pt` }}
                       >
                         {jam || '15.00 WIB'}
                       </div>
 
                       {/* Menu & Porsi with Wrap & Separator options */}
-                      <div className="border-t border-slate-200 pt-0.5 mt-0.5 text-center px-1">
+                      <div className='mt-0.5 border-t border-slate-200 px-1 pt-0.5 text-center'>
                         {wrapMode === 'wrap' ? (
-                          <div className="leading-tight">
+                          <div className='leading-tight'>
                             <div
-                              className="font-extrabold text-slate-900 tracking-wide uppercase truncate"
+                              className='truncate font-extrabold tracking-wide text-slate-900 uppercase'
                               style={{ fontSize: `${fontMenu * 1.05}pt` }}
                             >
                               {namaMenu || 'AYAM KECAP'}
                             </div>
                             <div
-                              className="font-bold text-slate-600 uppercase tracking-wide"
+                              className='font-bold tracking-wide text-slate-600 uppercase'
                               style={{ fontSize: `${fontPorsi * 1.05}pt` }}
                             >
-                              {separator !== 'none' ? `${separator} ` : ''}{porsiMenu || 'PORSI BESAR'}
+                              {separator !== 'none' ? `${separator} ` : ''}
+                              {porsiMenu || 'PORSI BESAR'}
                             </div>
                           </div>
                         ) : wrapMode === 'single' ? (
                           <div
-                            className="font-bold text-slate-600 tracking-wide uppercase truncate"
+                            className='truncate font-bold tracking-wide text-slate-600 uppercase'
                             style={{ fontSize: `${fontMenu * 1.05}pt` }}
                           >
-                            {(namaMenu || 'AYAM KECAP').toUpperCase()} {separator !== 'none' ? separator : ''} {(porsiMenu || 'PORSI BESAR').toUpperCase()}
+                            {(namaMenu || 'AYAM KECAP').toUpperCase()}{' '}
+                            {separator !== 'none' ? separator : ''}{' '}
+                            {(porsiMenu || 'PORSI BESAR').toUpperCase()}
                           </div>
                         ) : (
                           /* Auto wrap mode */
                           <div
-                            className="font-bold text-slate-700 leading-tight tracking-tight uppercase break-words"
+                            className='leading-tight font-bold tracking-tight break-words text-slate-700 uppercase'
                             style={{ fontSize: `${fontMenu * 1.05}pt` }}
                           >
-                            {(namaMenu || 'AYAM KECAP').toUpperCase()} {separator !== 'none' ? separator : ''} {(porsiMenu || 'PORSI BESAR').toUpperCase()}
+                            {(namaMenu || 'AYAM KECAP').toUpperCase()}{' '}
+                            {separator !== 'none' ? separator : ''}{' '}
+                            {(porsiMenu || 'PORSI BESAR').toUpperCase()}
                           </div>
                         )}
                       </div>
                     </div>
 
                     {/* Footer Warning */}
-                    <div className="shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center">
+                    <div className='shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center'>
                       <div
-                        className={`font-black tracking-tight uppercase leading-none ${
+                        className={`leading-none font-black tracking-tight uppercase ${
                           colorMode === 'bw' ? 'text-black' : 'text-red-600'
                         }`}
                         style={{ fontSize: `${fontCatatan * 1.05}pt` }}
@@ -1187,53 +1243,62 @@ export default function BatasMakanPage() {
 
           {/* Multi-Item Batch List Table (If items added) */}
           {items.length > 0 && (
-            <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800 no-print">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <span>📋 Daftar Batch Label ({items.length} jenis menu, Total {activeLabels.length} label)</span>
+            <div className='no-print mb-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-800'>
+              <div className='mb-4 flex items-center justify-between'>
+                <h3 className='flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white'>
+                  <span>
+                    📋 Daftar Batch Label ({items.length} jenis menu, Total {activeLabels.length}{' '}
+                    label)
+                  </span>
                 </h3>
                 <button
-                  type="button"
+                  type='button'
                   onClick={handleClearItems}
-                  className="text-xs font-semibold text-red-600 hover:underline cursor-pointer"
+                  className='cursor-pointer text-xs font-semibold text-red-600 hover:underline'
                 >
                   Hapus Semua Batch
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 dark:bg-slate-700 dark:text-slate-200">
+              <div className='overflow-x-auto'>
+                <table className='w-full text-left text-xs'>
+                  <thead className='bg-slate-50 text-slate-600 dark:bg-slate-700 dark:text-slate-200'>
                     <tr>
-                      <th className="p-2">#</th>
-                      <th className="p-2">Tanggal / Jam</th>
-                      <th className="p-2">Nama Menu</th>
-                      <th className="p-2">Porsi & Format</th>
-                      <th className="p-2">Ukuran Font (pt)</th>
-                      <th className="p-2">Catatan</th>
-                      <th className="p-2 text-center">Jumlah</th>
-                      <th className="p-2 text-right">Aksi</th>
+                      <th className='p-2'>#</th>
+                      <th className='p-2'>Tanggal / Jam</th>
+                      <th className='p-2'>Nama Menu</th>
+                      <th className='p-2'>Porsi & Format</th>
+                      <th className='p-2'>Ukuran Font (pt)</th>
+                      <th className='p-2'>Catatan</th>
+                      <th className='p-2 text-center'>Jumlah</th>
+                      <th className='p-2 text-right'>Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  <tbody className='divide-y divide-slate-200 dark:divide-slate-700'>
                     {items.map((item, idx) => (
                       <tr key={item.id}>
-                        <td className="p-2 font-bold">{idx + 1}</td>
-                        <td className="p-2 font-medium">{item.tanggal} - {item.jam}</td>
-                        <td className="p-2 font-bold uppercase">{item.namaMenu}</td>
-                        <td className="p-2 font-semibold text-emerald-700 dark:text-emerald-400">
-                          {item.porsiMenu} <span className="text-slate-400">({item.separator}, {item.wrapMode})</span>
+                        <td className='p-2 font-bold'>{idx + 1}</td>
+                        <td className='p-2 font-medium'>
+                          {item.tanggal} - {item.jam}
                         </td>
-                        <td className="p-2 font-mono text-[11px] text-slate-500">
-                          Hdr:{item.fontHeader} | Tgl:{item.fontTanggal} | Jam:{item.fontJam} | Mnu:{item.fontMenu}
+                        <td className='p-2 font-bold uppercase'>{item.namaMenu}</td>
+                        <td className='p-2 font-semibold text-emerald-700 dark:text-emerald-400'>
+                          {item.porsiMenu}{' '}
+                          <span className='text-slate-400'>
+                            ({item.separator}, {item.wrapMode})
+                          </span>
                         </td>
-                        <td className="p-2 font-semibold text-red-600">{item.catatan}</td>
-                        <td className="p-2 text-center font-bold text-sm">{item.jumlah} pcs</td>
-                        <td className="p-2 text-right">
+                        <td className='p-2 font-mono text-[11px] text-slate-500'>
+                          Hdr:{item.fontHeader} | Tgl:{item.fontTanggal} | Jam:{item.fontJam} | Mnu:
+                          {item.fontMenu}
+                        </td>
+                        <td className='p-2 font-semibold text-red-600'>{item.catatan}</td>
+                        <td className='p-2 text-center text-sm font-bold'>{item.jumlah} pcs</td>
+                        <td className='p-2 text-right'>
                           <button
-                            type="button"
+                            type='button'
                             onClick={() => handleRemoveItem(item.id)}
-                            className="text-red-500 hover:text-red-700 font-bold px-2 py-1 cursor-pointer"
+                            className='cursor-pointer px-2 py-1 font-bold text-red-500 hover:text-red-700'
                           >
                             ✕
                           </button>
@@ -1250,28 +1315,30 @@ export default function BatasMakanPage() {
         {/* ======================================================== */}
         {/* A4 PRINT SHEET PREVIEW (Visible on Screen & Print)        */}
         {/* ======================================================== */}
-        <div className="mx-auto max-w-6xl">
-          <div className="no-print flex items-center justify-between mb-3 border-t border-slate-200 pt-6 dark:border-slate-800">
+        <div className='mx-auto max-w-6xl'>
+          <div className='no-print mb-3 flex items-center justify-between border-t border-slate-200 pt-6 dark:border-slate-800'>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                📄 Preview Lembar Kerja A4 ({activeLabels.length} Label)
+              <h3 className='text-base font-bold text-slate-900 dark:text-white'>
+                📄 Preview Lembar Kerja A4 ({activeLabels.length} Label - Jarak Gap: {gridGapMm} mm)
               </h3>
-              <p className="text-xs text-slate-500">
-                Klik button di bawah untuk membuka halaman cetak polos tanpa background warna yang langsung otomatis siap di-print (CTRL+P).
+              <p className='text-xs text-slate-500'>
+                Klik button di bawah untuk membuka halaman cetak polos tanpa background warna yang
+                langsung otomatis siap di-print (CTRL+P).
               </p>
             </div>
             <button
-              type="button"
+              type='button'
               onClick={handlePrint}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 cursor-pointer"
+              className='cursor-pointer rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700'
             >
               🖨️ Cetak Halaman Polos
             </button>
           </div>
 
           {/* Printed Page Box */}
-          <div className="bg-slate-200 p-2 sm:p-6 rounded-2xl dark:bg-slate-950 no-print-bg">
-            <div className="mx-auto bg-white text-slate-900 shadow-xl rounded-lg p-3 sm:p-6 print-container"
+          <div className='no-print-bg rounded-2xl bg-slate-200 p-2 sm:p-6 dark:bg-slate-950'>
+            <div
+              className='print-container mx-auto rounded-lg bg-white p-3 text-slate-900 shadow-xl sm:p-6'
               style={{
                 width: '100%',
                 maxWidth: '210mm',
@@ -1280,11 +1347,11 @@ export default function BatasMakanPage() {
             >
               {/* CSS Grid for Labels */}
               <div
-                className="grid gap-2 justify-center"
+                className='grid justify-center'
                 style={{
                   gridTemplateColumns: `repeat(auto-fill, minmax(${widthMm}mm, 1fr))`,
-                  rowGap: '3mm',
-                  columnGap: '3mm'
+                  rowGap: `${gridGapMm}mm`,
+                  columnGap: `${gridGapMm}mm`
                 }}
               >
                 {activeLabels.map((lbl, idx) => {
@@ -1299,7 +1366,7 @@ export default function BatasMakanPage() {
                   return (
                     <div
                       key={idx}
-                      className="label-box relative bg-white text-slate-900 border-2 border-black rounded-[10px] overflow-hidden flex flex-col justify-between"
+                      className='label-box relative flex flex-col justify-between overflow-hidden rounded-[10px] border-2 border-black bg-white text-slate-900'
                       style={{
                         width: `${widthMm}mm`,
                         height: `${heightMm}mm`,
@@ -1310,7 +1377,7 @@ export default function BatasMakanPage() {
                     >
                       {/* Header Pill */}
                       <div
-                        className={`shrink-0 text-center font-black rounded-t-[6px] rounded-b-[2px] uppercase leading-tight shadow-xs ${
+                        className={`shrink-0 rounded-t-[6px] rounded-b-[2px] text-center leading-tight font-black uppercase shadow-xs ${
                           isBW ? 'bg-black text-white' : 'bg-[#16a34a] text-white'
                         }`}
                         style={{
@@ -1322,60 +1389,63 @@ export default function BatasMakanPage() {
                       </div>
 
                       {/* Date & Time */}
-                      <div className="text-center my-auto py-0.5 overflow-hidden flex flex-col justify-center flex-grow">
+                      <div className='my-auto flex flex-grow flex-col justify-center overflow-hidden py-0.5 text-center'>
                         <div
-                          className="font-extrabold leading-none text-slate-950 tracking-tight"
+                          className='leading-none font-extrabold tracking-tight text-slate-950'
                           style={{ fontSize: `${ftTanggal}pt` }}
                         >
                           {lbl.tanggal}
                         </div>
                         <div
-                          className="font-black leading-none text-slate-950 tracking-tight mt-0.5"
+                          className='mt-0.5 leading-none font-black tracking-tight text-slate-950'
                           style={{ fontSize: `${ftJam}pt` }}
                         >
                           {lbl.jam}
                         </div>
 
                         {/* Menu & Porsi */}
-                        <div className="border-t border-slate-200 pt-0.5 mt-0.5 text-center px-0.5">
+                        <div className='mt-0.5 border-t border-slate-200 px-0.5 pt-0.5 text-center'>
                           {lbl.wrapMode === 'wrap' ? (
-                            <div className="leading-tight">
+                            <div className='leading-tight'>
                               <div
-                                className="font-extrabold text-slate-950 tracking-tight uppercase truncate"
+                                className='truncate font-extrabold tracking-tight text-slate-950 uppercase'
                                 style={{ fontSize: `${ftMenu}pt` }}
                               >
                                 {lbl.namaMenu}
                               </div>
                               <div
-                                className="font-bold text-slate-700 uppercase tracking-tight"
+                                className='font-bold tracking-tight text-slate-700 uppercase'
                                 style={{ fontSize: `${ftPorsi}pt` }}
                               >
-                                {lbl.separator !== 'none' ? `${lbl.separator} ` : ''}{lbl.porsiMenu}
+                                {lbl.separator !== 'none' ? `${lbl.separator} ` : ''}
+                                {lbl.porsiMenu}
                               </div>
                             </div>
                           ) : lbl.wrapMode === 'single' ? (
                             <div
-                              className="font-bold text-slate-700 tracking-wide uppercase truncate"
+                              className='truncate font-bold tracking-wide text-slate-700 uppercase'
                               style={{ fontSize: `${ftMenu}pt` }}
                             >
-                              {lbl.namaMenu} {lbl.separator !== 'none' ? lbl.separator : ''} {lbl.porsiMenu}
+                              {lbl.namaMenu} {lbl.separator !== 'none' ? lbl.separator : ''}{' '}
+                              {lbl.porsiMenu}
                             </div>
                           ) : (
                             /* Auto Wrap mode */
                             <div
-                              className="font-extrabold text-slate-900 leading-tight tracking-tight uppercase break-words"
+                              className='leading-tight font-extrabold tracking-tight break-words text-slate-900 uppercase'
                               style={{ fontSize: `${ftMenu}pt` }}
                             >
-                              {lbl.namaMenu} {lbl.separator !== 'none' ? lbl.separator : ''} {lbl.porsiMenu}
+                              {lbl.namaMenu} {lbl.separator !== 'none' ? lbl.separator : ''}{' '}
+                              {lbl.porsiMenu}
                             </div>
                           )}
                         </div>
                       </div>
 
                       {/* Footer Warning */}
-                      <div className="shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center">
+                      <div className='shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center'>
                         <div
-                          className={`font-black tracking-tight uppercase leading-none ${
+                          className={`leading-none font-black tracking-tight uppercase ${
                             isBW ? 'text-black' : 'text-red-600'
                           }`}
                           style={{ fontSize: `${ftCatatan}pt` }}
