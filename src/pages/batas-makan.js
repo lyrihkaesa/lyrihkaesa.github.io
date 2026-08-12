@@ -1,6 +1,31 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Layout from '@theme/Layout'
 
+const STORAGE_KEY = 'batas_makan_config_v2'
+
+const toSafeBase64 = (str) => {
+  try {
+    const encoded = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+      String.fromCharCode(parseInt(p1, 16))
+    )
+    return btoa(encoded)
+  } catch {
+    return ''
+  }
+}
+
+const fromSafeBase64 = (str) => {
+  try {
+    const decoded = atob(str)
+      .split('')
+      .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
+      .join('')
+    return decodeURIComponent(decoded)
+  } catch {
+    return ''
+  }
+}
+
 // Presets for quick selection
 const MENU_PRESETS = [
   'AYAM KECAP',
@@ -48,6 +73,8 @@ const COLOR_MODE_OPTIONS = [
 
 export default function BatasMakanPage() {
   const [isClient, setIsClient] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   // Current Form Inputs
   const [tanggal, setTanggal] = useState('')
@@ -109,16 +136,127 @@ export default function BatasMakanPage() {
     }
   }
 
-  // Set default date & time on mount
+  // Set default date & time / Load from URL Query Params or LocalStorage on mount
   useEffect(() => {
     setIsClient(true)
     const now = new Date()
-    setTanggal(formatDateDDMMYYYY(now))
+    const defaultDate = formatDateDDMMYYYY(now)
+    const defaultTime = formatTimeWIB(new Date(now.getTime() + 4 * 60 * 60 * 1000))
 
-    // Default food expiry limit: +4 hours from now
-    const expiryTime = new Date(now.getTime() + 4 * 60 * 60 * 1000)
-    setJam(formatTimeWIB(expiryTime))
+    let loaded = null
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const shared = params.get('d')
+
+      if (shared) {
+        try {
+          const decoded = fromSafeBase64(shared)
+          if (decoded) loaded = JSON.parse(decoded)
+        } catch {}
+      }
+
+      if (!loaded) {
+        const saved = window.localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          try {
+            loaded = JSON.parse(saved)
+          } catch {}
+        }
+      }
+    }
+
+    if (loaded) {
+      setTanggal(loaded.t || defaultDate)
+      setJam(loaded.j || defaultTime)
+      if (loaded.m) setNamaMenu(loaded.m)
+      if (loaded.p) setPorsiMenu(loaded.p)
+      if (loaded.c) setCatatan(loaded.c)
+      if (loaded.n) setJumlah(loaded.n)
+      if (loaded.w) setWidthMm(loaded.w)
+      if (loaded.h) setHeightMm(loaded.h)
+      if (loaded.sep) setSeparator(loaded.sep)
+      if (loaded.wrap) setWrapMode(loaded.wrap)
+      if (loaded.col) setColorMode(loaded.col)
+      if (loaded.fh) setFontHeader(loaded.fh)
+      if (loaded.ft) setFontTanggal(loaded.ft)
+      if (loaded.fj) setFontJam(loaded.fj)
+      if (loaded.fm) setFontMenu(loaded.fm)
+      if (loaded.fp) setFontPorsi(loaded.fp)
+      if (loaded.fc) setFontCatatan(loaded.fc)
+      if (Array.isArray(loaded.items)) setItems(loaded.items)
+    } else {
+      setTanggal(defaultDate)
+      setJam(defaultTime)
+    }
+
+    setIsReady(true)
   }, [])
+
+  // Auto-sync state to LocalStorage and URL Query Param (?d=...)
+  useEffect(() => {
+    if (!isReady || typeof window === 'undefined') return
+
+    const payload = {
+      t: tanggal,
+      j: jam,
+      m: namaMenu,
+      p: porsiMenu,
+      c: catatan,
+      n: jumlah,
+      w: widthMm,
+      h: heightMm,
+      sep: separator,
+      wrap: wrapMode,
+      col: colorMode,
+      fh: fontHeader,
+      ft: fontTanggal,
+      fj: fontJam,
+      fm: fontMenu,
+      fp: fontPorsi,
+      fc: fontCatatan,
+      items
+    }
+
+    // 1. Save state to LocalStorage
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+    } catch {}
+
+    // 2. Update URL Query Param silently without page refresh
+    try {
+      const encoded = toSafeBase64(JSON.stringify(payload))
+      const baseUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}`
+      window.history.replaceState({}, '', `${baseUrl}?d=${encoded}`)
+    } catch {}
+  }, [
+    isReady,
+    tanggal,
+    jam,
+    namaMenu,
+    porsiMenu,
+    catatan,
+    jumlah,
+    widthMm,
+    heightMm,
+    separator,
+    wrapMode,
+    colorMode,
+    fontHeader,
+    fontTanggal,
+    fontJam,
+    fontMenu,
+    fontPorsi,
+    fontCatatan,
+    items
+  ])
+
+  // Share Link Handler
+  const handleCopyShareLink = () => {
+    if (typeof window === 'undefined') return
+    navigator.clipboard.writeText(window.location.href)
+    setCopiedLink(true)
+    setTimeout(() => setCopiedLink(false), 2500)
+  }
 
   // Quick Time Adder
   const addHoursToNow = (hours) => {
@@ -386,13 +524,23 @@ export default function BatasMakanPage() {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <a
                 href="/jkt"
                 className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
               >
-                ← Kembali ke SPPG Jeketro
+                ← SPPG Jeketro
               </a>
+
+              <button
+                type="button"
+                onClick={handleCopyShareLink}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800 shadow-xs hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 cursor-pointer"
+                title="Salin URL link konfigurasi label ini untuk dibagikan"
+              >
+                {copiedLink ? '✓ Link Tersalin!' : '🔗 Salin Link Share'}
+              </button>
+
               <button
                 type="button"
                 onClick={handlePrint}
