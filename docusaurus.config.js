@@ -113,6 +113,11 @@ const config = {
             label: 'Toram Online',
             position: 'left'
           },
+          {
+            to: '/batas-makan',
+            label: 'Cetak Batas Makan',
+            position: 'left'
+          },
           // {
           //   to: '/community',
           //   label: 'Community',
