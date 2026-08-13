@@ -506,13 +506,11 @@ export function renderLabelV2Html(lbl) {
 
   const noteHtml = hasCatatan
     ? `
-      <div style="margin-top:${nT}px; padding:${nT}px ${nR}px ${nB}px ${nL}px; flex-shrink:0;">
+      <div style="margin-top:${nT}px; padding-left:${nL}px; padding-right:${nR}px; flex-shrink:0;">
         <div style="display:grid; grid-template-columns:${sNoteIcon ? 'auto 1fr' : '1fr'}; gap:0px 6px; align-items:center; max-width:98%; margin:0 auto; text-align:left;">
           ${sNoteIcon ? `<div style="font-weight:700; color:#000000; font-size:${ftCatatan}pt; text-align:left;">🚫</div>` : ''}
           <div style="background:${noteBoxBg}; color:#ffffff; border-radius:3px; padding:1.5px 3.5px; text-align:left;">
-            <div style="font-size:${ftCatatan}pt; font-weight:900; color:#ffffff; text-transform:uppercase; line-height:1.1; white-space:pre-line; text-align:left;">
-              ${catVal.replace(/^🚫\s*/, '').toUpperCase()}
-            </div>
+            <div style="font-size:${ftCatatan}pt; font-weight:900; color:#ffffff; text-transform:uppercase; line-height:1.0; white-space:pre-line; text-align:left;">${catVal.replace(/^🚫\s*/, '').toUpperCase()}</div>
           </div>
         </div>
       </div>

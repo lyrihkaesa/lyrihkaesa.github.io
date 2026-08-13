@@ -1149,125 +1149,116 @@ export default function BatasMakanPage() {
                 </div>
               </div>
 
-              {/* Section Analisis Gizi (Versi 2) */}
-              <div
-                className={`space-y-3 rounded-xl border p-3.5 transition ${
-                  labelVersion === 'v2'
-                    ? 'border-emerald-200 bg-emerald-50/50 dark:border-emerald-900/50 dark:bg-emerald-950/20'
-                    : 'border-slate-200 bg-slate-50/50 opacity-60 dark:border-slate-800 dark:bg-slate-900/30'
-                }`}
-              >
-                <div className='flex flex-wrap items-center justify-between gap-2'>
-                  <label className='flex items-center gap-1.5 text-xs font-extrabold tracking-wide text-emerald-900 uppercase dark:text-emerald-300'>
-                    <span>🥗 Analisis Gizi (Versi 2)</span>
-                    {labelVersion === 'v1' && (
-                      <span className='rounded bg-slate-200 px-1.5 py-0.5 text-[10px] text-slate-600 dark:bg-slate-700 dark:text-slate-300'>
-                        Aktifkan Versi 2
-                      </span>
-                    )}
-                  </label>
-                  <div className='flex items-center gap-3'>
-                    <label className='flex cursor-pointer items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300'>
-                      <input
-                        type='checkbox'
-                        checked={showGiziIcons}
-                        onChange={(e) => setShowGiziIcons(e.target.checked)}
-                        className='rounded border-slate-300 text-emerald-600 focus:ring-emerald-500'
-                      />
-                      <span>Tampilkan Icon Gizi (⚡🥩🥑)</span>
+              {/* Section Analisis Gizi (Khusus Versi 2) */}
+              {labelVersion === 'v2' && (
+                <div className='space-y-3 rounded-xl border border-emerald-200 bg-emerald-50/50 p-3.5 dark:border-emerald-900/50 dark:bg-emerald-950/20'>
+                  <div className='flex flex-wrap items-center justify-between gap-2'>
+                    <label className='flex items-center gap-1.5 text-xs font-extrabold tracking-wide text-emerald-900 uppercase dark:text-emerald-300'>
+                      <span>🥗 Analisis Gizi (Versi 2)</span>
                     </label>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        setEnergi('512,14')
-                        setProtein('20,17')
-                        setLemak('18,27')
-                        setKarbohidrat('66,16')
-                        setSerat('1,96')
-                      }}
-                      className='cursor-pointer text-[11px] font-bold text-emerald-700 hover:underline dark:text-emerald-400'
-                    >
-                      ↺ Preset Contoh
-                    </button>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        setEnergi('')
-                        setProtein('')
-                        setLemak('')
-                        setKarbohidrat('')
-                        setSerat('')
-                      }}
-                      className='cursor-pointer text-[11px] font-bold text-red-600 hover:underline'
-                    >
-                      Kosongkan
-                    </button>
+                    <div className='flex items-center gap-3'>
+                      <label className='flex cursor-pointer items-center gap-1 text-[11px] font-bold text-slate-700 dark:text-slate-300'>
+                        <input
+                          type='checkbox'
+                          checked={showGiziIcons}
+                          onChange={(e) => setShowGiziIcons(e.target.checked)}
+                          className='rounded border-slate-300 text-emerald-600 focus:ring-emerald-500'
+                        />
+                        <span>Tampilkan Icon Gizi (⚡🥩🥑)</span>
+                      </label>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setEnergi('512,14')
+                          setProtein('20,17')
+                          setLemak('18,27')
+                          setKarbohidrat('66,16')
+                          setSerat('1,96')
+                        }}
+                        className='cursor-pointer text-[11px] font-bold text-emerald-700 hover:underline dark:text-emerald-400'
+                      >
+                        ↺ Preset Contoh
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setEnergi('')
+                          setProtein('')
+                          setLemak('')
+                          setKarbohidrat('')
+                          setSerat('')
+                        }}
+                        className='cursor-pointer text-[11px] font-bold text-red-600 hover:underline'
+                      >
+                        Kosongkan
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
-                  <div>
-                    <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
-                      ENERGI (kkal)
-                    </label>
-                    <input
-                      type='text'
-                      value={energi}
-                      onChange={(e) => setEnergi(e.target.value)}
-                      placeholder='Contoh: 512,14'
-                      className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                    />
-                  </div>
-                  <div>
-                    <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
-                      PROTEIN (gr)
-                    </label>
-                    <input
-                      type='text'
-                      value={protein}
-                      onChange={(e) => setProtein(e.target.value)}
-                      placeholder='Contoh: 20,17'
-                      className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                    />
-                  </div>
-                  <div>
-                    <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
-                      LEMAK (gr)
-                    </label>
-                    <input
-                      type='text'
-                      value={lemak}
-                      onChange={(e) => setLemak(e.target.value)}
-                      placeholder='Contoh: 18,27'
-                      className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                    />
-                  </div>
-                  <div>
-                    <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
-                      KARBOHIDRAT (gr)
-                    </label>
-                    <input
-                      type='text'
-                      value={karbohidrat}
-                      onChange={(e) => setKarbohidrat(e.target.value)}
-                      placeholder='Contoh: 66,16'
-                      className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                    />
-                  </div>
-                  <div>
-                    <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
-                      SERAT (gr)
-                    </label>
-                    <input
-                      type='text'
-                      value={serat}
-                      onChange={(e) => setSerat(e.target.value)}
-                      placeholder='Contoh: 1,96'
-                      className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                    />
+                  <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
+                    <div>
+                      <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
+                        ENERGI (kkal)
+                      </label>
+                      <input
+                        type='text'
+                        value={energi}
+                        onChange={(e) => setEnergi(e.target.value)}
+                        placeholder='Contoh: 512,14'
+                        className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                      />
+                    </div>
+                    <div>
+                      <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
+                        PROTEIN (gr)
+                      </label>
+                      <input
+                        type='text'
+                        value={protein}
+                        onChange={(e) => setProtein(e.target.value)}
+                        placeholder='Contoh: 20,17'
+                        className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                      />
+                    </div>
+                    <div>
+                      <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
+                        LEMAK (gr)
+                      </label>
+                      <input
+                        type='text'
+                        value={lemak}
+                        onChange={(e) => setLemak(e.target.value)}
+                        placeholder='Contoh: 18,27'
+                        className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                      />
+                    </div>
+                    <div>
+                      <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
+                        KARBOHIDRAT (gr)
+                      </label>
+                      <input
+                        type='text'
+                        value={karbohidrat}
+                        onChange={(e) => setKarbohidrat(e.target.value)}
+                        placeholder='Contoh: 66,16'
+                        className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                      />
+                    </div>
+                    <div>
+                      <label className='mb-0.5 block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
+                        SERAT (gr)
+                      </label>
+                      <input
+                        type='text'
+                        value={serat}
+                        onChange={(e) => setSerat(e.target.value)}
+                        placeholder='Contoh: 1,96'
+                        className='w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Tanggal & Jam */}
               <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
@@ -1677,35 +1668,37 @@ export default function BatasMakanPage() {
                     </div>
                   </div>
 
-                  {/* Font Gizi */}
-                  <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
-                    <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
-                      FONT SIZE GIZI
-                    </span>
-                    <div className='mt-1 flex items-center gap-1'>
-                      <button
-                        type='button'
-                        onClick={() => setFontGizi((prev) => Math.max(4, prev - 0.5))}
-                        className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
-                      >
-                        -
-                      </button>
-                      <input
-                        type='number'
-                        step='0.5'
-                        value={fontGizi}
-                        onChange={(e) => setFontGizi(Number(e.target.value) || 7)}
-                        className='w-full border-0 bg-transparent text-center text-xs font-bold'
-                      />
-                      <button
-                        type='button'
-                        onClick={() => setFontGizi((prev) => prev + 0.5)}
-                        className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
-                      >
-                        +
-                      </button>
+                  {/* Font Gizi (Khusus Versi 2) */}
+                  {labelVersion === 'v2' && (
+                    <div className='rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900'>
+                      <span className='block text-[10px] font-bold text-slate-600 dark:text-slate-400'>
+                        FONT SIZE GIZI
+                      </span>
+                      <div className='mt-1 flex items-center gap-1'>
+                        <button
+                          type='button'
+                          onClick={() => setFontGizi((prev) => Math.max(4, prev - 0.5))}
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
+                        >
+                          -
+                        </button>
+                        <input
+                          type='number'
+                          step='0.5'
+                          value={fontGizi}
+                          onChange={(e) => setFontGizi(Number(e.target.value) || 7)}
+                          className='w-full border-0 bg-transparent text-center text-xs font-bold'
+                        />
+                        <button
+                          type='button'
+                          onClick={() => setFontGizi((prev) => prev + 0.5)}
+                          className='rounded bg-slate-100 px-1.5 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -1943,74 +1936,76 @@ export default function BatasMakanPage() {
                         </div>
                       </div>
 
-                      {/* 4. INFORMASI GIZI */}
-                      <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
-                        <span className='mb-1.5 block text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
-                          INFORMASI GIZI
-                        </span>
-                        <div className='grid grid-cols-4 gap-1.5 text-center'>
-                          <div>
-                            <span className='block text-[9px] font-bold text-slate-500'>
-                              T (Top)
-                            </span>
-                            <input
-                              type='number'
-                              step='0.5'
-                              min='0'
-                              value={giziPadT}
-                              onChange={(e) =>
-                                setGiziPadT(Math.max(0, Number(e.target.value) || 0))
-                              }
-                              className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                            />
-                          </div>
-                          <div>
-                            <span className='block text-[9px] font-bold text-slate-500'>
-                              R (Right)
-                            </span>
-                            <input
-                              type='number'
-                              step='0.5'
-                              min='0'
-                              value={giziPadR}
-                              onChange={(e) =>
-                                setGiziPadR(Math.max(0, Number(e.target.value) || 0))
-                              }
-                              className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                            />
-                          </div>
-                          <div>
-                            <span className='block text-[9px] font-bold text-slate-500'>
-                              B (Bottom)
-                            </span>
-                            <input
-                              type='number'
-                              step='0.5'
-                              min='0'
-                              value={giziPadB}
-                              onChange={(e) =>
-                                setGiziPadB(Math.max(0, Number(e.target.value) || 0))
-                              }
-                              className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                            />
-                          </div>
-                          <div>
-                            <span className='block text-[9px] font-bold text-slate-500'>
-                              L (Left)
-                            </span>
-                            <input
-                              type='number'
-                              step='0.5'
-                              min='0'
-                              value={giziPadL}
-                              onChange={(e) =>
-                                setGiziPadL(Math.max(0, Number(e.target.value) || 0))
-                              }
-                              className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
-                            />
+                      {/* 4. INFORMASI GIZI (Khusus Versi 2) */}
+                      {labelVersion === 'v2' && (
+                        <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
+                          <span className='mb-1.5 block text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
+                            INFORMASI GIZI
+                          </span>
+                          <div className='grid grid-cols-4 gap-1.5 text-center'>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>
+                                T (Top)
+                              </span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={giziPadT}
+                                onChange={(e) =>
+                                  setGiziPadT(Math.max(0, Number(e.target.value) || 0))
+                                }
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>
+                                R (Right)
+                              </span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={giziPadR}
+                                onChange={(e) =>
+                                  setGiziPadR(Math.max(0, Number(e.target.value) || 0))
+                                }
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>
+                                B (Bottom)
+                              </span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={giziPadB}
+                                onChange={(e) =>
+                                  setGiziPadB(Math.max(0, Number(e.target.value) || 0))
+                                }
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>
+                                L (Left)
+                              </span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={giziPadL}
+                                onChange={(e) =>
+                                  setGiziPadL(Math.max(0, Number(e.target.value) || 0))
+                                }
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* 4. CATATAN PERINGATAN */}
                       <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
