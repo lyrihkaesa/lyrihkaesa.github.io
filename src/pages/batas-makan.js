@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import Layout from '@theme/Layout'
 
 const STORAGE_KEY = 'batas_makan_config_v2'
 
@@ -742,11 +741,7 @@ export default function BatasMakanPage() {
   const isSmallHeight = heightMm <= 32
 
   return (
-    <Layout
-      title='Cetak Label Batas Makan'
-      description='Generator & Cetak Label Batas Makan 40x60 mm SPPG BGN (Badan Gizi Nasional)'
-    >
-      <main className='min-h-screen bg-slate-50 p-4 text-slate-800 sm:p-6 dark:bg-slate-900 dark:text-slate-100 print:bg-white print:p-0'>
+    <main className='min-h-screen bg-slate-50 p-4 text-slate-800 sm:p-6 dark:bg-slate-900 dark:text-slate-100 print:bg-white print:p-0'>
         {/* Top Header Controls (Hidden on Print) */}
         <div className='no-print mx-auto max-w-6xl'>
           <div className='mb-6 flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between dark:border-slate-800'>
@@ -2157,6 +2152,5 @@ export default function BatasMakanPage() {
           }
         `}</style>
       </main>
-    </Layout>
   )
 }
