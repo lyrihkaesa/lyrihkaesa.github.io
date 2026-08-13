@@ -128,7 +128,7 @@ export function LabelV1({ lbl = {}, id }) {
               lbl.wrapMode === 'wrap' ? (
                 <div className='leading-tight'>
                   <div
-                    className='truncate font-extrabold tracking-wide text-slate-900 uppercase'
+                    className='leading-tight font-extrabold tracking-tight break-words text-slate-900 uppercase'
                     style={{ fontSize: `${ftMenu}pt` }}
                   >
                     {mnuVal.toUpperCase()}
@@ -268,7 +268,7 @@ export function renderLabelV1Html(lbl) {
       if (lbl.wrapMode === 'wrap') {
         menuPorsiContent = `
           <div style="line-height:1.1;">
-            <div style="font-size:${ftMenu}pt; font-weight:800; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#000;">${mnuVal}</div>
+            <div style="font-size:${ftMenu}pt; font-weight:800; text-transform:uppercase; word-break:break-word; line-height:1.1; color:#000;">${mnuVal}</div>
             <div style="font-size:${ftPorsi}pt; font-weight:700; text-transform:uppercase; color:#1e293b;">${lbl.separator !== 'none' ? (lbl.separator || '·') + ' ' : ''}${prsVal}</div>
           </div>
         `

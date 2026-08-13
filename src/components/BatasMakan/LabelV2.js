@@ -106,7 +106,7 @@ export function LabelV2({ lbl = {}, id }) {
   return (
     <div
       id={id}
-      className='label-box relative flex flex-col justify-between overflow-hidden rounded-[8px] bg-white text-slate-900 shadow-xs'
+      className='label-box relative flex flex-col justify-start overflow-hidden rounded-[8px] bg-white text-slate-900 shadow-xs'
       style={{
         width: `${widthMm}mm`,
         height: `${heightMm}mm`,
@@ -132,7 +132,7 @@ export function LabelV2({ lbl = {}, id }) {
       )}
 
       {/* Main Content Container */}
-      <div className='my-auto flex flex-grow flex-col justify-center overflow-hidden text-center'>
+      <div className='flex flex-grow flex-col justify-start overflow-hidden text-left'>
         {/* Menu & Porsi */}
         {hasMenuPorsi && (
           <div
@@ -146,7 +146,7 @@ export function LabelV2({ lbl = {}, id }) {
               lbl.wrapMode === 'wrap' ? (
                 <div className='leading-tight'>
                   <div
-                    className='truncate font-extrabold tracking-wide text-slate-900 uppercase'
+                    className='leading-tight font-extrabold tracking-tight break-words text-slate-900 uppercase'
                     style={{ fontSize: `${ftMenu}pt` }}
                   >
                     {mnuVal.toUpperCase()}
@@ -195,7 +195,7 @@ export function LabelV2({ lbl = {}, id }) {
           </div>
         )}
 
-        {/* Nutrition Analysis Grid */}
+        {/* Nutrition Analysis Grid (Constrained Top-Left) */}
         {giziItems.length > 0 && (
           <div
             style={{
@@ -402,7 +402,7 @@ export function renderLabelV2Html(lbl) {
       if (lbl.wrapMode === 'wrap') {
         menuPorsiContent = `
           <div style="line-height:1.1;">
-            <div style="font-size:${ftMenu}pt; font-weight:800; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#000;">${mnuVal}</div>
+            <div style="font-size:${ftMenu}pt; font-weight:800; text-transform:uppercase; word-break:break-word; line-height:1.1; color:#000;">${mnuVal}</div>
             <div style="font-size:${ftPorsi}pt; font-weight:700; text-transform:uppercase; color:#1e293b;">${lbl.separator !== 'none' ? (lbl.separator || '-') + ' ' : ''}${prsVal}</div>
           </div>
         `
@@ -518,9 +518,9 @@ export function renderLabelV2Html(lbl) {
     : ''
 
   return `
-    <div class="label-card" style="width:${widthMm}mm; height:${heightMm}mm; border:${bWidth}px solid #000000; border-radius:8px; background:#ffffff; color:#000000; box-sizing:border-box; padding:2px; display:flex; flex-direction:column; justify-content:space-between; page-break-inside:avoid; break-inside:avoid; margin:0; overflow:hidden;">
+    <div class="label-card" style="width:${widthMm}mm; height:${heightMm}mm; border:${bWidth}px solid #000000; border-radius:8px; background:#ffffff; color:#000000; box-sizing:border-box; padding:2px; display:flex; flex-direction:column; justify-content:flex-start; page-break-inside:avoid; break-inside:avoid; margin:0; overflow:hidden;">
       ${headerHtml}
-      <div style="text-align:center; margin:auto 0; flex-grow:1; display:flex; flex-direction:column; justify-content:center; overflow:hidden;">
+      <div style="text-align:left; flex-grow:1; display:flex; flex-direction:column; justify-content:flex-start; overflow:hidden;">
         ${menuPorsiHtml}
         ${giziGridHtml}
         ${timeDateGridHtml}
