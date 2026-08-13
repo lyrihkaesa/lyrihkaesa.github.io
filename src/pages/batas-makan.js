@@ -82,6 +82,7 @@ export default function BatasMakanPage() {
   const [isClient, setIsClient] = useState(false)
   const [isReady, setIsReady] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [downloadingPng, setDownloadingPng] = useState(false)
 
   // Current Form Inputs
   const [tanggal, setTanggal] = useState('')
@@ -268,6 +269,50 @@ export default function BatasMakanPage() {
     setCopiedLink(true)
     setTimeout(() => setCopiedLink(false), 2500)
   }
+
+  // Load html-to-image dynamically for PNG export (supports modern Tailwind OKLCH colors)
+  const loadHtmlToImage = () => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === 'undefined') return reject('window is undefined')
+      if (window.htmlToImage) {
+        resolve(window.htmlToImage)
+        return
+      }
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js'
+      script.onload = () => resolve(window.htmlToImage)
+      script.onerror = reject
+      document.body.appendChild(script)
+    })
+  }
+
+  // Download Single Label PNG
+  const handleDownloadSinglePng = async () => {
+    try {
+      setDownloadingPng(true)
+      const htmlToImage = await loadHtmlToImage()
+      const element = document.getElementById('single-label-preview')
+      if (!element) return
+
+      const dataUrl = await htmlToImage.toPng(element, {
+        quality: 1.0,
+        pixelRatio: 4, // 4x high resolution for crisp print
+        backgroundColor: '#ffffff'
+      })
+
+      const link = document.createElement('a')
+      link.href = dataUrl
+      const menuClean = (namaMenu || 'MENU').replace(/\s+/g, '_').toUpperCase()
+      const dateClean = (tanggal || '').replace(/\//g, '-')
+      link.download = `Label_${menuClean}_${dateClean}.png`
+      link.click()
+    } catch (err) {
+      console.error('Download Single PNG error:', err)
+    } finally {
+      setDownloadingPng(false)
+    }
+  }
+
 
   // Quick Time Adder
   const addHoursToNow = (hours) => {
@@ -553,6 +598,16 @@ export default function BatasMakanPage() {
                 title='Salin URL link konfigurasi label ini untuk dibagikan'
               >
                 {copiedLink ? '✓ Link Tersalin!' : '🔗 Salin Link Share'}
+              </button>
+
+              <button
+                type='button'
+                onClick={handleDownloadSinglePng}
+                disabled={downloadingPng}
+                className='inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-emerald-600 bg-white px-3 py-2 text-xs font-bold text-emerald-700 shadow-xs hover:bg-emerald-50 dark:border-emerald-500 dark:bg-slate-800 dark:text-emerald-300'
+                title='Unduh 1 Gambar Label Format PNG'
+              >
+                {downloadingPng ? '⏳ Memproses PNG...' : '🖼️ Unduh 1 PNG'}
               </button>
 
               <button
@@ -1010,7 +1065,7 @@ export default function BatasMakanPage() {
                       onChange={(e) => setJumlah(Math.max(1, parseInt(e.target.value) || 1))}
                       className='w-20 rounded-lg border border-slate-300 px-3 py-1.5 text-center text-sm font-bold dark:border-slate-600 dark:bg-slate-900'
                     />
-                    <span className='text-xs text-slate-500'>(1 lembar A4 ≈ 18 label)</span>
+                    <span className='text-xs text-slate-500'>(1 lembar A4 ≈ 21 label)</span>
                   </div>
 
                   <div className='flex items-center gap-2'>
@@ -1148,20 +1203,22 @@ export default function BatasMakanPage() {
                 <div className='flex justify-center overflow-auto rounded-xl bg-slate-100 p-4 dark:bg-slate-950'>
                   {/* Single Label Render */}
                   <div
-                    className='relative flex flex-col justify-between overflow-hidden rounded-[12px] border-2 border-black bg-white text-slate-900 shadow-md'
+                    id='single-label-preview'
+                    className='relative flex flex-col justify-between overflow-hidden rounded-[9px] border-2 border-black bg-white text-slate-900 shadow-md'
                     style={{
-                      width: `${widthMm * 3.5}px`,
-                      height: `${heightMm * 3.5}px`,
-                      padding: '3px'
+                      width: `${widthMm}mm`,
+                      height: `${heightMm}mm`,
+                      padding: '2.5px',
+                      boxSizing: 'border-box'
                     }}
                   >
                     {/* Header Pill */}
                     <div
-                      className={`shrink-0 rounded-t-[8px] rounded-b-[3px] text-center font-black uppercase shadow-xs ${
+                      className={`shrink-0 rounded-t-[6px] rounded-b-[2px] text-center font-black uppercase shadow-xs ${
                         colorMode === 'bw' ? 'bg-black text-white' : 'bg-[#16a34a] text-white'
                       }`}
                       style={{
-                        fontSize: `${fontHeader * 1.05}pt`,
+                        fontSize: `${fontHeader}pt`,
                         padding: isSmallHeight ? '1px 0' : '2px 0'
                       }}
                     >
@@ -1172,13 +1229,13 @@ export default function BatasMakanPage() {
                     <div className='my-auto flex flex-grow flex-col justify-center overflow-hidden py-0.5 text-center'>
                       <div
                         className='leading-none font-extrabold tracking-tight text-slate-950'
-                        style={{ fontSize: `${fontTanggal * 1.05}pt` }}
+                        style={{ fontSize: `${fontTanggal}pt` }}
                       >
                         {tanggal || '11/08/2026'}
                       </div>
                       <div
                         className='mt-0.5 leading-none font-black tracking-tight text-slate-950'
-                        style={{ fontSize: `${fontJam * 1.05}pt` }}
+                        style={{ fontSize: `${fontJam}pt` }}
                       >
                         {jam || '15.00 WIB'}
                       </div>
@@ -1189,13 +1246,13 @@ export default function BatasMakanPage() {
                           <div className='leading-tight'>
                             <div
                               className='truncate font-extrabold tracking-wide text-slate-900 uppercase'
-                              style={{ fontSize: `${fontMenu * 1.05}pt` }}
+                              style={{ fontSize: `${fontMenu}pt` }}
                             >
                               {namaMenu || 'AYAM KECAP'}
                             </div>
                             <div
                               className='font-bold tracking-wide text-slate-600 uppercase'
-                              style={{ fontSize: `${fontPorsi * 1.05}pt` }}
+                              style={{ fontSize: `${fontPorsi}pt` }}
                             >
                               {separator !== 'none' ? `${separator} ` : ''}
                               {porsiMenu || 'PORSI BESAR'}
@@ -1204,7 +1261,7 @@ export default function BatasMakanPage() {
                         ) : wrapMode === 'single' ? (
                           <div
                             className='truncate font-bold tracking-wide text-slate-600 uppercase'
-                            style={{ fontSize: `${fontMenu * 1.05}pt` }}
+                            style={{ fontSize: `${fontMenu}pt` }}
                           >
                             {(namaMenu || 'AYAM KECAP').toUpperCase()}{' '}
                             {separator !== 'none' ? separator : ''}{' '}
@@ -1214,7 +1271,7 @@ export default function BatasMakanPage() {
                           /* Auto wrap mode */
                           <div
                             className='leading-tight font-bold tracking-tight break-words text-slate-700 uppercase'
-                            style={{ fontSize: `${fontMenu * 1.05}pt` }}
+                            style={{ fontSize: `${fontMenu}pt` }}
                           >
                             {(namaMenu || 'AYAM KECAP').toUpperCase()}{' '}
                             {separator !== 'none' ? separator : ''}{' '}
@@ -1230,12 +1287,38 @@ export default function BatasMakanPage() {
                         className={`leading-none font-black tracking-tight uppercase ${
                           colorMode === 'bw' ? 'text-black' : 'text-red-600'
                         }`}
-                        style={{ fontSize: `${fontCatatan * 1.05}pt` }}
+                        style={{ fontSize: `${fontCatatan}pt` }}
                       >
                         {(catatan || 'TIDAK UNTUK DIBAWA PULANG').toUpperCase()}
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Single Label PNG Download Button */}
+                <div className='mt-3 flex justify-center'>
+                  <button
+                    type='button'
+                    onClick={handleDownloadSinglePng}
+                    disabled={downloadingPng}
+                    className='inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-emerald-600 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-800 shadow-xs hover:bg-emerald-100 dark:border-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-300'
+                  >
+                    {downloadingPng ? (
+                      <span>⏳ Memproses Gambar PNG...</span>
+                    ) : (
+                      <>
+                        <svg className='h-4 w-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'
+                          />
+                        </svg>
+                        <span>🖼️ Unduh 1 Label (PNG High-Res)</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
             </div>
@@ -1338,6 +1421,7 @@ export default function BatasMakanPage() {
           {/* Printed Page Box */}
           <div className='no-print-bg rounded-2xl bg-slate-200 p-2 sm:p-6 dark:bg-slate-950'>
             <div
+              id='a4-sheet-preview'
               className='print-container mx-auto rounded-lg bg-white p-3 text-slate-900 shadow-xl sm:p-6'
               style={{
                 width: '100%',
@@ -1349,7 +1433,7 @@ export default function BatasMakanPage() {
               <div
                 className='grid justify-center'
                 style={{
-                  gridTemplateColumns: `repeat(auto-fill, minmax(${widthMm}mm, 1fr))`,
+                  gridTemplateColumns: `repeat(auto-fill, ${widthMm}mm)`,
                   rowGap: `${gridGapMm}mm`,
                   columnGap: `${gridGapMm}mm`
                 }}
