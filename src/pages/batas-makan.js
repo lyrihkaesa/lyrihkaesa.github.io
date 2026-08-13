@@ -108,6 +108,31 @@ export default function BatasMakanPage() {
   const [fontPorsi, setFontPorsi] = useState(8)
   const [fontCatatan, setFontCatatan] = useState(7.5)
 
+  // Advanced Layout Options: TRBL Padding per Field & Borders
+  const [hdrPadT, setHdrPadT] = useState(2)
+  const [hdrPadR, setHdrPadR] = useState(0)
+  const [hdrPadB, setHdrPadB] = useState(2)
+  const [hdrPadL, setHdrPadL] = useState(0)
+
+  const [datePadT, setDatePadT] = useState(1)
+  const [datePadR, setDatePadR] = useState(0)
+  const [datePadB, setDatePadB] = useState(1)
+  const [datePadL, setDatePadL] = useState(0)
+
+  const [menuPadT, setMenuPadT] = useState(2)
+  const [menuPadR, setMenuPadR] = useState(1)
+  const [menuPadB, setMenuPadB] = useState(2)
+  const [menuPadL, setMenuPadL] = useState(1)
+
+  const [notePadT, setNotePadT] = useState(3)
+  const [notePadR, setNotePadR] = useState(0)
+  const [notePadB, setNotePadB] = useState(2)
+  const [notePadL, setNotePadL] = useState(0)
+
+  const [borderWidth, setBorderWidth] = useState(2) // Default 2px
+  const [dividerWidth, setDividerWidth] = useState(1) // Default 1px
+  const [showAdvanced, setShowAdvanced] = useState(false) // Hidden by default
+
   // Batch List for printing multiple different menus in one run
   const [items, setItems] = useState([])
 
@@ -143,6 +168,32 @@ export default function BatasMakanPage() {
       setFontPorsi(8)
       setFontCatatan(7.5)
     }
+  }
+
+  // Reset Advanced Layout TRBL helper
+  const handleResetAdvancedLayout = () => {
+    setHdrPadT(2)
+    setHdrPadR(0)
+    setHdrPadB(2)
+    setHdrPadL(0)
+
+    setDatePadT(1)
+    setDatePadR(0)
+    setDatePadB(1)
+    setDatePadL(0)
+
+    setMenuPadT(2)
+    setMenuPadR(1)
+    setMenuPadB(2)
+    setMenuPadL(1)
+
+    setNotePadT(3)
+    setNotePadR(0)
+    setNotePadB(2)
+    setNotePadL(0)
+
+    setBorderWidth(2)
+    setDividerWidth(1)
   }
 
   // Set default date & time / Load from URL Query Params or LocalStorage on mount
@@ -193,6 +244,29 @@ export default function BatasMakanPage() {
       if (loaded.fm) setFontMenu(loaded.fm)
       if (loaded.fp) setFontPorsi(loaded.fp)
       if (loaded.fc) setFontCatatan(loaded.fc)
+
+      if (typeof loaded.hpt === 'number') setHdrPadT(loaded.hpt)
+      if (typeof loaded.hpr === 'number') setHdrPadR(loaded.hpr)
+      if (typeof loaded.hpb === 'number') setHdrPadB(loaded.hpb)
+      if (typeof loaded.hpl === 'number') setHdrPadL(loaded.hpl)
+
+      if (typeof loaded.dpt === 'number') setDatePadT(loaded.dpt)
+      if (typeof loaded.dpr === 'number') setDatePadR(loaded.dpr)
+      if (typeof loaded.dpb === 'number') setDatePadB(loaded.dpb)
+      if (typeof loaded.dpl === 'number') setDatePadL(loaded.dpl)
+
+      if (typeof loaded.mpt === 'number') setMenuPadT(loaded.mpt)
+      if (typeof loaded.mpr === 'number') setMenuPadR(loaded.mpr)
+      if (typeof loaded.mpb === 'number') setMenuPadB(loaded.mpb)
+      if (typeof loaded.mpl === 'number') setMenuPadL(loaded.mpl)
+
+      if (typeof loaded.npt === 'number') setNotePadT(loaded.npt)
+      if (typeof loaded.npr === 'number') setNotePadR(loaded.npr)
+      if (typeof loaded.npb === 'number') setNotePadB(loaded.npb)
+      if (typeof loaded.npl === 'number') setNotePadL(loaded.npl)
+
+      if (typeof loaded.bw === 'number') setBorderWidth(loaded.bw)
+      if (typeof loaded.dw === 'number') setDividerWidth(loaded.dw)
       if (Array.isArray(loaded.items)) setItems(loaded.items)
     } else {
       setTanggal(defaultDate)
@@ -225,6 +299,24 @@ export default function BatasMakanPage() {
       fm: fontMenu,
       fp: fontPorsi,
       fc: fontCatatan,
+      hpt: hdrPadT,
+      hpr: hdrPadR,
+      hpb: hdrPadB,
+      hpl: hdrPadL,
+      dpt: datePadT,
+      dpr: datePadR,
+      dpb: datePadB,
+      dpl: datePadL,
+      mpt: menuPadT,
+      mpr: menuPadR,
+      mpb: menuPadB,
+      mpl: menuPadL,
+      npt: notePadT,
+      npr: notePadR,
+      npb: notePadB,
+      npl: notePadL,
+      bw: borderWidth,
+      dw: dividerWidth,
       items
     }
 
@@ -259,6 +351,24 @@ export default function BatasMakanPage() {
     fontMenu,
     fontPorsi,
     fontCatatan,
+    hdrPadT,
+    hdrPadR,
+    hdrPadB,
+    hdrPadL,
+    datePadT,
+    datePadR,
+    datePadB,
+    datePadL,
+    menuPadT,
+    menuPadR,
+    menuPadB,
+    menuPadL,
+    notePadT,
+    notePadR,
+    notePadB,
+    notePadL,
+    borderWidth,
+    dividerWidth,
     items
   ])
 
@@ -270,7 +380,7 @@ export default function BatasMakanPage() {
     setTimeout(() => setCopiedLink(false), 2500)
   }
 
-  // Load html-to-image dynamically for PNG export (supports modern Tailwind OKLCH colors)
+  // Load html-to-image dynamically for PNG export
   const loadHtmlToImage = () => {
     return new Promise((resolve, reject) => {
       if (typeof window === 'undefined') return reject('window is undefined')
@@ -313,7 +423,6 @@ export default function BatasMakanPage() {
     }
   }
 
-
   // Quick Time Adder
   const addHoursToNow = (hours) => {
     const now = new Date()
@@ -349,7 +458,25 @@ export default function BatasMakanPage() {
       fontJam,
       fontMenu,
       fontPorsi,
-      fontCatatan
+      fontCatatan,
+      hdrPadT,
+      hdrPadR,
+      hdrPadB,
+      hdrPadL,
+      datePadT,
+      datePadR,
+      datePadB,
+      datePadL,
+      menuPadT,
+      menuPadR,
+      menuPadB,
+      menuPadL,
+      notePadT,
+      notePadR,
+      notePadB,
+      notePadL,
+      borderWidth,
+      dividerWidth
     }
 
     setItems((prev) => [...prev, newItem])
@@ -394,7 +521,25 @@ export default function BatasMakanPage() {
       fontJam,
       fontMenu,
       fontPorsi,
-      fontCatatan
+      fontCatatan,
+      hdrPadT,
+      hdrPadR,
+      hdrPadB,
+      hdrPadL,
+      datePadT,
+      datePadR,
+      datePadB,
+      datePadL,
+      menuPadT,
+      menuPadR,
+      menuPadB,
+      menuPadL,
+      notePadT,
+      notePadR,
+      notePadB,
+      notePadL,
+      borderWidth,
+      dividerWidth
     }
 
     const list = []
@@ -419,7 +564,25 @@ export default function BatasMakanPage() {
     fontJam,
     fontMenu,
     fontPorsi,
-    fontCatatan
+    fontCatatan,
+    hdrPadT,
+    hdrPadR,
+    hdrPadB,
+    hdrPadL,
+    datePadT,
+    datePadR,
+    datePadB,
+    datePadL,
+    menuPadT,
+    menuPadR,
+    menuPadB,
+    menuPadL,
+    notePadT,
+    notePadR,
+    notePadB,
+    notePadL,
+    borderWidth,
+    dividerWidth
   ])
 
   // Open Clean Window Printer (Pure white page without any UI, background colors or theme elements)
@@ -448,9 +611,28 @@ export default function BatasMakanPage() {
         const ftPorsi = lbl.fontPorsi || fontPorsi
         const ftCatatan = lbl.fontCatatan || fontCatatan
 
-        const isSmallHeight = heightMm <= 32
-        const headerPadding = isSmallHeight ? '1px 0' : '2px 0'
-        const notePadding = isSmallHeight ? '1px 0' : '2px 0'
+        const hT = lbl.hdrPadT ?? hdrPadT
+        const hR = lbl.hdrPadR ?? hdrPadR
+        const hB = lbl.hdrPadB ?? hdrPadB
+        const hL = lbl.hdrPadL ?? hdrPadL
+
+        const dT = lbl.datePadT ?? datePadT
+        const dR = lbl.datePadR ?? datePadR
+        const dB = lbl.datePadB ?? datePadB
+        const dL = lbl.datePadL ?? datePadL
+
+        const mT = lbl.menuPadT ?? menuPadT
+        const mR = lbl.menuPadR ?? menuPadR
+        const mB = lbl.menuPadB ?? menuPadB
+        const mL = lbl.menuPadL ?? menuPadL
+
+        const nT = lbl.notePadT ?? notePadT
+        const nR = lbl.notePadR ?? notePadR
+        const nB = lbl.notePadB ?? notePadB
+        const nL = lbl.notePadL ?? notePadL
+
+        const bWidth = lbl.borderWidth ?? borderWidth
+        const dWidth = lbl.dividerWidth ?? dividerWidth
 
         let menuPorsiContent = ''
         if (lbl.wrapMode === 'wrap') {
@@ -475,18 +657,18 @@ export default function BatasMakanPage() {
         }
 
         return `
-          <div class="label-card" style="width:${widthMm}mm; height:${heightMm}mm; border:2px solid #000000; border-radius:9px; background:#ffffff; color:#000000; box-sizing:border-box; padding:2.5px; display:flex; flex-direction:column; justify-content:space-between; page-break-inside:avoid; break-inside:avoid; margin:0; overflow:hidden;">
-            <div style="${headerBg} text-align:center; font-weight:900; border-top-left-radius:6px; border-top-right-radius:6px; border-bottom-left-radius:2px; border-bottom-right-radius:2px; padding:${headerPadding}; font-size:${ftHeader}pt; letter-spacing:0.5px; flex-shrink:0;">
+          <div class="label-card" style="width:${widthMm}mm; height:${heightMm}mm; border:${bWidth}px solid #000000; border-radius:9px; background:#ffffff; color:#000000; box-sizing:border-box; padding:2.5px; display:flex; flex-direction:column; justify-content:space-between; page-break-inside:avoid; break-inside:avoid; margin:0; overflow:hidden;">
+            <div style="${headerBg} text-align:center; font-weight:900; border-top-left-radius:6px; border-top-right-radius:6px; border-bottom-left-radius:2px; border-bottom-right-radius:2px; padding:${hT}px ${hR}px ${hB}px ${hL}px; font-size:${ftHeader}pt; letter-spacing:0.5px; flex-shrink:0;">
               BATAS MAKAN
             </div>
-            <div style="text-align:center; margin:auto 0; padding:1px 0; flex-grow:1; display:flex; flex-direction:column; justify-content:center;">
+            <div style="text-align:center; margin:auto 0; padding:${dT}px ${dR}px ${dB}px ${dL}px; flex-grow:1; display:flex; flex-direction:column; justify-content:center;">
               <div style="font-size:${ftTanggal}pt; font-weight:800; line-height:1; color:#000000;">${lbl.tanggal}</div>
               <div style="font-size:${ftJam}pt; font-weight:900; line-height:1; color:#000000; margin-top:1px;">${lbl.jam}</div>
-              <div style="border-top:1px solid #cbd5e1; margin-top:2px; padding-top:2px; text-align:center;">
+              <div style="border-top:${dWidth}px solid #cbd5e1; margin-top:${mT}px; padding:${mT}px ${mR}px ${mB}px ${mL}px; text-align:center;">
                 ${menuPorsiContent}
               </div>
             </div>
-            <div style="border-top:1px solid ${isBW ? '#000000' : '#fca5a5'}; padding:${notePadding}; text-align:center; flex-shrink:0;">
+            <div style="border-top:${dWidth}px solid ${isBW ? '#000000' : '#fca5a5'}; padding:${nT}px ${nR}px ${nB}px ${nL}px; text-align:center; flex-shrink:0;">
               <div style="font-size:${ftCatatan}pt; font-weight:900; ${noteColor} text-transform:uppercase; line-height:1;">
                 ${lbl.catatan}
               </div>
@@ -584,13 +766,6 @@ export default function BatasMakanPage() {
             </div>
 
             <div className='flex flex-wrap items-center gap-2'>
-              <a
-                href='/jkt'
-                className='inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
-              >
-                ← SPPG Jeketro
-              </a>
-
               <button
                 type='button'
                 onClick={handleCopyShareLink}
@@ -1025,6 +1200,324 @@ export default function BatasMakanPage() {
                   </div>
                 </div>
 
+                {/* Collapsible Advanced Layout Controls (TRBL Padding per Field & Border) - Hidden by default */}
+                <div className='rounded-xl border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-700 dark:bg-slate-900/40'>
+                  <button
+                    type='button'
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className='flex w-full cursor-pointer items-center justify-between text-xs font-bold text-slate-700 hover:text-emerald-700 dark:text-slate-300 dark:hover:text-emerald-400'
+                  >
+                    <span className='flex items-center gap-2'>
+                      <span>⚙️ Pengaturan Lanjutan (Padding TRBL Tiap Field & Garis)</span>
+                      <span className='rounded bg-slate-200 px-1.5 py-0.5 text-[10px] text-slate-600 dark:bg-slate-700 dark:text-slate-300'>
+                        {showAdvanced ? 'Terbuka' : 'Disembunyikan'}
+                      </span>
+                    </span>
+                    <span className='font-extrabold text-emerald-600 dark:text-emerald-400'>
+                      {showAdvanced ? '▲ Sembunyikan' : '▼ Tampilkan'}
+                    </span>
+                  </button>
+
+                  {showAdvanced && (
+                    <div className='mt-3 space-y-3 rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-700 dark:bg-slate-900'>
+                      <div className='mb-1 flex items-center justify-between'>
+                        <span className='text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
+                          📐 PADDING (SPASI SEGALA SISI T:Top, R:Right, B:Bottom, L:Left - px):
+                        </span>
+                        <button
+                          type='button'
+                          onClick={handleResetAdvancedLayout}
+                          className='cursor-pointer text-[10px] font-bold text-emerald-700 hover:underline dark:text-emerald-400'
+                        >
+                          ↺ Reset Spasi
+                        </button>
+                      </div>
+
+                      {/* TRBL Settings per Field Block */}
+                      <div className='space-y-2 text-xs'>
+                        {/* 1. HEADER (BATAS MAKAN) */}
+                        <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
+                          <span className='mb-1.5 block text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
+                            HEADER (BATAS MAKAN)
+                          </span>
+                          <div className='grid grid-cols-4 gap-1.5 text-center'>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>T (Top)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={hdrPadT}
+                                onChange={(e) => setHdrPadT(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>R (Right)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={hdrPadR}
+                                onChange={(e) => setHdrPadR(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>B (Bottom)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={hdrPadB}
+                                onChange={(e) => setHdrPadB(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>L (Left)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={hdrPadL}
+                                onChange={(e) => setHdrPadL(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. TANGGAL & JAM */}
+                        <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
+                          <span className='mb-1.5 block text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
+                            TANGGAL & JAM
+                          </span>
+                          <div className='grid grid-cols-4 gap-1.5 text-center'>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>T (Top)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={datePadT}
+                                onChange={(e) => setDatePadT(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>R (Right)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={datePadR}
+                                onChange={(e) => setDatePadR(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>B (Bottom)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={datePadB}
+                                onChange={(e) => setDatePadB(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>L (Left)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={datePadL}
+                                onChange={(e) => setDatePadL(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 3. NAMA MENU & PORSI */}
+                        <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
+                          <span className='mb-1.5 block text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
+                            NAMA MENU & PORSI
+                          </span>
+                          <div className='grid grid-cols-4 gap-1.5 text-center'>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>T (Top)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={menuPadT}
+                                onChange={(e) => setMenuPadT(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>R (Right)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={menuPadR}
+                                onChange={(e) => setMenuPadR(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>B (Bottom)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={menuPadB}
+                                onChange={(e) => setMenuPadB(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>L (Left)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={menuPadL}
+                                onChange={(e) => setMenuPadL(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 4. CATATAN PERINGATAN */}
+                        <div className='rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/80'>
+                          <span className='mb-1.5 block text-[11px] font-extrabold text-slate-800 uppercase dark:text-slate-200'>
+                            CATATAN PERINGATAN
+                          </span>
+                          <div className='grid grid-cols-4 gap-1.5 text-center'>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>T (Top)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={notePadT}
+                                onChange={(e) => setNotePadT(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>R (Right)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={notePadR}
+                                onChange={(e) => setNotePadR(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>B (Bottom)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={notePadB}
+                                onChange={(e) => setNotePadB(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                            <div>
+                              <span className='block text-[9px] font-bold text-slate-500'>L (Left)</span>
+                              <input
+                                type='number'
+                                step='0.5'
+                                min='0'
+                                value={notePadL}
+                                onChange={(e) => setNotePadL(Math.max(0, Number(e.target.value) || 0))}
+                                className='w-full rounded border border-slate-300 bg-white py-0.5 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Border & Divider Controls */}
+                      <div className='grid grid-cols-2 gap-3 border-t border-slate-100 pt-2 dark:border-slate-800'>
+                        {/* Border Width */}
+                        <div>
+                          <label className='mb-1 block text-[11px] font-bold text-slate-700 dark:text-slate-200'>
+                            KETEBALAN BORDER LUAR (px):
+                          </label>
+                          <div className='flex items-center gap-1'>
+                            <button
+                              type='button'
+                              onClick={() => setBorderWidth((prev) => Math.max(0.5, prev - 0.5))}
+                              className='rounded bg-slate-100 px-2 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
+                            >
+                              -
+                            </button>
+                            <input
+                              type='number'
+                              step='0.5'
+                              min='0.5'
+                              max='6'
+                              value={borderWidth}
+                              onChange={(e) => setBorderWidth(Number(e.target.value) || 2)}
+                              className='w-full rounded border border-slate-300 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                            />
+                            <button
+                              type='button'
+                              onClick={() => setBorderWidth((prev) => prev + 0.5)}
+                              className='rounded bg-slate-100 px-2 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Divider Width */}
+                        <div>
+                          <label className='mb-1 block text-[11px] font-bold text-slate-700 dark:text-slate-200'>
+                            GARIS PEMISAH (px):
+                          </label>
+                          <div className='flex items-center gap-1'>
+                            <button
+                              type='button'
+                              onClick={() => setDividerWidth((prev) => Math.max(0.5, prev - 0.5))}
+                              className='rounded bg-slate-100 px-2 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
+                            >
+                              -
+                            </button>
+                            <input
+                              type='number'
+                              step='0.5'
+                              min='0.5'
+                              max='5'
+                              value={dividerWidth}
+                              onChange={(e) => setDividerWidth(Number(e.target.value) || 1)}
+                              className='w-full rounded border border-slate-300 text-center text-xs font-bold dark:border-slate-600 dark:bg-slate-900'
+                            />
+                            <button
+                              type='button'
+                              onClick={() => setDividerWidth((prev) => prev + 0.5)}
+                              className='rounded bg-slate-100 px-2 py-0.5 text-xs font-bold hover:bg-slate-200 dark:bg-slate-800'
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Catatan / Warning */}
                 <div>
                   <label className='mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300'>
@@ -1204,11 +1697,12 @@ export default function BatasMakanPage() {
                   {/* Single Label Render */}
                   <div
                     id='single-label-preview'
-                    className='relative flex flex-col justify-between overflow-hidden rounded-[9px] border-2 border-black bg-white text-slate-900 shadow-md'
+                    className='relative flex flex-col justify-between overflow-hidden rounded-[9px] bg-white text-slate-900 shadow-md'
                     style={{
                       width: `${widthMm}mm`,
                       height: `${heightMm}mm`,
-                      padding: '2.5px',
+                      padding: `2.5px`,
+                      border: `${borderWidth}px solid #000000`,
                       boxSizing: 'border-box'
                     }}
                   >
@@ -1219,14 +1713,17 @@ export default function BatasMakanPage() {
                       }`}
                       style={{
                         fontSize: `${fontHeader}pt`,
-                        padding: isSmallHeight ? '1px 0' : '2px 0'
+                        padding: `${hdrPadT}px ${hdrPadR}px ${hdrPadB}px ${hdrPadL}px`
                       }}
                     >
                       BATAS MAKAN
                     </div>
 
                     {/* Date & Time */}
-                    <div className='my-auto flex flex-grow flex-col justify-center overflow-hidden py-0.5 text-center'>
+                    <div
+                      className='my-auto flex flex-grow flex-col justify-center overflow-hidden text-center'
+                      style={{ padding: `${datePadT}px ${datePadR}px ${datePadB}px ${datePadL}px` }}
+                    >
                       <div
                         className='leading-none font-extrabold tracking-tight text-slate-950'
                         style={{ fontSize: `${fontTanggal}pt` }}
@@ -1241,7 +1738,14 @@ export default function BatasMakanPage() {
                       </div>
 
                       {/* Menu & Porsi with Wrap & Separator options */}
-                      <div className='mt-0.5 border-t border-slate-200 px-1 pt-0.5 text-center'>
+                      <div
+                        className='px-1 text-center'
+                        style={{
+                          marginTop: `${menuPadT}px`,
+                          padding: `${menuPadT}px ${menuPadR}px ${menuPadB}px ${menuPadL}px`,
+                          borderTop: `${dividerWidth}px solid #cbd5e1`
+                        }}
+                      >
                         {wrapMode === 'wrap' ? (
                           <div className='leading-tight'>
                             <div
@@ -1282,7 +1786,14 @@ export default function BatasMakanPage() {
                     </div>
 
                     {/* Footer Warning */}
-                    <div className='shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center'>
+                    <div
+                      className='shrink-0 text-center'
+                      style={{
+                        marginTop: `${notePadT}px`,
+                        padding: `${notePadT}px ${notePadR}px ${notePadB}px ${notePadL}px`,
+                        borderTop: `${dividerWidth}px solid ${colorMode === 'bw' ? '#000000' : '#fca5a5'}`
+                      }}
+                    >
                       <div
                         className={`leading-none font-black tracking-tight uppercase ${
                           colorMode === 'bw' ? 'text-black' : 'text-red-600'
@@ -1447,16 +1958,39 @@ export default function BatasMakanPage() {
                   const ftPorsi = lbl.fontPorsi || fontPorsi
                   const ftCatatan = lbl.fontCatatan || fontCatatan
 
+                  const hT = lbl.hdrPadT ?? hdrPadT
+                  const hR = lbl.hdrPadR ?? hdrPadR
+                  const hB = lbl.hdrPadB ?? hdrPadB
+                  const hL = lbl.hdrPadL ?? hdrPadL
+
+                  const dT = lbl.datePadT ?? datePadT
+                  const dR = lbl.datePadR ?? datePadR
+                  const dB = lbl.datePadB ?? datePadB
+                  const dL = lbl.datePadL ?? datePadL
+
+                  const mT = lbl.menuPadT ?? menuPadT
+                  const mR = lbl.menuPadR ?? menuPadR
+                  const mB = lbl.menuPadB ?? menuPadB
+                  const mL = lbl.menuPadL ?? menuPadL
+
+                  const nT = lbl.notePadT ?? notePadT
+                  const nR = lbl.notePadR ?? notePadR
+                  const nB = lbl.notePadB ?? notePadB
+                  const nL = lbl.notePadL ?? notePadL
+
+                  const bWidth = lbl.borderWidth ?? borderWidth
+                  const dWidth = lbl.dividerWidth ?? dividerWidth
+
                   return (
                     <div
                       key={idx}
-                      className='label-box relative flex flex-col justify-between overflow-hidden rounded-[10px] border-2 border-black bg-white text-slate-900'
+                      className='label-box relative flex flex-col justify-between overflow-hidden rounded-[9px] bg-white text-slate-900'
                       style={{
                         width: `${widthMm}mm`,
                         height: `${heightMm}mm`,
-                        padding: '2.5px',
-                        boxSizing: 'border-box',
-                        pageBreakInside: 'avoid'
+                        padding: `2.5px`,
+                        border: `${bWidth}px solid #000000`,
+                        boxSizing: 'border-box'
                       }}
                     >
                       {/* Header Pill */}
@@ -1466,14 +2000,17 @@ export default function BatasMakanPage() {
                         }`}
                         style={{
                           fontSize: `${ftHeader}pt`,
-                          padding: isSmallHeight ? '1px 0' : '2px 0'
+                          padding: `${hT}px ${hR}px ${hB}px ${hL}px`
                         }}
                       >
                         BATAS MAKAN
                       </div>
 
                       {/* Date & Time */}
-                      <div className='my-auto flex flex-grow flex-col justify-center overflow-hidden py-0.5 text-center'>
+                      <div
+                        className='my-auto flex flex-grow flex-col justify-center overflow-hidden text-center'
+                        style={{ padding: `${dT}px ${dR}px ${dB}px ${dL}px` }}
+                      >
                         <div
                           className='leading-none font-extrabold tracking-tight text-slate-950'
                           style={{ fontSize: `${ftTanggal}pt` }}
@@ -1488,7 +2025,14 @@ export default function BatasMakanPage() {
                         </div>
 
                         {/* Menu & Porsi */}
-                        <div className='mt-0.5 border-t border-slate-200 px-0.5 pt-0.5 text-center'>
+                        <div
+                          className='px-0.5 text-center'
+                          style={{
+                            marginTop: `${mT}px`,
+                            padding: `${mT}px ${mR}px ${mB}px ${mL}px`,
+                            borderTop: `${dWidth}px solid #cbd5e1`
+                          }}
+                        >
                           {lbl.wrapMode === 'wrap' ? (
                             <div className='leading-tight'>
                               <div
@@ -1527,7 +2071,14 @@ export default function BatasMakanPage() {
                       </div>
 
                       {/* Footer Warning */}
-                      <div className='shrink-0 border-t border-red-200 pt-0.5 pb-0.5 text-center'>
+                      <div
+                        className='shrink-0 text-center'
+                        style={{
+                          marginTop: `${nT}px`,
+                          padding: `${nT}px ${nR}px ${nB}px ${nL}px`,
+                          borderTop: `${dWidth}px solid ${isBW ? '#000000' : '#fca5a5'}`
+                        }}
+                      >
                         <div
                           className={`leading-none font-black tracking-tight uppercase ${
                             isBW ? 'text-black' : 'text-red-600'
