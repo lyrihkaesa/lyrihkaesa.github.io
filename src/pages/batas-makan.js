@@ -42,6 +42,7 @@ const MENU_PRESETS = [
 const PORSI_OPTIONS = ['PORSI BESAR', 'PORSI KECIL', 'PORSI SEDANG']
 
 const NOTE_PRESETS = [
+  'TIDAK BOLEH DIBAWA PULANG',
   'MAKAN DI TEMPAT OMPRENG\nTIDAK BOLEH DIBAWA PULANG',
   'MAKAN DITEMPAT. OMPRENG TIDAK BOLEH DIBAWA PULANG',
   'TIDAK UNTUK DIBAWA PULANG',
@@ -60,7 +61,7 @@ const HEADER_COLOR_PRESETS = [
   { label: 'Hitam', value: '#000000' }
 ]
 
-const JAM_PRESETS = ['10.00 - 12.00', '11.00 - 13.00', '12.00 - 14.00', '15.00 WIB']
+const JAM_PRESETS = ['12:00 WIB', '10.00 - 12.00', '11.00 - 13.00', '12.00 - 14.00', '15.00 WIB']
 
 const VERSION_OPTIONS = [
   { label: 'Versi 2 (Informasi Gizi & Fleksibel)', value: 'v2' },
@@ -123,19 +124,19 @@ export default function BatasMakanPage() {
 
   // Current Form Inputs & Label Version
   const [labelVersion, setLabelVersion] = useState('v1') // 'v1' or 'v2'
-  const [headerText, setHeaderText] = useState('MBG - MENU HARI INI')
+  const [headerText, setHeaderText] = useState('BATAS MAKAN')
   const [headerBgColor, setHeaderBgColor] = useState('#16a34a')
   const [tanggal, setTanggal] = useState('')
-  const [jam, setJam] = useState('10.00 - 12.00')
+  const [jam, setJam] = useState('12:00 WIB')
   const [namaMenu, setNamaMenu] = useState('AYAM GORENG')
   const [porsiMenu, setPorsiMenu] = useState('PORSI BESAR')
-  const [catatan, setCatatan] = useState('MAKAN DI TEMPAT OMPRENG\nTIDAK BOLEH DIBAWA PULANG')
+  const [catatan, setCatatan] = useState('TIDAK BOLEH DIBAWA PULANG')
   const [jumlah, setJumlah] = useState(21) // Default 21 label (1 lembar A4)
 
-  // Icon Toggles for V2
+  // Icon Toggles
   const [showGiziIcons, setShowGiziIcons] = useState(true)
-  const [showNoteIcon, setShowNoteIcon] = useState(true)
-  const [showTimeIcon, setShowTimeIcon] = useState(true)
+  const [showNoteIcon, setShowNoteIcon] = useState(false)
+  const [showTimeIcon, setShowTimeIcon] = useState(false)
 
   // Nutrition Analysis States (for V2)
   const [energi, setEnergi] = useState('512,14')
@@ -220,15 +221,15 @@ export default function BatasMakanPage() {
       setHeaderText('BATAS MAKAN')
       setHeaderBgColor('#16a34a')
       setTanggal(defaultDate)
-      setJam('10.00 - 12.00')
+      setJam('12:00 WIB')
       setNamaMenu('AYAM GORENG')
       setPorsiMenu('PORSI BESAR')
-      setCatatan('MAKAN DI TEMPAT OMPRENG\nTIDAK BOLEH DIBAWA PULANG')
+      setCatatan('TIDAK BOLEH DIBAWA PULANG')
       setJumlah(21)
 
-      setShowGiziIcons(true)
-      setShowNoteIcon(true)
-      setShowTimeIcon(true)
+      setShowGiziIcons(false)
+      setShowNoteIcon(false)
+      setShowTimeIcon(false)
 
       setSeparator('·')
       setWrapMode('auto')
@@ -509,7 +510,7 @@ export default function BatasMakanPage() {
       if (Array.isArray(loaded.items)) setItems(loaded.items)
     } else {
       setTanggal(defaultDate)
-      setJam('10.00 - 12.00')
+      setJam('12:00 WIB')
     }
 
     setIsReady(true)

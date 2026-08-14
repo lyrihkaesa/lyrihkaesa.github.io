@@ -52,8 +52,8 @@ export function LabelV1({ lbl = {}, id }) {
   const catVal = (lbl.catatan || '').trim()
   const hasCatatan = Boolean(catVal)
 
-  const sTimeIcon = lbl.showTimeIcon ?? true
-  const sNoteIcon = lbl.showNoteIcon ?? true
+  const sTimeIcon = lbl.showTimeIcon ?? false
+  const sNoteIcon = lbl.showNoteIcon ?? false
   const hasWarningEmoji = catVal.includes('🚫') || catVal.includes('🛑') || catVal.includes('⚠️')
   const noteIconStr = sNoteIcon && !hasWarningEmoji ? '🚫 ' : ''
 
@@ -254,8 +254,8 @@ export function renderLabelV1Html(lbl) {
   const catVal = (lbl.catatan || '').trim()
   const hasCatatan = Boolean(catVal)
 
-  const sTimeIcon = lbl.showTimeIcon ?? true
-  const sNoteIcon = lbl.showNoteIcon ?? true
+  const sTimeIcon = lbl.showTimeIcon ?? false
+  const sNoteIcon = lbl.showNoteIcon ?? false
   const hasWarningEmoji = catVal.includes('🚫') || catVal.includes('🛑') || catVal.includes('⚠️')
   const noteIconStr = sNoteIcon && !hasWarningEmoji ? '🚫 ' : ''
 
