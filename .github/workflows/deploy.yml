@@ -5,6 +5,11 @@ on:
     branches:
       - main # jalan setiap ada push ke main
 
+# Izinkan hanya 1 deployment berjalan pada satu waktu agar antrean Pages tidak saling mengunci
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
 jobs:
   build:
     name: Build Docusaurus
