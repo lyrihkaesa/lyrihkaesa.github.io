@@ -476,6 +476,43 @@ const config = {
       }
     ],
 
+    // Dokumentasi SPPG
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'sppg',
+        path: 'articles/sppg',
+        routeBasePath: 'sppg',
+        sidebarPath: require.resolve('./sidebars.js'),
+        beforeDefaultRemarkPlugins: [
+          [
+            remarkCodeExample,
+            {
+              target: 'mdx3'
+            }
+          ],
+          [
+            autoTabs,
+            {
+              labels: {
+                'plantuml': 'Diagram PlantUML',
+                'plant-uml': 'Kode PlantUML'
+              }
+            }
+          ],
+          [
+            remarkKroki,
+            {
+              // ...options here
+              alias: ['plantuml'],
+              target: 'mdx3',
+              server: 'https://kroki.io'
+            }
+          ]
+        ]
+      }
+    ],
+
     // Dokumentasi Toram
     [
       '@docusaurus/plugin-content-docs',
