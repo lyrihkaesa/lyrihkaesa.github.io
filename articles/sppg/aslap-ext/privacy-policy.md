@@ -80,7 +80,7 @@ Kebijakan Privasi ini dapat diperbarui sewaktu-waktu jika terdapat pembaruan fit
 
 ## 8. Kontak & Dukungan
 
-Apabila Anda memiliki pertanyaan, saran, atau kendala terkait Kebijakan Privasi ini, silakan hubungi tim pengembang melalui:
+Apabila Anda memiliki pertanyaan, saran, atau kendala terkait Kebijakan Privasi ini, silakan hubungi tim kami melalui:
 * **Website Resmi**: [https://dapursppg.web.id](https://dapursppg.web.id)
-* **Dokumentasi & Dukungan**: [https://lyrihkaesa.github.io](https://lyrihkaesa.github.io)
-* **Repositori Proyek**: [https://github.com/lyrihkaesa/aslap-extension-chrome](https://github.com/lyrihkaesa/aslap-extension-chrome)
+* **Dokumentasi & Panduan**: [https://lyrihkaesa.github.io](https://lyrihkaesa.github.io)
+* **Email Dukungan**: kaesalyrih@gmail.com
