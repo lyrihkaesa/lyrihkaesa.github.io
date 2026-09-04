@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import StikerLabel from '../components/StikerLabel'
+import StikerLabel, { GIZI_CATEGORIES } from '../components/StikerLabel'
 
 // ─── Default Data Spesifik Pengguna ───────────────────────────────────────────
 const DEFAULT_CONFIG = {
@@ -25,7 +25,14 @@ const DEFAULT_CONFIG = {
   
   // 5. Analisis Nilai Gizi
   showGizi: true,
-  judulGizi: 'KANDUNGAN GIZI',
+  judulGizi: 'ANALISIS KANDUNGAN GIZI',
+  giziActiveCategories: {
+    besar: true,
+    kecil: true,
+    balita: false,
+    ibuHamil: false,
+    ibuMenyusui: false,
+  },
   giziBesar: {
     energi: '396,45',
     protein: '14,64',
@@ -40,6 +47,27 @@ const DEFAULT_CONFIG = {
     karbohidrat: '38,86',
     serat: '1,39',
   },
+  giziBalita: {
+    energi: '350,00',
+    protein: '12,00',
+    lemak: '15,00',
+    karbohidrat: '35,00',
+    serat: '1,20',
+  },
+  giziIbuHamil: {
+    energi: '450,00',
+    protein: '18,00',
+    lemak: '22,00',
+    karbohidrat: '48,00',
+    serat: '2,00',
+  },
+  giziIbuMenyusui: {
+    energi: '480,00',
+    protein: '20,00',
+    lemak: '24,00',
+    karbohidrat: '50,00',
+    serat: '2,20',
+  },
   
   // 6. Batas Waktu Konsumsi
   showBatasAman: true,
@@ -52,8 +80,8 @@ const DEFAULT_CONFIG = {
   
   // 7. Badge Petunjuk Konsumsi & Larangan Bawa Pulang
   showBadges: true,
-  badgeLayout: 'sideBySide', // 'sideBySide' (kiri-kanan) atau 'stacked' (atas-bawah)
-  badgeBorder: true,
+  badgeLayout: 'stacked', // 'sideBySide' (kiri-kanan) atau 'stacked' (atas-bawah)
+  badgeBorder: false,
   showBadgeSegera: true,
   judulBadgeSegera: 'SEGERA KONSUMSI',
   subBadgeSegera: 'SETELAH DITERIMA',
@@ -96,7 +124,7 @@ const DEFAULT_CONFIG = {
     judul: 26,
     namaDapur: 12,
     namaMitra: 10,
-    judulGizi: 12,
+    judulGizi: 11,
     headerBox: 10,
     isiMenu: 8,
     isiGizi: 8,
@@ -986,7 +1014,7 @@ export default function StikerMakanPage() {
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      4. Kandungan Gizi (Porsi Besar & Kecil)
+                      4. Kandungan Gizi (Pilihan Kategori)
                     </span>
                     <label className="flex items-center gap-1 text-xs text-slate-500">
                       <input
@@ -1008,6 +1036,61 @@ export default function StikerMakanPage() {
                         placeholder="Judul Seksi (misal: KANDUNGAN GIZI)"
                         className="w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs font-bold text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                       />
+
+                      {/* Pilih Kategori Gizi yang Aktif */}
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                          Pilih Kategori yang Ditampilkan di Stiker:
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                          {GIZI_CATEGORIES.map((cat) => {
+                            const isActive = cfg.giziActiveCategories
+                              ? !!cfg.giziActiveCategories[cat.id]
+                              : cat.defaultActive
+                            return (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => {
+                                  const currentActive = cfg.giziActiveCategories || {
+                                    besar: true,
+                                    kecil: true,
+                                    balita: false,
+                                    ibuHamil: false,
+                                    ibuMenyusui: false,
+                                  }
+                                  setCfg({
+                                    ...cfg,
+                                    giziActiveCategories: {
+                                      ...currentActive,
+                                      [cat.id]: !isActive,
+                                    },
+                                  })
+                                }}
+                                className={`flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                                  isActive
+                                    ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                    : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-400'
+                                }`}
+                              >
+                                <span className="flex items-center gap-1.5 truncate">
+                                  <span>{cat.icon}</span>
+                                  <span>{cat.title}</span>
+                                </span>
+                                <span
+                                  className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                                    isActive
+                                      ? 'bg-emerald-600 text-white'
+                                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {isActive ? 'Aktif' : 'Off'}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
 
                       {/* Opsi Ikon / Emoji Nilai Gizi */}
                       <div>
@@ -1036,52 +1119,47 @@ export default function StikerMakanPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* Porsi Besar */}
-                        <div className="rounded-xl border border-slate-200 p-2.5 dark:border-slate-800">
-                          <div className="text-[11px] font-bold text-slate-900 dark:text-white mb-1">
-                            🍱 PORSI BESAR
-                          </div>
-                          {['energi', 'protein', 'lemak', 'karbohidrat', 'serat'].map((k) => (
-                            <div key={`b-${k}`} className="mt-1">
-                              <label className="block text-[10px] text-slate-500 capitalize">{k}</label>
-                              <input
-                                type="text"
-                                value={cfg.giziBesar[k]}
-                                onChange={(e) =>
-                                  setCfg({
-                                    ...cfg,
-                                    giziBesar: { ...cfg.giziBesar, [k]: e.target.value },
-                                  })
-                                }
-                                className="w-full rounded border border-slate-300 px-1.5 py-0.5 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                              />
+                      {/* Kotak Input Nilai Gizi untuk Kategori yang Aktif */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {GIZI_CATEGORIES.filter((cat) =>
+                          cfg.giziActiveCategories
+                            ? !!cfg.giziActiveCategories[cat.id]
+                            : cat.defaultActive
+                        ).map((cat) => {
+                          const data = cfg[cat.key] || DEFAULT_CONFIG[cat.key] || {}
+                          return (
+                            <div
+                              key={cat.id}
+                              className="rounded-xl border border-slate-200 p-2.5 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850"
+                            >
+                              <div className="text-[11px] font-bold text-slate-900 dark:text-white mb-1.5 flex items-center justify-between">
+                                <span>{cat.icon} {cat.title}</span>
+                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                                  ✓ Tampil di Label
+                                </span>
+                              </div>
+                              {['energi', 'protein', 'lemak', 'karbohidrat', 'serat'].map((k) => (
+                                <div key={`${cat.id}-${k}`} className="mt-1">
+                                  <label className="block text-[10px] text-slate-500 capitalize">{k}</label>
+                                  <input
+                                    type="text"
+                                    value={data[k] || ''}
+                                    onChange={(e) =>
+                                      setCfg({
+                                        ...cfg,
+                                        [cat.key]: {
+                                          ...(cfg[cat.key] || DEFAULT_CONFIG[cat.key] || {}),
+                                          [k]: e.target.value,
+                                        },
+                                      })
+                                    }
+                                    className="w-full rounded border border-slate-300 px-1.5 py-0.5 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                  />
+                                </div>
+                              ))}
                             </div>
-                          ))}
-                        </div>
-
-                        {/* Porsi Kecil */}
-                        <div className="rounded-xl border border-slate-200 p-2.5 dark:border-slate-800">
-                          <div className="text-[11px] font-bold text-slate-900 dark:text-white mb-1">
-                            🍱 PORSI KECIL
-                          </div>
-                          {['energi', 'protein', 'lemak', 'karbohidrat', 'serat'].map((k) => (
-                            <div key={`k-${k}`} className="mt-1">
-                              <label className="block text-[10px] text-slate-500 capitalize">{k}</label>
-                              <input
-                                type="text"
-                                value={cfg.giziKecil[k]}
-                                onChange={(e) =>
-                                  setCfg({
-                                    ...cfg,
-                                    giziKecil: { ...cfg.giziKecil, [k]: e.target.value },
-                                  })
-                                }
-                                className="w-full rounded border border-slate-300 px-1.5 py-0.5 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                              />
-                            </div>
-                          ))}
-                        </div>
+                          )
+                        })}
                       </div>
                     </div>
                   )}

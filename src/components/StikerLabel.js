@@ -6,6 +6,15 @@ import React from 'react'
  * Anda bisa mengedit tampilan, ukuran font, border, warna, susunan, 
  * dan tata letak stiker langsung di file komponen ini.
  */
+// Kategori Kandungan Gizi BGN
+export const GIZI_CATEGORIES = [
+  { id: 'besar', key: 'giziBesar', title: 'PORSI BESAR', icon: '🍱', defaultActive: true },
+  { id: 'kecil', key: 'giziKecil', title: 'PORSI KECIL', icon: '🍱', defaultActive: true },
+  { id: 'balita', key: 'giziBalita', title: 'BALITA', icon: '👶', defaultActive: false },
+  { id: 'ibuHamil', key: 'giziIbuHamil', title: 'IBU HAMIL', icon: '🤰', defaultActive: false },
+  { id: 'ibuMenyusui', key: 'giziIbuMenyusui', title: 'IBU MENYUSUI', icon: '🤱', defaultActive: false },
+]
+
 export default function StikerLabel({
   cfg,
   kolom = 2,
@@ -65,21 +74,18 @@ export default function StikerLabel({
   const patternOpacity = cfg?.patternOpacity ?? 0.85
   const patternPos = cfg?.patternPos || 'both' // 'both', 'top', 'bottom', 'none'
 
-  // Data Kandungan Gizi dengan Emoji
-  const giziBesarItems = [
-    { l: 'Energi', v: cfg.giziBesar?.energi, u: 'kkal', icon: '⚡' },
-    { l: 'Protein', v: cfg.giziBesar?.protein, u: 'gr', icon: '🥩' },
-    { l: 'Lemak', v: cfg.giziBesar?.lemak, u: 'gr', icon: '🥑' },
-    { l: 'Karbohidrat', v: cfg.giziBesar?.karbohidrat, u: 'gr', icon: '🍚' },
-    { l: 'Serat', v: cfg.giziBesar?.serat, u: 'gr', icon: '🥦' },
-  ]
+  // Kategori Gizi yang Aktif
+  const activeGiziCategories = GIZI_CATEGORIES.filter((cat) =>
+    cfg?.giziActiveCategories ? !!cfg.giziActiveCategories[cat.id] : cat.defaultActive
+  )
 
-  const giziKecilItems = [
-    { l: 'Energi', v: cfg.giziKecil?.energi, u: 'kkal', icon: '⚡' },
-    { l: 'Protein', v: cfg.giziKecil?.protein, u: 'gr', icon: '🥩' },
-    { l: 'Lemak', v: cfg.giziKecil?.lemak, u: 'gr', icon: '🥑' },
-    { l: 'Karbohidrat', v: cfg.giziKecil?.karbohidrat, u: 'gr', icon: '🍚' },
-    { l: 'Serat', v: cfg.giziKecil?.serat, u: 'gr', icon: '🥦' },
+  // Helper Baris Nilai Gizi
+  const getGiziRows = (giziData) => [
+    { l: 'Energi', v: giziData?.energi, u: 'kkal', icon: '⚡' },
+    { l: 'Protein', v: giziData?.protein, u: 'gr', icon: '🥩' },
+    { l: 'Lemak', v: giziData?.lemak, u: 'gr', icon: '🥑' },
+    { l: 'Karbohidrat', v: giziData?.karbohidrat, u: 'gr', icon: '🍚' },
+    { l: 'Serat', v: giziData?.serat, u: 'gr', icon: '🥦' },
   ]
 
   // Helper Renderer Pita Ornamen Dekorasi Label (Full Bleed ke ujung kertas kiri & kanan)
@@ -308,7 +314,7 @@ export default function StikerLabel({
       {/* ═══════════════════════════════════════════════════════════════════════
           3. BOX KANDUNGAN GIZI (HEADER SOLID HITAM + RATA KIRI-KANAN)
       ═══════════════════════════════════════════════════════════════════════ */}
-      {cfg.showGizi && (
+      {cfg.showGizi && activeGiziCategories.length > 0 && (
         <div style={{ width: '100%' }}>
           <div
             style={{
@@ -331,135 +337,77 @@ export default function StikerLabel({
               gap: '3.5pt',
             }}
           >
-            {/* Box Porsi Besar */}
-            <div
-              style={{
-                flex: 1,
-                border: `1.5pt solid ${blackColor}`,
-                borderRadius: `${tableRadius}px`,
-                overflow: 'hidden',
-                background: '#ffffff',
-                boxSizing: 'border-box',
-              }}
-            >
-              <div
-                style={{
-                  background: blackColor,
-                  color: '#ffffff',
-                  textAlign: 'center',
-                  fontWeight: '900',
-                  fontSize: `${fs.headerBox * fontMultiplier}pt`,
-                  letterSpacing: '0.05em',
-                  padding: '2.5pt 4pt',
-                  textTransform: 'uppercase',
-                  margin: '-1px -1px 0 -1px',
-                  width: 'calc(100% + 2px)',
-                  boxSizing: 'border-box',
-                }}
-              >
-                PORSI BESAR
-              </div>
-              <div style={{ padding: '3.5pt 6pt' }}>
-                {giziBesarItems.map((row, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                      fontSize: `${fs.isiGizi * fontMultiplier}pt`,
-                      lineHeight: 1.42,
-                      fontWeight: '700',
-                      color: blackColor,
-                      padding: '0.5pt 0',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3pt', minWidth: 0 }}>
-                      {giziIconType === 'emoji' && (
-                        <span style={{ fontSize: `${fs.isiGizi * fontMultiplier}pt`, lineHeight: 1, flexShrink: 0 }}>
-                          {row.icon}
-                        </span>
-                      )}
-                      {giziIconType === 'bullet' && (
-                        <span style={{ fontSize: `${(fs.isiGizi + 0.5) * fontMultiplier}pt`, lineHeight: 1, flexShrink: 0 }}>
-                          •
-                        </span>
-                      )}
-                      <span style={{ whiteSpace: 'nowrap' }}>{row.l}</span>
-                    </div>
-                    <div style={{ fontWeight: '800', textAlign: 'right', whiteSpace: 'nowrap', marginLeft: '4pt' }}>
-                      {row.v} {row.u}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {activeGiziCategories.map((cat) => {
+              const giziData = cfg[cat.key] || {}
+              const rows = getGiziRows(giziData)
 
-            {/* Box Porsi Kecil */}
-            <div
-              style={{
-                flex: 1,
-                border: `1.5pt solid ${blackColor}`,
-                borderRadius: `${tableRadius}px`,
-                overflow: 'hidden',
-                background: '#ffffff',
-                boxSizing: 'border-box',
-              }}
-            >
-              <div
-                style={{
-                  background: blackColor,
-                  color: '#ffffff',
-                  textAlign: 'center',
-                  fontWeight: '900',
-                  fontSize: `${fs.headerBox * fontMultiplier}pt`,
-                  letterSpacing: '0.05em',
-                  padding: '2.5pt 4pt',
-                  textTransform: 'uppercase',
-                  margin: '-1px -1px 0 -1px',
-                  width: 'calc(100% + 2px)',
-                  boxSizing: 'border-box',
-                }}
-              >
-                PORSI KECIL
-              </div>
-              <div style={{ padding: '3.5pt 6pt' }}>
-                {giziKecilItems.map((row, i) => (
+              return (
+                <div
+                  key={cat.id}
+                  style={{
+                    flex: 1,
+                    border: `1.5pt solid ${blackColor}`,
+                    borderRadius: `${tableRadius}px`,
+                    overflow: 'hidden',
+                    background: '#ffffff',
+                    boxSizing: 'border-box',
+                  }}
+                >
                   <div
-                    key={i}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                      fontSize: `${fs.isiGizi * fontMultiplier}pt`,
-                      lineHeight: 1.42,
-                      fontWeight: '700',
-                      color: blackColor,
-                      padding: '0.5pt 0',
+                      background: blackColor,
+                      color: '#ffffff',
+                      textAlign: 'center',
+                      fontWeight: '900',
+                      fontSize: `${fs.headerBox * fontMultiplier}pt`,
+                      letterSpacing: '0.05em',
+                      padding: '2.5pt 4pt',
+                      textTransform: 'uppercase',
+                      margin: '-1px -1px 0 -1px',
+                      width: 'calc(100% + 2px)',
+                      boxSizing: 'border-box',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3pt', minWidth: 0 }}>
-                      {giziIconType === 'emoji' && (
-                        <span style={{ fontSize: `${fs.isiGizi * fontMultiplier}pt`, lineHeight: 1, flexShrink: 0 }}>
-                          {row.icon}
-                        </span>
-                      )}
-                      {giziIconType === 'bullet' && (
-                        <span style={{ fontSize: `${(fs.isiGizi + 0.5) * fontMultiplier}pt`, lineHeight: 1, flexShrink: 0 }}>
-                          •
-                        </span>
-                      )}
-                      <span style={{ whiteSpace: 'nowrap' }}>{row.l}</span>
-                    </div>
-                    <div style={{ fontWeight: '800', textAlign: 'right', whiteSpace: 'nowrap', marginLeft: '4pt' }}>
-                      {row.v} {row.u}
-                    </div>
+                    {cat.title}
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div style={{ padding: '3.5pt 6pt' }}>
+                    {rows.map((row, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                          fontSize: `${fs.isiGizi * fontMultiplier}pt`,
+                          lineHeight: 1.42,
+                          fontWeight: '700',
+                          color: blackColor,
+                          padding: '0.5pt 0',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '3pt', minWidth: 0 }}>
+                          {giziIconType === 'emoji' && (
+                            <span style={{ fontSize: `${fs.isiGizi * fontMultiplier}pt`, lineHeight: 1, flexShrink: 0 }}>
+                              {row.icon}
+                            </span>
+                          )}
+                          {giziIconType === 'bullet' && (
+                            <span style={{ fontSize: `${(fs.isiGizi + 0.5) * fontMultiplier}pt`, lineHeight: 1, flexShrink: 0 }}>
+                              •
+                            </span>
+                          )}
+                          <span style={{ whiteSpace: 'nowrap' }}>{row.l}</span>
+                        </div>
+                        <div style={{ fontWeight: '800', textAlign: 'right', whiteSpace: 'nowrap', marginLeft: '4pt' }}>
+                          {row.v || '-'} {row.u}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
