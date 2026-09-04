@@ -238,6 +238,9 @@ const loadHtmlToImage = () => {
   })
 }
 
+// Storage Key untuk LocalStorage Browser
+const STORAGE_KEY = 'sppg_bgn_stiker_config_v2'
+
 export default function StikerMakanPage() {
   const [cfg, setCfg] = useState(DEFAULT_CONFIG)
 
@@ -262,6 +265,11 @@ export default function StikerMakanPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [exportMsg, setExportMsg] = useState('')
   const [activeTab, setActiveTab] = useState('konten') // 'konten', 'font', 'layout', 'word-guide', 'json-backup'
+
+  // LocalStorage State
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [lastSavedTime, setLastSavedTime] = useState('')
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true)
 
   const fileInputRef = useRef(null)
   const jsonInputRef = useRef(null)
@@ -313,6 +321,86 @@ export default function StikerMakanPage() {
   const notify = (msg) => {
     setExportMsg(msg)
     setTimeout(() => setExportMsg(''), 4000)
+  }
+
+  // 1. Muat otomatis konfigurasi dari LocalStorage saat pertama kali buka
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        handleApplyConfigObject(parsed)
+        const timeStr = parsed._meta?.exportedAt
+          ? new Date(parsed._meta.exportedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+          : ''
+        setLastSavedTime(timeStr || 'sebelumnya')
+        notify('Desain terakhir berhasil dimuat dari LocalStorage')
+      }
+    } catch (err) {
+      console.error('Gagal memuat dari localStorage:', err)
+    } finally {
+      setIsInitialized(true)
+    }
+  }, [])
+
+  // 2. Simpan otomatis ke LocalStorage setiap ada perubahan (Debounce 600ms)
+  useEffect(() => {
+    if (!isInitialized || !autoSaveEnabled || typeof window === 'undefined') return
+    const timer = setTimeout(() => {
+      try {
+        const fullConfig = getCurrentFullConfig()
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(fullConfig))
+        const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        setLastSavedTime(nowStr)
+      } catch (err) {
+        console.error('Gagal menyimpan otomatis ke localStorage:', err)
+      }
+    }, 600)
+    return () => clearTimeout(timer)
+  }, [
+    cfg, kolom, marginAtas, marginBawah, marginKiri, marginKanan,
+    gapAntarStiker, paddingStiker, borderStyle, susunanGizi,
+    scaleFont, colorMode, showGarisPotong, isInitialized, autoSaveEnabled
+  ])
+
+  // Handler Manual Save & Clear LocalStorage
+  const handleManualSaveStorage = () => {
+    try {
+      const fullConfig = getCurrentFullConfig()
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(fullConfig))
+      const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      setLastSavedTime(nowStr)
+      notify('💾 Seluruh konfigurasi berhasil disimpan ke LocalStorage browser!')
+    } catch (err) {
+      notify('❌ Gagal simpan ke LocalStorage: ' + err.message)
+    }
+  }
+
+  const handleClearLocalStorage = () => {
+    if (typeof window === 'undefined') return
+    if (window.confirm('Hapus data yang tersimpan di LocalStorage browser dan kembalikan ke standar awal BGN?')) {
+      try {
+        localStorage.removeItem(STORAGE_KEY)
+        setCfg(DEFAULT_CONFIG)
+        setKolom(DEFAULT_LAYOUT.kolom)
+        setMarginAtas(DEFAULT_LAYOUT.marginAtas)
+        setMarginBawah(DEFAULT_LAYOUT.marginBawah)
+        setMarginKiri(DEFAULT_LAYOUT.marginKiri)
+        setMarginKanan(DEFAULT_LAYOUT.marginKanan)
+        setGapAntarStiker(DEFAULT_LAYOUT.gapAntarStiker)
+        setPaddingStiker(DEFAULT_LAYOUT.paddingStiker)
+        setBorderStyle(DEFAULT_LAYOUT.borderStyle)
+        setSusunanGizi(DEFAULT_LAYOUT.susunanGizi)
+        setScaleFont(DEFAULT_LAYOUT.scaleFont)
+        setColorMode(DEFAULT_LAYOUT.colorMode)
+        setShowGarisPotong(DEFAULT_LAYOUT.showGarisPotong)
+        setLastSavedTime('')
+        notify('🗑️ LocalStorage dihapus dan pengaturan direset ke default.')
+      } catch (err) {
+        notify('❌ Gagal menghapus LocalStorage: ' + err.message)
+      }
+    }
   }
 
   // Upload Logo
@@ -701,6 +789,26 @@ export default function StikerMakanPage() {
 
           {/* Action Toolbar */}
           <div className="flex flex-wrap items-center gap-1.5">
+            {/* Auto-Save Status Badge */}
+            {lastSavedTime && (
+              <div
+                className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-[#F7F6F3] px-2.5 font-mono text-[10px] text-[#787774] dark:border-[#262626] dark:bg-[#181818] dark:text-[#AAAAAA]"
+                title="Desain tersimpan otomatis di LocalStorage browser ini"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Tersimpan {lastSavedTime}</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handleManualSaveStorage}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-2.5 text-xs font-medium text-[#111111] transition-transform hover:bg-[#F7F6F3] active:scale-[0.98] dark:border-[#262626] dark:bg-[#181818] dark:text-white dark:hover:bg-[#222222] cursor-pointer"
+              title="Simpan perubahan ke LocalStorage browser"
+            >
+              <span>💾 Simpan</span>
+            </button>
+
             <button
               type="button"
               onClick={handlePrint}
@@ -2027,80 +2135,121 @@ export default function StikerMakanPage() {
                 TAB 5: BACKUP & EDIT JSON
             ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'json-backup' && (
-              <div className="rounded-lg border border-[#EAEAEA] bg-white p-4 text-xs space-y-3 dark:border-[#262626] dark:bg-[#181818]">
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-[#111111] dark:text-white">
-                    Konfigurasi JSON
+              <div className="space-y-4">
+                
+                {/* LocalStorage Browser Section */}
+                <div className="rounded-lg border border-[#EAEAEA] bg-white p-4 text-xs space-y-3 dark:border-[#262626] dark:bg-[#181818]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-[#111111] dark:text-white flex items-center gap-1.5">
+                        <span>💾 Penyimpanan Browser (LocalStorage)</span>
+                        {lastSavedTime && (
+                          <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[9px] font-mono font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                            Aktif
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-[#787774] dark:text-[#888888] mt-0.5">
+                        Desain otomatis tersimpan di peramban (browser) ini sehingga tidak hilang saat halaman dimuat ulang.
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
+
+                  <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => {
-                        setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
-                        notify('Teks JSON dimuat ulang')
-                      }}
-                      className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-2 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                      onClick={handleManualSaveStorage}
+                      className="flex items-center justify-center gap-1.5 rounded border border-[#111111] bg-[#111111] py-1.5 text-xs font-semibold text-white transition-transform hover:bg-[#262626] active:scale-[0.98] dark:border-white dark:bg-white dark:text-[#111111] cursor-pointer"
                     >
-                      Reload
+                      <span>Simpan ke Browser</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearLocalStorage}
+                      className="flex items-center justify-center gap-1.5 rounded border border-rose-200 bg-rose-50 py-1.5 text-xs font-semibold text-rose-700 transition-transform hover:bg-rose-100 active:scale-[0.98] dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300 cursor-pointer"
+                    >
+                      <span>Hapus Penyimpanan</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* JSON File Backup & Editor Section */}
+                <div className="rounded-lg border border-[#EAEAEA] bg-white p-4 text-xs space-y-3 dark:border-[#262626] dark:bg-[#181818]">
+                  <div className="flex items-center justify-between">
+                    <div className="font-bold text-[#111111] dark:text-white">
+                      Konfigurasi JSON (File / Teks)
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
+                          notify('Teks JSON dimuat ulang')
+                        }}
+                        className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-2 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                      >
+                        Reload
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText(rawJsonText || JSON.stringify(getCurrentFullConfig(), null, 2))
+                            notify('Teks JSON disalin')
+                          }
+                        }}
+                        className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-2 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                      >
+                        Salin
+                      </button>
+                    </div>
+                  </div>
+
+                  <textarea
+                    rows={12}
+                    value={rawJsonText}
+                    onChange={(e) => setRawJsonText(e.target.value)}
+                    placeholder="Paste JSON config..."
+                    className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] p-2.5 font-mono text-[11px] leading-relaxed text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-[#38ef7d]"
+                    spellCheck={false}
+                  />
+
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={handleApplyRawJson}
+                      className="w-full rounded-md bg-[#111111] py-2 text-xs font-semibold text-white transition-transform hover:bg-[#262626] active:scale-[0.98] dark:bg-[#EAEAEA] dark:text-[#111111] dark:hover:bg-white cursor-pointer"
+                    >
+                      Terapkan Perubahan JSON
                     </button>
                     <button
                       type="button"
                       onClick={() => {
-                        if (navigator.clipboard) {
-                          navigator.clipboard.writeText(rawJsonText || JSON.stringify(getCurrentFullConfig(), null, 2))
-                          notify('Teks JSON disalin')
+                        if (window.confirm('Kembalikan seluruh isi dan ukuran ke setelan bawaan standar BGN?')) {
+                          setCfg(DEFAULT_CONFIG)
+                          setKolom(DEFAULT_LAYOUT.kolom)
+                          setMarginAtas(DEFAULT_LAYOUT.marginAtas)
+                          setMarginBawah(DEFAULT_LAYOUT.marginBawah)
+                          setMarginKiri(DEFAULT_LAYOUT.marginKiri)
+                          setMarginKanan(DEFAULT_LAYOUT.marginKanan)
+                          setGapAntarStiker(DEFAULT_LAYOUT.gapAntarStiker)
+                          setPaddingStiker(DEFAULT_LAYOUT.paddingStiker)
+                          setBorderStyle(DEFAULT_LAYOUT.borderStyle)
+                          setSusunanGizi(DEFAULT_LAYOUT.susunanGizi)
+                          setScaleFont(DEFAULT_LAYOUT.scaleFont)
+                          setColorMode(DEFAULT_LAYOUT.colorMode)
+                          setShowGarisPotong(DEFAULT_LAYOUT.showGarisPotong)
+                          setRawJsonText(JSON.stringify({ _meta: { app: 'StikerLabelBGN', version: '2.0', exportedAt: new Date().toISOString() }, cfg: DEFAULT_CONFIG, layout: DEFAULT_LAYOUT }, null, 2))
+                          notify('Desain dikembalikan ke standar awal BGN')
                         }
                       }}
-                      className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-2 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                      className="text-[11px] text-[#787774] hover:text-rose-600 dark:text-[#888888] dark:hover:text-rose-400 py-1 text-center cursor-pointer"
                     >
-                      Salin
+                      Reset ke Standar Awal BGN
                     </button>
                   </div>
                 </div>
 
-                <textarea
-                  rows={14}
-                  value={rawJsonText}
-                  onChange={(e) => setRawJsonText(e.target.value)}
-                  placeholder="Paste JSON config..."
-                  className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] p-2.5 font-mono text-[11px] leading-relaxed text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-[#38ef7d]"
-                  spellCheck={false}
-                />
-
-                <div className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={handleApplyRawJson}
-                    className="w-full rounded-md bg-[#111111] py-2 text-xs font-semibold text-white transition-transform hover:bg-[#262626] active:scale-[0.98] dark:bg-[#EAEAEA] dark:text-[#111111] dark:hover:bg-white cursor-pointer"
-                  >
-                    Terapkan Perubahan JSON
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm('Kembalikan seluruh isi dan ukuran ke setelan bawaan standar BGN?')) {
-                        setCfg(DEFAULT_CONFIG)
-                        setKolom(DEFAULT_LAYOUT.kolom)
-                        setMarginAtas(DEFAULT_LAYOUT.marginAtas)
-                        setMarginBawah(DEFAULT_LAYOUT.marginBawah)
-                        setMarginKiri(DEFAULT_LAYOUT.marginKiri)
-                        setMarginKanan(DEFAULT_LAYOUT.marginKanan)
-                        setGapAntarStiker(DEFAULT_LAYOUT.gapAntarStiker)
-                        setPaddingStiker(DEFAULT_LAYOUT.paddingStiker)
-                        setBorderStyle(DEFAULT_LAYOUT.borderStyle)
-                        setSusunanGizi(DEFAULT_LAYOUT.susunanGizi)
-                        setScaleFont(DEFAULT_LAYOUT.scaleFont)
-                        setColorMode(DEFAULT_LAYOUT.colorMode)
-                        setShowGarisPotong(DEFAULT_LAYOUT.showGarisPotong)
-                        setRawJsonText(JSON.stringify({ _meta: { app: 'StikerLabelBGN', version: '2.0', exportedAt: new Date().toISOString() }, cfg: DEFAULT_CONFIG, layout: DEFAULT_LAYOUT }, null, 2))
-                        notify('Desain dikembalikan ke standar awal BGN')
-                      }
-                    }}
-                    className="text-[11px] text-[#787774] hover:text-rose-600 dark:text-[#888888] dark:hover:text-rose-400 py-1 text-center cursor-pointer"
-                  >
-                    Reset ke Standar Awal BGN
-                  </button>
-                </div>
               </div>
             )}
 
