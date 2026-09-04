@@ -208,7 +208,28 @@ const DEFAULT_CONFIG = {
   }
 }
 
+// Pilihan Ukuran Kertas
+const PAPER_SIZES = {
+  F4: {
+    id: 'F4',
+    label: 'F4 / Folio',
+    subLabel: '210 × 330 mm',
+    widthMm: 210,
+    heightMm: 330,
+    desc: 'Standar Percetakan / Folio (HVS Panjang)'
+  },
+  A4: {
+    id: 'A4',
+    label: 'A4',
+    subLabel: '210 × 297 mm',
+    widthMm: 210,
+    heightMm: 297,
+    desc: 'Standar Kertas Kantor Internasional'
+  }
+}
+
 const DEFAULT_LAYOUT = {
+  paperSize: 'F4',
   kolom: 3,
   marginAtas: 5,
   marginBawah: 5,
@@ -263,7 +284,8 @@ const STORAGE_KEY = 'sppg_bgn_stiker_config_v2'
 export default function StikerMakanPage() {
   const [cfg, setCfg] = useState(DEFAULT_CONFIG)
 
-  // Layout & Margin Kertas F4 (210 x 330 mm)
+  // Layout & Ukuran Kertas (F4 210 x 330 mm atau A4 210 x 297 mm)
+  const [paperSize, setPaperSize] = useState(DEFAULT_LAYOUT.paperSize) // 'F4' | 'A4'
   const [kolom, setKolom] = useState(DEFAULT_LAYOUT.kolom)
   const [marginAtas, setMarginAtas] = useState(DEFAULT_LAYOUT.marginAtas)
   const [marginBawah, setMarginBawah] = useState(DEFAULT_LAYOUT.marginBawah)
@@ -295,9 +317,10 @@ export default function StikerMakanPage() {
   const jsonInputRef = useRef(null)
   const [rawJsonText, setRawJsonText] = useState('')
 
-  // Dimensi Fisik F4 (mm)
-  const paperWidthMm = 210
-  const paperHeightMm = 330
+  // Dimensi Fisik Kertas (mm)
+  const currentPaper = PAPER_SIZES[paperSize] || PAPER_SIZES.F4
+  const paperWidthMm = currentPaper.widthMm
+  const paperHeightMm = currentPaper.heightMm
 
   // Perhitungan Ukuran Stiker
   const totalGapWidthMm = Math.max(0, (kolom - 1) * gapAntarStiker)
@@ -323,6 +346,7 @@ export default function StikerMakanPage() {
     },
     cfg,
     layout: {
+      paperSize,
       kolom,
       marginAtas,
       marginBawah,
@@ -388,6 +412,7 @@ export default function StikerMakanPage() {
     return () => clearTimeout(timer)
   }, [
     cfg,
+    paperSize,
     kolom,
     marginAtas,
     marginBawah,
@@ -432,6 +457,7 @@ export default function StikerMakanPage() {
       try {
         localStorage.removeItem(STORAGE_KEY)
         setCfg(DEFAULT_CONFIG)
+        setPaperSize(DEFAULT_LAYOUT.paperSize)
         setKolom(DEFAULT_LAYOUT.kolom)
         setMarginAtas(DEFAULT_LAYOUT.marginAtas)
         setMarginBawah(DEFAULT_LAYOUT.marginBawah)
@@ -489,6 +515,7 @@ export default function StikerMakanPage() {
     if (parsed.cfg) {
       setCfg((prev) => ({ ...prev, ...parsed.cfg }))
       if (parsed.layout) {
+        if (parsed.layout.paperSize !== undefined) setPaperSize(parsed.layout.paperSize)
         if (parsed.layout.kolom !== undefined) setKolom(parsed.layout.kolom)
         if (parsed.layout.marginAtas !== undefined) setMarginAtas(parsed.layout.marginAtas)
         if (parsed.layout.marginBawah !== undefined) setMarginBawah(parsed.layout.marginBawah)
@@ -597,14 +624,14 @@ export default function StikerMakanPage() {
     }
   }
 
-  // Download Full Sheet F4 PNG
+  // Download Full Sheet PNG (F4 / A4)
   const handleDownloadFullSheetPng = async () => {
     try {
       setIsExporting(true)
-      notify('Merender lembar F4 utuh resolusi tinggi...')
+      notify(`Merender lembar ${paperSize} utuh resolusi tinggi...`)
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-full-sheet')
-      if (!el) throw new Error('Elemen lembar F4 tidak ditemukan')
+      if (!el) throw new Error(`Elemen lembar ${paperSize} tidak ditemukan`)
 
       const dataUrl = await htmlToImage.toPng(el, {
         quality: 1.0,
@@ -614,10 +641,10 @@ export default function StikerMakanPage() {
       })
 
       const link = document.createElement('a')
-      link.download = `Lembar_F4_${kolom}Stiker_MBG.png`
+      link.download = `Lembar_${paperSize}_${kolom}Stiker_MBG.png`
       link.href = dataUrl
       link.click()
-      notify('Lembar F4 PNG berhasil diunduh')
+      notify(`Lembar ${paperSize} PNG berhasil diunduh`)
     } catch (err) {
       notify('Gagal export: ' + err.message)
     } finally {
@@ -757,10 +784,10 @@ export default function StikerMakanPage() {
 
   return (
     <main className='min-h-screen bg-[#FBFBFA] text-[#111111] selection:bg-neutral-200 dark:bg-[#121212] dark:text-[#EAEAEA] dark:selection:bg-neutral-800'>
-      {/* ─── PRINT CSS STYLES (STANDAR CETAK F4 210 x 330 mm) ─── */}
+      {/* ─── PRINT CSS STYLES (STANDAR CETAK F4 / A4) ─── */}
       <style>{`
         @page {
-          size: 210mm 330mm portrait;
+          size: ${paperWidthMm}mm ${paperHeightMm}mm portrait;
           margin: 0mm !important;
         }
         @media screen {
@@ -779,12 +806,12 @@ export default function StikerMakanPage() {
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
-            width: 210mm !important;
-            min-width: 210mm !important;
-            max-width: 210mm !important;
-            height: 330mm !important;
-            min-height: 330mm !important;
-            max-height: 330mm !important;
+            width: ${paperWidthMm}mm !important;
+            min-width: ${paperWidthMm}mm !important;
+            max-width: ${paperWidthMm}mm !important;
+            height: ${paperHeightMm}mm !important;
+            min-height: ${paperHeightMm}mm !important;
+            max-height: ${paperHeightMm}mm !important;
             overflow: hidden !important;
           }
           .no-print-area, nav, footer, header, .navbar, .footer, .no-print,
@@ -801,8 +828,8 @@ export default function StikerMakanPage() {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
-            width: 210mm !important;
-            height: 330mm !important;
+            width: ${paperWidthMm}mm !important;
+            height: ${paperHeightMm}mm !important;
             margin: 0 !important;
             background: #ffffff !important;
             box-shadow: none !important;
@@ -829,9 +856,27 @@ export default function StikerMakanPage() {
         <header className='mb-6 flex flex-col gap-4 border-b border-[#EAEAEA] pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-[#262626]'>
           <div>
             <div className='flex items-center gap-2'>
-              <span className='inline-flex items-center justify-center rounded bg-[#111111] px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-white dark:bg-[#EAEAEA] dark:text-[#111111]'>
-                F4 210×330mm
-              </span>
+              {/* Paper Selector Switcher Pill */}
+              <div className='inline-flex rounded-md border border-[#EAEAEA] bg-[#F7F6F3] p-0.5 dark:border-[#262626] dark:bg-[#181818]'>
+                {Object.values(PAPER_SIZES).map((p) => {
+                  const isSelected = paperSize === p.id
+                  return (
+                    <button
+                      key={p.id}
+                      type='button'
+                      onClick={() => setPaperSize(p.id)}
+                      className={`cursor-pointer rounded px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider transition-all ${
+                        isSelected
+                          ? 'bg-[#111111] text-white shadow-xs dark:bg-[#EAEAEA] dark:text-[#111111]'
+                          : 'text-[#787774] hover:text-[#111111] dark:text-[#888888] dark:hover:text-white'
+                      }`}
+                      title={`Ganti format kertas ke ${p.label} (${p.subLabel})`}
+                    >
+                      {p.id} {p.subLabel}
+                    </button>
+                  )
+                })}
+              </div>
               <span className='text-[11px] font-medium text-[#787774] dark:text-[#888888]'>
                 SPPG Badan Gizi Nasional
               </span>
@@ -867,7 +912,7 @@ export default function StikerMakanPage() {
               type='button'
               onClick={handlePrint}
               className='inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md bg-[#111111] px-3 text-xs font-semibold text-white transition-transform hover:bg-[#262626] active:scale-[0.98] dark:bg-[#EAEAEA] dark:text-[#111111] dark:hover:bg-white'
-              title='Cetak langsung ke printer (Kertas F4)'
+              title={`Cetak langsung ke printer (Kertas ${paperSize})`}
             >
               <svg
                 width='14'
@@ -883,7 +928,7 @@ export default function StikerMakanPage() {
                 <path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'></path>
                 <rect x='6' y='14' width='12' height='8'></rect>
               </svg>
-              <span>Cetak F4</span>
+              <span>Cetak {paperSize}</span>
             </button>
 
             <button
@@ -938,7 +983,7 @@ export default function StikerMakanPage() {
               onClick={handleDownloadFullSheetPng}
               disabled={isExporting}
               className='inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-3 text-xs font-medium text-[#787774] transition-transform hover:bg-[#F7F6F3] hover:text-[#111111] active:scale-[0.98] disabled:opacity-50 dark:border-[#262626] dark:bg-[#181818] dark:text-[#AAAAAA] dark:hover:bg-[#222222] dark:hover:text-white'
-              title='Unduh 1 lembar F4 utuh resolusi tinggi'
+              title={`Unduh 1 lembar ${paperSize} utuh resolusi tinggi`}
             >
               <svg
                 width='14'
@@ -953,7 +998,7 @@ export default function StikerMakanPage() {
                 <rect x='3' y='3' width='18' height='18' rx='2' ry='2'></rect>
                 <line x1='9' y1='3' x2='9' y2='21'></line>
               </svg>
-              <span>Lembar F4</span>
+              <span>Lembar {paperSize}</span>
             </button>
 
             <button
@@ -969,10 +1014,12 @@ export default function StikerMakanPage() {
               type='button'
               onClick={() => jsonInputRef.current?.click()}
               className='inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-2.5 text-xs font-medium text-[#787774] transition-transform hover:bg-[#F7F6F3] hover:text-[#111111] active:scale-[0.98] dark:border-[#262626] dark:bg-[#181818] dark:text-[#AAAAAA] dark:hover:bg-[#222222] dark:hover:text-white'
-              title='Impor konfigurasi JSON'
+              title='Impor file konfigurasi JSON'
             >
-              <span>Impor</span>
+              <span className='font-mono text-[10px]'>+json</span>
             </button>
+
+            {/* Hidden JSON File Input */}
             <input
               type='file'
               ref={jsonInputRef}
@@ -1005,7 +1052,7 @@ export default function StikerMakanPage() {
           {[
             { id: 'konten', label: 'Konten Stiker' },
             { id: 'font', label: 'Tipografi & Pita' },
-            { id: 'layout', label: 'Tata Letak F4' },
+            { id: 'layout', label: 'Tata Letak & Kertas' },
             { id: 'word-guide', label: 'Panduan Word' },
             { id: 'json-backup', label: 'JSON Config' }
           ].map((tab) => (
@@ -2349,14 +2396,55 @@ export default function StikerMakanPage() {
             )}
 
             {/* ══════════════════════════════════════════════════════════════
-                TAB 3: TATA LETAK & KERTAS F4
+                TAB 3: TATA LETAK & KERTAS
             ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'layout' && (
               <div className='space-y-4'>
+                {/* Pilihan Format Kertas Cetak */}
+                <section className='space-y-3 rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]'>
+                  <div className='flex items-center justify-between'>
+                    <h2 className='text-xs font-bold tracking-wider text-[#111111] uppercase dark:text-[#EAEAEA]'>
+                      Ukuran Kertas Cetak
+                    </h2>
+                    <span className='rounded bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'>
+                      Aktif: {paperSize} ({paperWidthMm}×{paperHeightMm} mm)
+                    </span>
+                  </div>
+                  <div className='grid grid-cols-2 gap-2'>
+                    {Object.values(PAPER_SIZES).map((p) => {
+                      const isSelected = paperSize === p.id
+                      return (
+                        <button
+                          key={p.id}
+                          type='button'
+                          onClick={() => setPaperSize(p.id)}
+                          className={`cursor-pointer rounded-lg border p-3 text-left transition-all ${
+                            isSelected
+                              ? 'border-[#111111] bg-[#F7F6F3] text-[#111111] ring-1 ring-[#111111] dark:border-white dark:bg-[#1E1E1E] dark:text-white dark:ring-white'
+                              : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
+                          }`}
+                        >
+                          <div className='flex items-center justify-between'>
+                            <span className='text-xs font-bold'>{p.label}</span>
+                            <span className='font-mono text-[10px] font-bold opacity-90'>
+                              {p.subLabel}
+                            </span>
+                          </div>
+                          <p className='mt-1 text-[10px] leading-snug opacity-75'>{p.desc}</p>
+                          <div className='mt-2 border-t border-black/5 pt-1.5 font-mono text-[10px] font-medium dark:border-white/10'>
+                            Tinggi Stiker: ~
+                            {((p.heightMm - marginAtas - marginBawah) / 10).toFixed(1)} cm
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </section>
+
                 {/* Kolom Stiker */}
                 <section className='space-y-3 rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]'>
                   <h2 className='text-xs font-bold tracking-wider text-[#111111] uppercase dark:text-[#EAEAEA]'>
-                    Jumlah Kolom di Lembar F4 (210 mm)
+                    Jumlah Kolom di Lembar {paperSize} ({paperWidthMm} mm)
                   </h2>
                   <div className='grid grid-cols-2 gap-2'>
                     <button
@@ -2390,10 +2478,10 @@ export default function StikerMakanPage() {
                   </div>
                 </section>
 
-                {/* Presisi Margin Lembar F4 */}
+                {/* Presisi Margin Lembar */}
                 <section className='space-y-3 rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]'>
                   <h2 className='text-xs font-bold tracking-wider text-[#111111] uppercase dark:text-[#EAEAEA]'>
-                    Margin Kertas &amp; Celah Potong (mm)
+                    Margin Kertas &amp; Celah Potong ({paperSize})
                   </h2>
                   <div className='grid grid-cols-2 gap-2.5 text-xs'>
                     <div>
@@ -2575,19 +2663,36 @@ export default function StikerMakanPage() {
             ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'word-guide' && (
               <div className='space-y-3 rounded-lg border border-[#EAEAEA] bg-white p-4 text-xs dark:border-[#262626] dark:bg-[#181818]'>
-                <div className='text-sm font-bold text-[#111111] dark:text-white'>
-                  Panduan Pasang Stiker di Microsoft Word
+                <div className='flex items-center justify-between'>
+                  <div className='text-sm font-bold text-[#111111] dark:text-white'>
+                    Panduan Pasang Stiker di Microsoft Word
+                  </div>
+                  <span className='rounded bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'>
+                    Ukuran Aktif: {paperSize} ({paperWidthMm}×{paperHeightMm} mm)
+                  </span>
                 </div>
 
                 <div className='space-y-1 rounded border border-[#EAEAEA] bg-[#F7F6F3] p-3 dark:border-[#262626] dark:bg-[#141414]'>
                   <div className='font-bold text-[#111111] dark:text-white'>
-                    1. Atur Ukuran Kertas F4
+                    1. Atur Ukuran Kertas {paperSize} di Word
                   </div>
                   <p className='leading-relaxed text-[#787774] dark:text-[#888888]'>
                     Buka Word &gt; <strong>Layout</strong> &gt; <strong>Size</strong> &gt;{' '}
-                    <strong>More Paper Sizes</strong>. Masukkan Width: <strong>21.0 cm</strong>,
-                    Height: <strong>33.0 cm</strong>. Set Margin: Atas 0.5 cm, Bawah 0.5 cm, Kiri
-                    0.5 cm, Kanan 0.5 cm.
+                    {paperSize === 'A4' ? (
+                      <>
+                        Pilih <strong>A4</strong> (atau <strong>More Paper Sizes</strong>: Width:{' '}
+                        <strong>21.0 cm</strong>, Height: <strong>29.7 cm</strong>).
+                      </>
+                    ) : (
+                      <>
+                        <strong>More Paper Sizes</strong>. Masukkan Width: <strong>21.0 cm</strong>,
+                        Height: <strong>33.0 cm</strong> (F4/Folio).
+                      </>
+                    )}
+                    {' '}Set Margin: Atas <strong>{(marginAtas / 10).toFixed(1)} cm</strong>, Bawah{' '}
+                    <strong>{(marginBawah / 10).toFixed(1)} cm</strong>, Kiri{' '}
+                    <strong>{(marginKiri / 10).toFixed(1)} cm</strong>, Kanan{' '}
+                    <strong>{(marginKanan / 10).toFixed(1)} cm</strong>.
                   </p>
                 </div>
 
@@ -2611,7 +2716,7 @@ export default function StikerMakanPage() {
                     <strong>In Front of Text</strong>. Di tab Picture Format, atur Tinggi:{' '}
                     <strong>{(stickerHeightMm / 10).toFixed(1)} cm</strong> dan Lebar:{' '}
                     <strong>{(stickerWidthMm / 10).toFixed(1)} cm</strong>. Copy paste stiker sesuai
-                    jumlah kolom.
+                    jumlah {kolom} kolom.
                   </p>
                 </div>
               </div>
@@ -2719,6 +2824,7 @@ export default function StikerMakanPage() {
                           )
                         ) {
                           setCfg(DEFAULT_CONFIG)
+                          setPaperSize(DEFAULT_LAYOUT.paperSize)
                           setKolom(DEFAULT_LAYOUT.kolom)
                           setMarginAtas(DEFAULT_LAYOUT.marginAtas)
                           setMarginBawah(DEFAULT_LAYOUT.marginBawah)
@@ -2760,16 +2866,16 @@ export default function StikerMakanPage() {
             )}
           </div>
 
-          {/* ── RIGHT PANEL: INTERACTIVE LIVE PREVIEW F4 ── */}
+          {/* ── RIGHT PANEL: INTERACTIVE LIVE PREVIEW ── */}
           <section
-            aria-label='Preview Lembar F4'
+            aria-label={`Preview Lembar ${paperSize}`}
             className='flex flex-col gap-2 lg:sticky lg:top-4'
           >
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
                 <span className='h-2 w-2 rounded-full bg-emerald-500'></span>
                 <h2 className='text-xs font-bold tracking-wider text-[#111111] uppercase dark:text-white'>
-                  Live Preview F4 (210 × 330 mm)
+                  Live Preview {paperSize} ({paperWidthMm} × {paperHeightMm} mm)
                 </h2>
               </div>
 
@@ -2792,7 +2898,7 @@ export default function StikerMakanPage() {
               </div>
             </div>
 
-            {/* F4 Paper Sheet Container */}
+            {/* Paper Sheet Container */}
             <div className='flex max-h-[82vh] justify-center overflow-auto rounded-lg border border-[#EAEAEA] bg-[#EFEFEF] p-4 dark:border-[#262626] dark:bg-[#161616]'>
               <div
                 style={{
@@ -2903,8 +3009,8 @@ export default function StikerMakanPage() {
         id='stiker-print-root'
         style={{
           display: 'none',
-          width: '210mm',
-          height: '330mm',
+          width: `${paperWidthMm}mm`,
+          height: `${paperHeightMm}mm`,
           boxSizing: 'border-box',
           position: 'relative',
           background: '#ffffff',
@@ -2958,7 +3064,7 @@ export default function StikerMakanPage() {
           {renderStikerContent()}
         </div>
 
-        {/* Full F4 Sheet Export */}
+        {/* Full Sheet Export (F4 / A4) */}
         <div
           id='export-full-sheet'
           style={{
