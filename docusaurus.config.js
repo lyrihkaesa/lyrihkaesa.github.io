@@ -33,15 +33,24 @@ const config = {
   deploymentBranch: 'gh-pages',
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn'
+    }
+  },
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: { defaultLocale: 'id', locales: ['id'] },
 
-  // Enable Docusaurs Faster: https://github.com/facebook/docusaurus/issues/10556
-  future: { experimental_faster: true },
+  // Enable Docusaurus Faster: https://github.com/facebook/docusaurus/issues/10556
+  future: {
+    faster: true,
+    v4: {
+      removeLegacyPostBuildHeadAttribute: true
+    }
+  },
 
   presets: [
     [
