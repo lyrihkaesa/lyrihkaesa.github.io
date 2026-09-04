@@ -1,31 +1,83 @@
 import React, { useState, useEffect, useRef } from 'react'
 import StikerLabel, { GIZI_CATEGORIES } from '../components/StikerLabel'
 
-// ─── Default Data Spesifik Pengguna ───────────────────────────────────────────
+// Helper format tanggal Indonesia
+const MONTH_NAMES_ID = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+]
+
+const formatDateToPattern = (dateObj, pattern = 'slash') => {
+  const d = String(dateObj.getDate()).padStart(2, '0')
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0')
+  const y = dateObj.getFullYear()
+  if (pattern === 'long') {
+    return `${d} ${MONTH_NAMES_ID[dateObj.getMonth()]} ${y}`
+  }
+  if (pattern === 'dash') {
+    return `${d}-${m}-${y}`
+  }
+  return `${d}/${m}/${y}`
+}
+
+const parseDateToIso = (str) => {
+  if (!str) return ''
+  const m = String(str).match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/)
+  if (m) {
+    const d = String(m[1]).padStart(2, '0')
+    const mo = String(m[2]).padStart(2, '0')
+    const y = m[3]
+    return `${y}-${mo}-${d}`
+  }
+  const parts = String(str).trim().split(/\s+/)
+  if (parts.length >= 3) {
+    const d = String(parseInt(parts[0], 10)).padStart(2, '0')
+    const monthIdx = MONTH_NAMES_ID.findIndex((nm) => nm.toLowerCase() === parts[1].toLowerCase())
+    const y = parts[2]
+    if (monthIdx >= 0) {
+      const mo = String(monthIdx + 1).padStart(2, '0')
+      return `${y}-${mo}-${d}`
+    }
+  }
+  const dt = new Date(str)
+  if (!isNaN(dt.getTime())) {
+    return dt.toISOString().split('T')[0]
+  }
+  return ''
+}
+
+const parseTimeToHhMm = (str) => {
+  if (!str) return '08:00'
+  const m = String(str).match(/(\d{1,2})[:.](\d{2})/)
+  if (m) {
+    return `${String(m[1]).padStart(2, '0')}:${m[2]}`
+  }
+  return '08:00'
+}
+
+// ─── Default Konfigurasi Standar BGN (Badan Gizi Nasional) ───────────────────
 const DEFAULT_CONFIG = {
-  // 1. Judul Atas
+  // 1. Judul & Logo
   showJudul: true,
   judul: 'LABEL MAKANAN',
-  judulArch: true, // Teks melengkung di atas logo
-  archCurvature: 55, // Derajat kelengkungan busur lingkaran sejati (6 - 75)
-  logoOffsetPt: 14, // Offset jarak vertikal logo ke judul (pt)
-  
-  // 2. Logo BGN
+  judulArch: true,
+  archCurvature: 55,
+  logoOffsetPt: 14,
   showLogo: true,
   logoUrl: '/img/logo-bgn.png',
-  
-  // 3. Nama Dapur & Yayasan
+
+  // 2. SPPG Dapur & Yayasan Mitra
   showDapur: true,
   namaDapur: 'SPPG GROBOGAN GROBOGAN PURWODADI',
   showMitra: true,
   namaMitra: 'YAYASAN LEMAN GRIMAH LOHJINAWI',
-  
-  // 4. Menu Makanan (Textarea per baris)
+
+  // 3. Menu Makanan
   showMenu: true,
   judulMenu: 'MENU',
   menuText: 'Nasi Putih\nAyam Goreng Mentega\nTumis Gambas Wortel\nSemur Tahu\nKelengkeng',
-  
-  // 5. Analisis Nilai Gizi
+
+  // 4. Analisis Nilai Gizi
   showGizi: true,
   judulGizi: 'ANALISIS KANDUNGAN GIZI',
   giziActiveCategories: {
@@ -70,19 +122,19 @@ const DEFAULT_CONFIG = {
     karbohidrat: '50,00',
     serat: '2,20',
   },
-  
-  // 6. Batas Waktu Konsumsi
+
+  // 5. Batas Waktu Konsumsi
   showBatasAman: true,
   judulBatasAman: 'HARUS DIKONSUMSI\nSEBELUM PUKUL',
   durasiBatas: '08:00 WIB',
   showTanggalBatas: true,
-  tanggalBatas: '09/09/2026',
+  tanggalBatas: formatDateToPattern(new Date(), 'slash'),
   showSubteksBatas: false,
   subteksBatas: 'Setelah makanan diterima untuk menjaga kualitas dan keamanan makanan',
-  
-  // 7. Badge Petunjuk Konsumsi & Larangan Bawa Pulang
+
+  // 6. Badges
   showBadges: true,
-  badgeLayout: 'stacked', // 'sideBySide' (kiri-kanan) atau 'stacked' (atas-bawah)
+  badgeLayout: 'stacked', // 'sideBySide' atau 'stacked'
   badgeBorder: false,
   showBadgeSegera: true,
   judulBadgeSegera: 'SEGERA KONSUMSI',
@@ -92,17 +144,17 @@ const DEFAULT_CONFIG = {
   judulBadgeLarangan: 'TIDAK BOLEH',
   subBadgeLarangan: 'DIBAWA PULANG',
 
-  // Peringatan Bar Teks Tambahan (Opsional)
+  // Peringatan Bar Teks Tambahan
   showPeringatan: false,
   teksPeringatan: 'DILARANG MEMBAWA PULANG MAKANAN',
-  
-  // 8. Footer Media Sosial
+
+  // 7. Footer Media Sosial
   showSosmed: true,
   igHandle: '@sppgdefault',
   fbHandle: '@sppgdefault',
   tiktokHandle: '@sppgdefault',
-  
-  // 9. Edukasi: Kenapa Harus Tepat Waktu? (Opsional)
+
+  // 8. Edukasi
   showEdukasi: false,
   judulEdukasi: 'Kenapa Harus Tepat Waktu?',
   edukasiItem1: 'MENJAGA MUTU MAKANAN',
@@ -112,16 +164,16 @@ const DEFAULT_CONFIG = {
   edukasiItem3: 'MENJAGA MAKANAN AMAN DI KONSUMSI PENERIMA MANFAAT',
   edukasiIcon3: '🍽️',
 
-  // 10. Pengaturan Font & Ukuran Teks (pt)
+  // 9. Tipografi & Ornamen
   fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-  giziIconType: 'emoji', // 'emoji', 'bullet', 'none'
-  tableRadius: 4, // Kelengkungan sudut kotak tabel menu & gizi (px)
-  logoSizeMm: 50, // 5 cm x 5 cm
-  showPattern: true, // Pita Ornamen Dekorasi BGN (PATTERN4)
-  patternType: 'color', // 'color' (PATTERN4) atau 'white' (PATTERN4_WHITE)
+  giziIconType: 'emoji',
+  tableRadius: 4,
+  logoSizeMm: 50,
+  showPattern: true,
+  patternType: 'color',
   patternUrl: '/img/pattern4.png',
-  patternPos: 'both', // 'both', 'top', 'bottom', 'none'
-  patternHeightMm: 7.5, // Tinggi pita dekorasi (mm)
+  patternPos: 'both',
+  patternHeightMm: 7.5,
   patternOpacity: 1,
   fontSizes: {
     judul: 29.5,
@@ -160,20 +212,19 @@ const DEFAULT_LAYOUT = {
 }
 
 const FONT_OPTIONS = [
-  { label: 'System UI (Standar Modern)', value: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" },
-  { label: 'Arial (Standar Cetak Kantor)', value: "Arial, Helvetica, sans-serif" },
+  { label: 'System UI (Standar Modern Clean)', value: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" },
+  { label: 'Arial (Standar Cetak Percetakan)', value: 'Arial, Helvetica, sans-serif' },
   { label: 'Segoe UI (Windows Clean)', value: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" },
-  { label: 'Roboto (Google Clean)', value: "Roboto, 'Segoe UI', sans-serif" },
-  { label: 'Montserrat (Modern Bold)', value: "Montserrat, sans-serif" },
-  { label: 'Poppins (Bulat Modern)', value: "Poppins, sans-serif" },
+  { label: 'Roboto (Google Sans-Serif)', value: "Roboto, 'Segoe UI', sans-serif" },
+  { label: 'Montserrat (Modern Bold)', value: 'Montserrat, sans-serif' },
+  { label: 'Poppins (Geometric Clean)', value: 'Poppins, sans-serif' },
   { label: 'Trebuchet MS (Tegas & Jelas)', value: "'Trebuchet MS', 'Lucida Sans Unicode', sans-serif" },
-  { label: 'Tahoma (Kompak & Rapi)', value: "Tahoma, Verdana, sans-serif" },
+  { label: 'Tahoma (Kompak & Rapi)', value: 'Tahoma, Verdana, sans-serif' },
   { label: 'Times New Roman (Klasik Formal)', value: "'Times New Roman', Times, serif" },
-  { label: 'Georgia (Serif Elegan)', value: "Georgia, serif" },
-  { label: 'Impact (Ekstra Tebal)', value: "Impact, Charcoal, sans-serif" },
+  { label: 'Georgia (Serif Elegan)', value: 'Georgia, serif' },
 ]
 
-// Dynamic loader untuk html-to-image
+// Dynamic loader html-to-image
 const loadHtmlToImage = () => {
   if (typeof window !== 'undefined' && window.htmlToImage) {
     return Promise.resolve(window.htmlToImage)
@@ -189,33 +240,34 @@ const loadHtmlToImage = () => {
 
 export default function StikerMakanPage() {
   const [cfg, setCfg] = useState(DEFAULT_CONFIG)
-  
+
   // Layout & Margin Kertas F4 (210 x 330 mm)
-  const [kolom, setKolom] = useState(DEFAULT_LAYOUT.kolom) // 2 atau 3 kolom
-  const [marginAtas, setMarginAtas] = useState(DEFAULT_LAYOUT.marginAtas) // 0.5 cm
-  const [marginBawah, setMarginBawah] = useState(DEFAULT_LAYOUT.marginBawah) // 0.5 cm
-  const [marginKiri, setMarginKiri] = useState(DEFAULT_LAYOUT.marginKiri) // 0.5 cm
-  const [marginKanan, setMarginKanan] = useState(DEFAULT_LAYOUT.marginKanan) // 0.5 cm
-  const [gapAntarStiker, setGapAntarStiker] = useState(DEFAULT_LAYOUT.gapAntarStiker) // 1.0 cm gap
-  const [paddingStiker, setPaddingStiker] = useState(DEFAULT_LAYOUT.paddingStiker) // padding dalam stiker (mm)
-  
-  // Opsi Tampilan
-  const [borderStyle, setBorderStyle] = useState(DEFAULT_LAYOUT.borderStyle) // 'none', 'border-subtle', 'border-green'
-  const [susunanGizi, setSusunanGizi] = useState(DEFAULT_LAYOUT.susunanGizi) // 'stacked' atau 'sideBySide'
-  const [scaleFont, setScaleFont] = useState(DEFAULT_LAYOUT.scaleFont) // 'compact', 'normal', 'spacious'
+  const [kolom, setKolom] = useState(DEFAULT_LAYOUT.kolom)
+  const [marginAtas, setMarginAtas] = useState(DEFAULT_LAYOUT.marginAtas)
+  const [marginBawah, setMarginBawah] = useState(DEFAULT_LAYOUT.marginBawah)
+  const [marginKiri, setMarginKiri] = useState(DEFAULT_LAYOUT.marginKiri)
+  const [marginKanan, setMarginKanan] = useState(DEFAULT_LAYOUT.marginKanan)
+  const [gapAntarStiker, setGapAntarStiker] = useState(DEFAULT_LAYOUT.gapAntarStiker)
+  const [paddingStiker, setPaddingStiker] = useState(DEFAULT_LAYOUT.paddingStiker)
+
+  // Opsi Tampilan & Export
+  const [borderStyle, setBorderStyle] = useState(DEFAULT_LAYOUT.borderStyle)
+  const [susunanGizi, setSusunanGizi] = useState(DEFAULT_LAYOUT.susunanGizi)
+  const [scaleFont, setScaleFont] = useState(DEFAULT_LAYOUT.scaleFont)
   const [colorMode, setColorMode] = useState(DEFAULT_LAYOUT.colorMode)
   const [showGarisPotong, setShowGarisPotong] = useState(DEFAULT_LAYOUT.showGarisPotong)
-  const [zoomPreview, setZoomPreview] = useState(0.45)
-  
-  // Status Export
+  const [zoomPreview, setZoomPreview] = useState(0.42)
+
+  // Status & Navigasi
   const [isExporting, setIsExporting] = useState(false)
   const [exportMsg, setExportMsg] = useState('')
   const [activeTab, setActiveTab] = useState('konten') // 'konten', 'font', 'layout', 'word-guide', 'json-backup'
+
   const fileInputRef = useRef(null)
   const jsonInputRef = useRef(null)
   const [rawJsonText, setRawJsonText] = useState('')
 
-  // Ukuran Fisik F4 (mm)
+  // Dimensi Fisik F4 (mm)
   const paperWidthMm = 210
   const paperHeightMm = 330
 
@@ -225,23 +277,16 @@ export default function StikerMakanPage() {
   const stickerWidthMm = Math.max(10, (printableWidthMm - totalGapWidthMm) / kolom)
   const stickerHeightMm = Math.max(10, paperHeightMm - marginAtas - marginBawah)
 
-  // Parsing baris menu
-  const menuList = (cfg.menuText || '')
-    .split('\n')
-    .map((s) => s.trim().replace(/^[•*\-]\s*/, ''))
-    .filter(Boolean)
-
   let cardBorder = 'none'
-  if (borderStyle === 'border-subtle') cardBorder = '1px solid #cbd5e1'
-  if (borderStyle === 'border-black') cardBorder = '1.2px solid #000000'
-  if (borderStyle === 'border-green') cardBorder = '1.2px solid #16a34a'
+  if (borderStyle === 'border-subtle') cardBorder = '1px solid #e2e8f0'
+  if (borderStyle === 'border-black') cardBorder = '1.2px solid #111111'
+  if (borderStyle === 'border-green') cardBorder = '1.2px solid #15803d'
 
-  // Pengali Skala Font
   let fontMultiplier = 1
   if (scaleFont === 'compact') fontMultiplier = 0.88
   if (scaleFont === 'spacious') fontMultiplier = 1.08
 
-  // Helper Full Config Object
+  // Helper Config Object
   const getCurrentFullConfig = () => ({
     _meta: {
       app: 'StikerLabelBGN',
@@ -265,19 +310,25 @@ export default function StikerMakanPage() {
     },
   })
 
-  // Handle Logo Upload
+  const notify = (msg) => {
+    setExportMsg(msg)
+    setTimeout(() => setExportMsg(''), 4000)
+  }
+
+  // Upload Logo
   const handleUploadLogo = (e) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
       reader.onload = (ev) => {
         setCfg((prev) => ({ ...prev, logoUrl: ev.target.result }))
+        notify('Logo berhasil diperbarui')
       }
       reader.readAsDataURL(file)
     }
   }
 
-  // ─── Export / Import Config JSON ──────────────────────────────────────────
+  // Download Config JSON
   const handleDownloadConfigJson = () => {
     try {
       const fullConfig = getCurrentFullConfig()
@@ -290,12 +341,9 @@ export default function StikerMakanPage() {
       link.href = url
       link.click()
       URL.revokeObjectURL(url)
-
-      setExportMsg('💾 File config JSON berhasil diunduh! Anda bisa mengeditnya dan membagikannya ke saya.')
-      setTimeout(() => setExportMsg(''), 4500)
+      notify('Config JSON berhasil diunduh')
     } catch (err) {
-      console.error(err)
-      setExportMsg('❌ Gagal unduh JSON: ' + err.message)
+      notify('Gagal unduh JSON: ' + err.message)
     }
   }
 
@@ -317,7 +365,6 @@ export default function StikerMakanPage() {
         if (parsed.layout.showGarisPotong !== undefined) setShowGarisPotong(parsed.layout.showGarisPotong)
       }
     } else {
-      // Direct config format
       setCfg((prev) => ({ ...prev, ...parsed }))
     }
   }
@@ -325,18 +372,15 @@ export default function StikerMakanPage() {
   const handleImportConfigJson = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     const reader = new FileReader()
     reader.onload = (ev) => {
       try {
         const parsed = JSON.parse(ev.target.result)
         handleApplyConfigObject(parsed)
         setRawJsonText(JSON.stringify(parsed, null, 2))
-        setExportMsg('✅ Config JSON berhasil dimuat & diterapkan ke stiker!')
-        setTimeout(() => setExportMsg(''), 4500)
+        notify('Config JSON berhasil dimuat')
       } catch (err) {
-        console.error(err)
-        setExportMsg('❌ Format file JSON tidak valid: ' + err.message)
+        notify('Format JSON tidak valid: ' + err.message)
       }
     }
     reader.readAsText(file)
@@ -345,24 +389,23 @@ export default function StikerMakanPage() {
 
   const handleApplyRawJson = () => {
     try {
-      if (!rawJsonText.trim()) throw new Error('Teks JSON tidak boleh kosong')
+      if (!rawJsonText.trim()) throw new Error('Teks JSON kosong')
       const parsed = JSON.parse(rawJsonText)
       handleApplyConfigObject(parsed)
-      setExportMsg('✅ Teks JSON berhasil diterapkan ke seluruh stiker!')
-      setTimeout(() => setExportMsg(''), 4500)
+      notify('Konfigurasi JSON berhasil diterapkan')
     } catch (err) {
-      setExportMsg('❌ Gagal menerapkan JSON: ' + err.message)
+      notify('Gagal menerapkan JSON: ' + err.message)
     }
   }
 
-  // ─── Export Handlers (Ultra-High Resolution ~400 DPI) ────────────────────────
+  // Export 1 Stiker PNG HD
   const handleDownloadSinglePng = async () => {
     try {
       setIsExporting(true)
-      setExportMsg('⏳ Merender 1 stiker resolusi sangat tinggi (400 DPI)...')
+      notify('Merender stiker PNG resolusi tinggi...')
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-single-stiker')
-      if (!el) throw new Error('Elemen export tidak ditemukan')
+      if (!el) throw new Error('Elemen render tidak ditemukan')
 
       const dataUrl = await htmlToImage.toPng(el, {
         quality: 1.0,
@@ -375,24 +418,22 @@ export default function StikerMakanPage() {
       link.download = `Stiker_MBG_${(cfg.namaDapur || 'DAPUR').replace(/[^a-zA-Z0-9]/g, '_')}.png`
       link.href = dataUrl
       link.click()
-
-      setExportMsg('✅ 1 Stiker PNG resolusi tinggi siap dicetak / dimasukkan ke Ms Word!')
-      setTimeout(() => setExportMsg(''), 4500)
+      notify('1 Stiker PNG HD berhasil diunduh')
     } catch (err) {
-      console.error(err)
-      setExportMsg('❌ Error: ' + err.message)
+      notify('Gagal export: ' + err.message)
     } finally {
       setIsExporting(false)
     }
   }
 
+  // Copy 1 Stiker to Clipboard
   const handleCopySinglePng = async () => {
     try {
       setIsExporting(true)
-      setExportMsg('⏳ Menyalin gambar stiker resolusi tinggi ke clipboard...')
+      notify('Menyalin stiker ke clipboard...')
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-single-stiker')
-      if (!el) throw new Error('Elemen export tidak ditemukan')
+      if (!el) throw new Error('Elemen render tidak ditemukan')
 
       const blob = await htmlToImage.toBlob(el, {
         quality: 1.0,
@@ -403,23 +444,22 @@ export default function StikerMakanPage() {
 
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-        setExportMsg('📋 Gambar stiker HD berhasil disalin! Langsung buka Word dan tekan CTRL + V.')
+        notify('Gambar disalin. Langsung CTRL+V di Ms Word')
       } else {
-        throw new Error('Clipboard API tidak didukung di browser ini.')
+        throw new Error('Clipboard API tidak didukung browser ini')
       }
-      setTimeout(() => setExportMsg(''), 4500)
     } catch (err) {
-      console.error(err)
-      setExportMsg('❌ Gagal salin: ' + err.message)
+      notify('Gagal salin: ' + err.message)
     } finally {
       setIsExporting(false)
     }
   }
 
+  // Download Full Sheet F4 PNG
   const handleDownloadFullSheetPng = async () => {
     try {
       setIsExporting(true)
-      setExportMsg('⏳ Merender lembar F4 utuh resolusi tinggi (400 DPI)...')
+      notify('Merender lembar F4 utuh resolusi tinggi...')
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-full-sheet')
       if (!el) throw new Error('Elemen lembar F4 tidak ditemukan')
@@ -435,12 +475,9 @@ export default function StikerMakanPage() {
       link.download = `Lembar_F4_${kolom}Stiker_MBG.png`
       link.href = dataUrl
       link.click()
-
-      setExportMsg('✅ Lembar F4 utuh resolusi tinggi berhasil diunduh!')
-      setTimeout(() => setExportMsg(''), 4500)
+      notify('Lembar F4 PNG berhasil diunduh')
     } catch (err) {
-      console.error(err)
-      setExportMsg('❌ Error: ' + err.message)
+      notify('Gagal export: ' + err.message)
     } finally {
       setIsExporting(false)
     }
@@ -450,7 +487,7 @@ export default function StikerMakanPage() {
     if (typeof window !== 'undefined') window.print()
   }
 
-  // ─── RENDER KOMPONEN STIKER SATU PER SATU ──────────────────────────────────
+  // Render Sub-Komponen Stiker
   const renderStikerContent = (sheetOffsetX = 0, extendLeftMm = 0, extendRightMm = 0) => (
     <StikerLabel
       cfg={cfg}
@@ -465,16 +502,10 @@ export default function StikerMakanPage() {
     />
   )
 
-  // Render 1 Stiker Card Box
   const renderStikerCard = (idx) => {
-    // Posisi fisik X awal kartu dari tepi kiri kertas F4
     const cardPhysicalX = marginKiri + idx * (stickerWidthMm + gapAntarStiker)
-
-    // Perpanjang ke pojok paling kiri lembar kertas jika kolom 0
     const extendLeftMm = idx === 0 ? marginKiri : 0
-    // Perpanjang ke gap kanan, atau ke pojok paling kanan lembar kertas jika kolom terakhir
     const extendRightMm = idx < kolom - 1 ? gapAntarStiker : marginKanan
-    // Offset background dari titik awal fisik (X=0) pita
     const sheetOffsetX = idx === 0 ? 0 : cardPhysicalX
 
     return (
@@ -487,7 +518,7 @@ export default function StikerMakanPage() {
           boxSizing: 'border-box',
           padding: `${paddingStiker}mm`,
           border: cardBorder,
-          borderRadius: borderStyle === 'none' ? '0' : '5px',
+          borderRadius: borderStyle === 'none' ? '0' : '4px',
           background: '#ffffff',
           overflow: 'visible',
           position: 'relative',
@@ -501,7 +532,6 @@ export default function StikerMakanPage() {
     )
   }
 
-  // Render Celah Gap Antar Stiker (Garis Potong ✂️ di Tengah)
   const renderGapAntarStiker = (idx) => {
     if (!showGarisPotong && gapAntarStiker <= 0) return null
     return (
@@ -527,7 +557,7 @@ export default function StikerMakanPage() {
               bottom: 0,
               left: '50%',
               width: '1px',
-              borderLeft: '1px dashed #9ca3af',
+              borderLeft: '1px dashed #94a3b8',
               transform: 'translateX(-50%)',
               zIndex: 10,
             }}
@@ -541,14 +571,14 @@ export default function StikerMakanPage() {
                 top: '2mm',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                fontSize: '8pt',
+                fontSize: '7pt',
                 color: '#64748b',
                 background: '#ffffff',
                 lineHeight: 1,
                 zIndex: 11,
               }}
             >
-              ✂️
+              ✂
             </div>
             <div
               style={{
@@ -556,14 +586,14 @@ export default function StikerMakanPage() {
                 bottom: '2mm',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                fontSize: '8pt',
+                fontSize: '7pt',
                 color: '#64748b',
                 background: '#ffffff',
                 lineHeight: 1,
                 zIndex: 11,
               }}
             >
-              ✂️
+              ✂
             </div>
           </>
         )}
@@ -583,20 +613,11 @@ export default function StikerMakanPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
-      {/* ─── PRINT CSS STYLES (STANDAR MODERN CETAK PRESISI F4) ─── */}
+    <main className="min-h-screen bg-[#FBFBFA] text-[#111111] dark:bg-[#121212] dark:text-[#EAEAEA] selection:bg-neutral-200 dark:selection:bg-neutral-800">
+      {/* ─── PRINT CSS STYLES (STANDAR CETAK F4 210 x 330 mm) ─── */}
       <style>{`
         @page {
           size: 210mm 330mm portrait;
-          margin: 0mm !important;
-        }
-        @page :first {
-          margin: 0mm !important;
-        }
-        @page :left {
-          margin: 0mm !important;
-        }
-        @page :right {
           margin: 0mm !important;
         }
         @media screen {
@@ -623,7 +644,6 @@ export default function StikerMakanPage() {
             max-height: 330mm !important;
             overflow: hidden !important;
           }
-          /* Sembunyikan elemen antarmuka website */
           .no-print-area, nav, footer, header, .navbar, .footer, .no-print,
           [class*="navbar"], [class*="footer"], .docusaurus-highlight-code-line, .theme-layout-navbar {
             display: none !important;
@@ -632,7 +652,6 @@ export default function StikerMakanPage() {
             margin: 0 !important;
             padding: 0 !important;
           }
-          /* Tampilkan khusus kontainer cetak lembar F4 */
           #stiker-print-root {
             display: block !important;
             visibility: visible !important;
@@ -661,204 +680,217 @@ export default function StikerMakanPage() {
         }
       `}</style>
 
-      {/* ─── INTERACTIVE EDITOR & CONTROLS (NO PRINT) ─── */}
-      <div className="no-print-area mx-auto max-w-7xl px-4 py-6">
+      {/* ─── WORKSPACE CONTENT (NO PRINT) ─── */}
+      <div className="no-print-area mx-auto max-w-[1400px] px-4 py-5 sm:px-6">
         
-        {/* Header Bar */}
-        <header className="mb-5 border-b border-slate-200 pb-4 dark:border-slate-800">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                🏷️ Desain Label Stiker Makan (F4) — SPPG BGN
-              </h1>
-              <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-                Pengaturan per komponen lengkap: Judul, Logo, Dapur, Mitra, Menu, Gizi, Batas Aman 2 Jam, dan Edukasi.
-              </p>
+        {/* Top Header & Utilitarian Action Bar */}
+        <header className="mb-6 flex flex-col gap-4 border-b border-[#EAEAEA] pb-4 dark:border-[#262626] sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center rounded bg-[#111111] px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-white dark:bg-[#EAEAEA] dark:text-[#111111]">
+                F4 210×330mm
+              </span>
+              <span className="text-[11px] font-medium text-[#787774] dark:text-[#888888]">
+                SPPG Badan Gizi Nasional
+              </span>
             </div>
-
-            {/* Action Buttons Toolbar */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={handleDownloadConfigJson}
-                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl bg-amber-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-transform"
-                title="Download seluruh konfigurasi stiker dalam format file .json untuk diedit / disimpan"
-              >
-                <span>💾 Unduh JSON</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => jsonInputRef.current?.click()}
-                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-xs font-bold text-amber-800 shadow-xs hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 active:scale-[0.98] transition-transform"
-                title="Buka file .json konfigurasi yang sudah diedit"
-              >
-                <span>📂 Impor JSON</span>
-              </button>
-
-              <input
-                type="file"
-                ref={jsonInputRef}
-                accept=".json,application/json"
-                onChange={handleImportConfigJson}
-                style={{ display: 'none' }}
-              />
-
-              <button
-                type="button"
-                onClick={handleDownloadSinglePng}
-                disabled={isExporting}
-                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-700 disabled:opacity-50 active:scale-[0.98] transition-transform"
-                title="Download 1 strip gambar stiker resolusi tinggi untuk Word"
-              >
-                <span>🖼️ Unduh 1 Stiker PNG</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleCopySinglePng}
-                disabled={isExporting}
-                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-xs hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 active:scale-[0.98] transition-transform"
-                title="Salin stiker ke clipboard, lalu paste (CTRL+V) langsung di Word"
-              >
-                <span>📋 Salin (CTRL+V di Word)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleDownloadFullSheetPng}
-                disabled={isExporting}
-                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-indigo-700 disabled:opacity-50 active:scale-[0.98] transition-transform"
-                title="Download 1 lembar F4 utuh resolusi tinggi berisi stiker berjajar"
-              >
-                <span>📄 Unduh Lembar F4 Utuh</span>
-              </button>
-            </div>
+            <h1 className="mt-1 text-xl font-bold tracking-tight text-[#111111] dark:text-white sm:text-2xl">
+              Editor Desain Label Stiker Makan
+            </h1>
           </div>
 
-          {exportMsg && (
-            <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2 text-xs font-semibold text-blue-900 shadow-xs dark:border-blue-900/50 dark:bg-blue-950/50 dark:text-blue-200">
-              {exportMsg}
-            </div>
-          )}
+          {/* Action Toolbar */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md bg-[#111111] px-3 text-xs font-semibold text-white transition-transform hover:bg-[#262626] active:scale-[0.98] dark:bg-[#EAEAEA] dark:text-[#111111] dark:hover:bg-white cursor-pointer"
+              title="Cetak langsung ke printer (Kertas F4)"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              <span>Cetak F4</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadSinglePng}
+              disabled={isExporting}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-3 text-xs font-medium text-[#111111] transition-transform hover:bg-[#F7F6F3] active:scale-[0.98] disabled:opacity-50 dark:border-[#262626] dark:bg-[#181818] dark:text-white dark:hover:bg-[#222222] cursor-pointer"
+              title="Unduh 1 stiker PNG HD (untuk disisipkan di Ms Word)"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>Unduh 1 PNG</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCopySinglePng}
+              disabled={isExporting}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-3 text-xs font-medium text-[#111111] transition-transform hover:bg-[#F7F6F3] active:scale-[0.98] disabled:opacity-50 dark:border-[#262626] dark:bg-[#181818] dark:text-white dark:hover:bg-[#222222] cursor-pointer"
+              title="Salin stiker ke clipboard, langsung CTRL+V di Word"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Salin (Word)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadFullSheetPng}
+              disabled={isExporting}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-3 text-xs font-medium text-[#787774] transition-transform hover:bg-[#F7F6F3] hover:text-[#111111] active:scale-[0.98] disabled:opacity-50 dark:border-[#262626] dark:bg-[#181818] dark:text-[#AAAAAA] dark:hover:bg-[#222222] dark:hover:text-white cursor-pointer"
+              title="Unduh 1 lembar F4 utuh resolusi tinggi"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="3" x2="9" y2="21"></line>
+              </svg>
+              <span>Lembar F4</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadConfigJson}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-2.5 text-xs font-medium text-[#787774] transition-transform hover:bg-[#F7F6F3] hover:text-[#111111] active:scale-[0.98] dark:border-[#262626] dark:bg-[#181818] dark:text-[#AAAAAA] dark:hover:bg-[#222222] dark:hover:text-white cursor-pointer"
+              title="Unduh file konfigurasi JSON"
+            >
+              <span className="font-mono text-[10px]">.json</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => jsonInputRef.current?.click()}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#EAEAEA] bg-white px-2.5 text-xs font-medium text-[#787774] transition-transform hover:bg-[#F7F6F3] hover:text-[#111111] active:scale-[0.98] dark:border-[#262626] dark:bg-[#181818] dark:text-[#AAAAAA] dark:hover:bg-[#222222] dark:hover:text-white cursor-pointer"
+              title="Impor konfigurasi JSON"
+            >
+              <span>Impor</span>
+            </button>
+            <input
+              type="file"
+              ref={jsonInputRef}
+              accept=".json,application/json"
+              onChange={handleImportConfigJson}
+              className="hidden"
+            />
+          </div>
         </header>
 
-        {/* Tab Navigasi Pengaturan */}
-        <div className="mb-5 flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800">
-          <button
-            type="button"
-            onClick={() => setActiveTab('konten')}
-            className={`border-b-2 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              activeTab === 'konten'
-                ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
-            }`}
-          >
-            🧩 Konten Teks
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('font')}
-            className={`border-b-2 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              activeTab === 'font'
-                ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
-            }`}
-          >
-            🔤 Font & Ukuran Teks
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('layout')}
-            className={`border-b-2 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              activeTab === 'layout'
-                ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
-            }`}
-          >
-            📐 Margin Kertas & Gap
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('word-guide')}
-            className={`border-b-2 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              activeTab === 'word-guide'
-                ? 'border-emerald-600 text-emerald-700 dark:border-emerald-400 dark:text-emerald-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
-            }`}
-          >
-            💡 Cara Pakai di Ms Word
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('json-backup')
-              setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
-            }}
-            className={`border-b-2 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
-              activeTab === 'json-backup'
-                ? 'border-amber-600 text-amber-700 dark:border-amber-400 dark:text-amber-400'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
-            }`}
-          >
-            💾 Backup / Edit JSON
-          </button>
+        {/* Minimalist Status Toast */}
+        {exportMsg && (
+          <div className="mb-4 flex items-center justify-between rounded-md border border-[#EAEAEA] bg-[#F7F6F3] px-3.5 py-2 text-xs font-medium text-[#111111] dark:border-[#333333] dark:bg-[#1C1C1C] dark:text-[#EAEAEA]">
+            <span className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              {exportMsg}
+            </span>
+            <button
+              type="button"
+              onClick={() => setExportMsg('')}
+              className="text-[#787774] hover:text-[#111111] dark:hover:text-white text-xs cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Segmented Tab Navigation */}
+        <div className="mb-6 flex flex-wrap items-center gap-1.5 border-b border-[#EAEAEA] pb-2 dark:border-[#262626]">
+          {[
+            { id: 'konten', label: 'Konten Stiker' },
+            { id: 'font', label: 'Tipografi & Pita' },
+            { id: 'layout', label: 'Tata Letak F4' },
+            { id: 'word-guide', label: 'Panduan Word' },
+            { id: 'json-backup', label: 'JSON Config' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => {
+                setActiveTab(tab.id)
+                if (tab.id === 'json-backup') {
+                  setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
+                }
+              }}
+              className={`inline-flex h-7 items-center rounded-md px-3 text-xs font-medium transition-colors cursor-pointer ${
+                activeTab === tab.id
+                  ? 'bg-[#111111] text-white dark:bg-[#EAEAEA] dark:text-[#111111]'
+                  : 'text-[#787774] hover:bg-[#F7F6F3] hover:text-[#111111] dark:text-[#888888] dark:hover:bg-[#1E1E1E] dark:hover:text-white'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Layout Grid: Editor Form (Kiri) & Preview F4 (Kanan) */}
-        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[430px_1fr] lg:items-start">
+        {/* Main 2-Column Responsive Workspace Grid */}
+        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[440px_1fr] xl:grid-cols-[480px_1fr] lg:items-start">
           
-          {/* ── PANEL KIRI: TABS FORM ── */}
+          {/* ── LEFT PANEL: CONFIGURATION FORMS ── */}
           <div className="flex flex-col gap-4">
             
-            {/* TAB 1: PENGATURAN PER KOMPONEN */}
+            {/* ══════════════════════════════════════════════════════════════
+                TAB 1: KONTEN TEKS & ELEMEN
+            ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'konten' && (
               <div className="space-y-4">
                 
                 {/* 1. Judul & Logo */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      1. Judul Label & Logo
-                    </span>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      1. Judul Label &amp; Logo
+                    </h2>
+                    <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={cfg.showJudul}
                         onChange={(e) => setCfg({ ...cfg, showJudul: e.target.checked })}
-                        className="rounded accent-emerald-600"
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
                       />
                       <span>Tampilkan</span>
                     </label>
                   </div>
 
                   {cfg.showJudul && (
-                    <div className="mt-2.5 space-y-2">
-                      <input
-                        type="text"
-                        value={cfg.judul}
-                        onChange={(e) => setCfg({ ...cfg, judul: e.target.value })}
-                        placeholder="Judul Label (misal: LABEL MAKANAN)"
-                        className="w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                      />
-                      <div className="space-y-2 pt-1">
-                        <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <div className="mt-3 space-y-2.5">
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#787774] dark:text-[#888888] mb-1">
+                          Teks Judul:
+                        </label>
+                        <input
+                          type="text"
+                          value={cfg.judul}
+                          onChange={(e) => setCfg({ ...cfg, judul: e.target.value })}
+                          placeholder="LABEL MAKANAN"
+                          className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1.5 text-xs font-semibold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                        />
+                      </div>
+
+                      <div className="rounded-md border border-[#EAEAEA] bg-[#F7F6F3] p-2.5 dark:border-[#262626] dark:bg-[#141414] space-y-2">
+                        <label className="flex items-center gap-1.5 text-xs font-medium text-[#111111] dark:text-white cursor-pointer">
                           <input
                             type="checkbox"
                             checked={cfg.judulArch}
                             onChange={(e) => setCfg({ ...cfg, judulArch: e.target.checked })}
-                            className="rounded accent-emerald-600"
+                            className="rounded accent-neutral-900 dark:accent-neutral-100"
                           />
-                          <span>Teks Melengkung (Arched) di atas logo</span>
+                          <span>Teks Melengkung (Arched) di Atas Logo</span>
                         </label>
 
                         {cfg.judulArch && (
-                          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-2.5 dark:border-emerald-900/40 dark:bg-emerald-950/20 space-y-2">
-                            <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
-                              <span className="font-semibold">Tingkat Kelengkungan Busur:</span>
-                              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                                {cfg.archCurvature ?? 55}
-                              </span>
+                          <div className="space-y-2 pt-1 border-t border-[#EAEAEA] dark:border-[#262626]">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-[#787774] dark:text-[#888888]">Kelengkungan Busur:</span>
+                              <span className="font-mono font-bold">{cfg.archCurvature ?? 55}°</span>
                             </div>
                             <input
                               type="range"
@@ -867,24 +899,23 @@ export default function StikerMakanPage() {
                               step="1"
                               value={cfg.archCurvature ?? 55}
                               onChange={(e) => setCfg({ ...cfg, archCurvature: Number(e.target.value) })}
-                              className="w-full accent-emerald-600 cursor-pointer"
+                              className="w-full accent-neutral-900 dark:accent-neutral-100 cursor-pointer"
                             />
-                            <div className="flex flex-wrap gap-1 text-xs">
+                            <div className="flex flex-wrap gap-1">
                               {[
                                 { label: 'Landai (18)', val: 18 },
                                 { label: 'Sedang (35)', val: 35 },
                                 { label: 'Standar (55)', val: 55 },
                                 { label: 'Tinggi (65)', val: 65 },
-                                { label: 'Ekstrem (75)', val: 75 },
                               ].map((p) => (
                                 <button
                                   key={p.val}
                                   type="button"
                                   onClick={() => setCfg({ ...cfg, archCurvature: p.val })}
-                                  className={`px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer ${
+                                  className={`rounded px-1.5 py-0.5 text-[10px] font-mono border cursor-pointer ${
                                     (cfg.archCurvature ?? 55) === p.val
-                                      ? 'border-emerald-600 bg-emerald-600 text-white font-bold'
-                                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                      ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                                      : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#181818] dark:text-[#888888]'
                                   }`}
                                 >
                                   {p.label}
@@ -892,11 +923,10 @@ export default function StikerMakanPage() {
                               ))}
                             </div>
 
-                            {/* Slider Offset Jarak Vertikal Logo ke Judul */}
-                            <div className="pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 space-y-1">
-                              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
-                                <span className="font-semibold">Jarak Vertikal Logo ke Judul:</span>
-                                <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                            <div className="pt-2 border-t border-[#EAEAEA] dark:border-[#262626]">
+                              <div className="flex items-center justify-between text-xs mb-1">
+                                <span className="text-[#787774] dark:text-[#888888]">Jarak Vertikal Logo ke Judul:</span>
+                                <span className="font-mono font-bold">
                                   {(cfg.logoOffsetPt ?? 0) > 0 ? `+${cfg.logoOffsetPt} pt` : `${cfg.logoOffsetPt ?? 0} pt`}
                                 </span>
                               </div>
@@ -907,13 +937,8 @@ export default function StikerMakanPage() {
                                 step="1"
                                 value={cfg.logoOffsetPt ?? 0}
                                 onChange={(e) => setCfg({ ...cfg, logoOffsetPt: Number(e.target.value) })}
-                                className="w-full accent-emerald-600 cursor-pointer"
+                                className="w-full accent-neutral-900 dark:accent-neutral-100 cursor-pointer"
                               />
-                              <div className="flex justify-between text-[10px] text-slate-500">
-                                <span>Lebih Rapat (Ke Atas)</span>
-                                <span>Bawaan (0)</span>
-                                <span>Lebih Renggang (Ke Bawah)</span>
-                              </div>
                             </div>
                           </div>
                         )}
@@ -921,25 +946,23 @@ export default function StikerMakanPage() {
                     </div>
                   )}
 
-                  <div className="mt-3 border-t border-slate-100 pt-2 dark:border-slate-800">
-                    <div className="flex items-center justify-between text-xs">
-                      <label className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300">
-                        <input
-                          type="checkbox"
-                          checked={cfg.showLogo}
-                          onChange={(e) => setCfg({ ...cfg, showLogo: e.target.checked })}
-                          className="rounded accent-emerald-600"
-                        />
-                        <span>Logo BGN</span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="text-[11px] font-semibold text-blue-600 underline hover:text-blue-700 cursor-pointer dark:text-blue-400"
-                      >
-                        📁 Upload Logo Lain
-                      </button>
-                    </div>
+                  <div className="mt-3 flex items-center justify-between border-t border-[#EAEAEA] pt-2.5 dark:border-[#262626]">
+                    <label className="flex items-center gap-1.5 text-xs text-[#111111] dark:text-white cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={cfg.showLogo}
+                        onChange={(e) => setCfg({ ...cfg, showLogo: e.target.checked })}
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
+                      />
+                      <span>Logo BGN</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-[11px] font-medium text-[#787774] underline hover:text-[#111111] dark:text-[#888888] dark:hover:text-white cursor-pointer"
+                    >
+                      Unggah Logo Lain
+                    </button>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -948,163 +971,168 @@ export default function StikerMakanPage() {
                       className="hidden"
                     />
                   </div>
-                </div>
+                </section>
 
-                {/* 2. Dapur & Yayasan */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                    2. Nama SPPG & Yayasan
-                  </span>
+                {/* 2. Nama SPPG & Yayasan */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                    2. SPPG Dapur &amp; Yayasan Mitra
+                  </h2>
 
-                  {/* SPPG */}
-                  <div className="mt-2.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <label htmlFor="cfg-dapur" className="font-semibold text-slate-700 dark:text-slate-300">
-                        Nama SPPG
-                      </label>
-                      <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <label className="text-[11px] font-medium text-[#787774] dark:text-[#888888]">Nama SPPG:</label>
+                      <label className="flex items-center gap-1 text-[11px] text-[#787774] dark:text-[#888888] cursor-pointer">
                         <input
                           type="checkbox"
                           checked={cfg.showDapur}
                           onChange={(e) => setCfg({ ...cfg, showDapur: e.target.checked })}
-                          className="rounded accent-emerald-600"
+                          className="rounded accent-neutral-900 dark:accent-neutral-100"
                         />
                         <span>Aktif</span>
                       </label>
                     </div>
                     <input
-                      id="cfg-dapur"
                       type="text"
                       value={cfg.namaDapur}
                       onChange={(e) => setCfg({ ...cfg, namaDapur: e.target.value })}
-                      className="mt-1 w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                       placeholder="SPPG GROBOGAN GROBOGAN PURWODADI"
+                      className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1.5 text-xs font-semibold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                     />
                   </div>
 
-                  {/* Yayasan */}
-                  <div className="mt-3 border-t border-slate-100 pt-2.5 dark:border-slate-800">
-                    <div className="flex items-center justify-between text-xs">
-                      <label htmlFor="cfg-mitra" className="font-semibold text-slate-700 dark:text-slate-300">
-                        Nama Yayasan / Mitra
-                      </label>
-                      <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <label className="text-[11px] font-medium text-[#787774] dark:text-[#888888]">Nama Yayasan / Mitra:</label>
+                      <label className="flex items-center gap-1 text-[11px] text-[#787774] dark:text-[#888888] cursor-pointer">
                         <input
                           type="checkbox"
                           checked={cfg.showMitra}
                           onChange={(e) => setCfg({ ...cfg, showMitra: e.target.checked })}
-                          className="rounded accent-emerald-600"
+                          className="rounded accent-neutral-900 dark:accent-neutral-100"
                         />
                         <span>Aktif</span>
                       </label>
                     </div>
                     <input
-                      id="cfg-mitra"
                       type="text"
                       value={cfg.namaMitra}
                       onChange={(e) => setCfg({ ...cfg, namaMitra: e.target.value })}
-                      className="mt-1 w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                       placeholder="YAYASAN LEMAN GRIMAH LOHJINAWI"
+                      className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1.5 text-xs font-semibold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                     />
                   </div>
-                </div>
+                </section>
 
-                {/* 3. Menu Makanan */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+                {/* 3. Box Menu Makanan */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      3. Box Menu Makanan (Header Hitam)
-                    </span>
-                    <label className="flex items-center gap-1 text-xs text-slate-500">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      3. Box Menu Makanan
+                    </h2>
+                    <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={cfg.showMenu}
                         onChange={(e) => setCfg({ ...cfg, showMenu: e.target.checked })}
-                        className="rounded accent-emerald-600"
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
                       />
                       <span>Tampilkan</span>
                     </label>
                   </div>
-                  {cfg.showMenu && (
-                    <div className="mt-2 space-y-2">
-                      <input
-                        type="text"
-                        value={cfg.judulMenu}
-                        onChange={(e) => setCfg({ ...cfg, judulMenu: e.target.value })}
-                        placeholder="Judul Box (misal: MENU)"
-                        className="w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs font-bold text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                      />
-                      <textarea
-                        rows={5}
-                        value={cfg.menuText}
-                        onChange={(e) => setCfg({ ...cfg, menuText: e.target.value })}
-                        className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs leading-relaxed text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                        placeholder="Ketik 1 menu per baris..."
-                      />
 
-                      {/* Rounded / Sudut Melengkung Tabel */}
-                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">
-                          Sudut Melengkung Tabel (Menu &amp; Gizi):
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          {[
-                            { label: 'Siku (0)', val: 0 },
-                            { label: '2px', val: 2 },
-                            { label: '4px', val: 4 },
-                            { label: '6px', val: 6 },
-                            { label: '8px', val: 8 },
-                          ].map((r) => (
-                            <button
-                              key={r.val}
-                              type="button"
-                              onClick={() => setCfg({ ...cfg, tableRadius: r.val })}
-                              className={`px-2 py-0.5 rounded text-[11px] font-semibold border cursor-pointer ${
-                                (cfg.tableRadius ?? 3) === r.val
-                                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
-                                  : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300'
-                              }`}
-                            >
-                              {r.label}
-                            </button>
-                          ))}
+                  {cfg.showMenu && (
+                    <div className="mt-3 space-y-2.5">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">Judul Header Box:</label>
+                          <input
+                            type="text"
+                            value={cfg.judulMenu}
+                            onChange={(e) => setCfg({ ...cfg, judulMenu: e.target.value })}
+                            placeholder="MENU"
+                            className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-bold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                          />
                         </div>
+                        <div>
+                          <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">Sudut Kotak (Radius):</label>
+                          <select
+                            value={cfg.tableRadius ?? 4}
+                            onChange={(e) => setCfg({ ...cfg, tableRadius: Number(e.target.value) })}
+                            className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                          >
+                            <option value={0}>Siku Tajam (0px)</option>
+                            <option value={2}>Halus (2px)</option>
+                            <option value={4}>Standar (4px)</option>
+                            <option value={6}>Bulat (6px)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">
+                          Daftar Menu (Ketik 1 baris per menu):
+                        </label>
+                        <textarea
+                          rows={5}
+                          value={cfg.menuText}
+                          onChange={(e) => setCfg({ ...cfg, menuText: e.target.value })}
+                          placeholder="Nasi Putih&#10;Ayam Goreng Mentega&#10;Tumis Gambas Wortel..."
+                          className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1.5 font-mono text-xs leading-relaxed text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                        />
                       </div>
                     </div>
                   )}
-                </div>
+                </section>
 
                 {/* 4. Analisis Nilai Gizi */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      4. Kandungan Gizi (Pilihan Kategori)
-                    </span>
-                    <label className="flex items-center gap-1 text-xs text-slate-500">
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      4. Kandungan Gizi
+                    </h2>
+                    <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={cfg.showGizi}
                         onChange={(e) => setCfg({ ...cfg, showGizi: e.target.checked })}
-                        className="rounded accent-emerald-600"
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
                       />
                       <span>Tampilkan</span>
                     </label>
                   </div>
 
                   {cfg.showGizi && (
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        value={cfg.judulGizi}
-                        onChange={(e) => setCfg({ ...cfg, judulGizi: e.target.value })}
-                        placeholder="Judul Seksi (misal: KANDUNGAN GIZI)"
-                        className="w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs font-bold text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                      />
+                    <div className="mt-3 space-y-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">Judul Seksi:</label>
+                          <input
+                            type="text"
+                            value={cfg.judulGizi}
+                            onChange={(e) => setCfg({ ...cfg, judulGizi: e.target.value })}
+                            placeholder="ANALISIS KANDUNGAN GIZI"
+                            className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-bold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">Ikon Baris Gizi:</label>
+                          <select
+                            value={cfg.giziIconType || 'emoji'}
+                            onChange={(e) => setCfg({ ...cfg, giziIconType: e.target.value })}
+                            className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                          >
+                            <option value="emoji">Emoji (⚡🥩🥑🍚🥦)</option>
+                            <option value="bullet">Bullet Titik (•)</option>
+                            <option value="none">Tanpa Ikon</option>
+                          </select>
+                        </div>
+                      </div>
 
-                      {/* Pilih Kategori Gizi yang Aktif */}
+                      {/* Filter Kategori Aktif */}
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                          Pilih Kategori yang Ditampilkan di Stiker:
+                        <label className="block text-[10px] font-medium text-[#787774] dark:text-[#888888] mb-1">
+                          Kategori yang Ditampilkan di Stiker:
                         </label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
                           {GIZI_CATEGORIES.map((cat) => {
@@ -1131,595 +1159,512 @@ export default function StikerMakanPage() {
                                     },
                                   })
                                 }}
-                                className={`flex items-center justify-between gap-1.5 px-2.5 py-2 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
+                                className={`flex items-center justify-between rounded px-2 py-1 text-xs font-medium border transition-colors cursor-pointer ${
                                   isActive
-                                    ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
-                                    : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-400'
+                                    ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                                    : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
                                 }`}
                               >
-                                <span className="flex items-center gap-1.5 truncate">
-                                  <span>{cat.icon}</span>
-                                  <span>{cat.title}</span>
-                                </span>
-                                <span
-                                  className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
-                                    isActive
-                                      ? 'bg-emerald-600 text-white'
-                                      : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                                  }`}
-                                >
-                                  {isActive ? 'Aktif' : 'Off'}
-                                </span>
+                                <span className="truncate">{cat.icon} {cat.title}</span>
+                                <span className="font-mono text-[9px] opacity-80">{isActive ? 'ON' : 'OFF'}</span>
                               </button>
                             )
                           })}
                         </div>
                       </div>
 
-                      {/* Opsi Ikon / Emoji Nilai Gizi */}
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Tampilan Ikon List Gizi:
-                        </label>
-                        <div className="grid grid-cols-3 gap-1.5 text-xs">
-                          {[
-                            { id: 'emoji', label: '⚡ Emoji (⚡🥩🥑)' },
-                            { id: 'bullet', label: '• Bullet (Titik)' },
-                            { id: 'none', label: 'Tanpa Ikon' },
-                          ].map((opt) => (
-                            <button
-                              key={opt.id}
-                              type="button"
-                              onClick={() => setCfg({ ...cfg, giziIconType: opt.id })}
-                              className={`py-1 px-1.5 rounded text-[11px] font-semibold border cursor-pointer ${
-                                (cfg.giziIconType || 'emoji') === opt.id
-                                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                                  : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
-                              }`}
-                            >
-                              {opt.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Kotak Input Nilai Gizi untuk Kategori yang Aktif */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Detail Input Gizi */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                         {GIZI_CATEGORIES.filter((cat) =>
-                          cfg.giziActiveCategories
-                            ? !!cfg.giziActiveCategories[cat.id]
-                            : cat.defaultActive
+                          cfg.giziActiveCategories ? !!cfg.giziActiveCategories[cat.id] : cat.defaultActive
                         ).map((cat) => {
                           const data = cfg[cat.key] || DEFAULT_CONFIG[cat.key] || {}
                           return (
                             <div
                               key={cat.id}
-                              className="rounded-xl border border-slate-200 p-2.5 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850"
+                              className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-2 dark:border-[#262626] dark:bg-[#141414]"
                             >
-                              <div className="text-[11px] font-bold text-slate-900 dark:text-white mb-1.5 flex items-center justify-between">
+                              <div className="text-[11px] font-bold text-[#111111] dark:text-white mb-1.5 flex items-center justify-between">
                                 <span>{cat.icon} {cat.title}</span>
-                                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                                  ✓ Tampil di Label
-                                </span>
+                                <span className="font-mono text-[9px] text-[#787774] dark:text-[#888888]">Aktif</span>
                               </div>
-                              {['energi', 'protein', 'lemak', 'karbohidrat', 'serat'].map((k) => (
-                                <div key={`${cat.id}-${k}`} className="mt-1">
-                                  <label className="block text-[10px] text-slate-500 capitalize">{k}</label>
-                                  <input
-                                    type="text"
-                                    value={data[k] || ''}
-                                    onChange={(e) =>
-                                      setCfg({
-                                        ...cfg,
-                                        [cat.key]: {
-                                          ...(cfg[cat.key] || DEFAULT_CONFIG[cat.key] || {}),
-                                          [k]: e.target.value,
-                                        },
-                                      })
-                                    }
-                                    className="w-full rounded border border-slate-300 px-1.5 py-0.5 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                                  />
-                                </div>
-                              ))}
+                              <div className="grid grid-cols-2 gap-1.5">
+                                {['energi', 'protein', 'lemak', 'karbohidrat', 'serat'].map((k) => (
+                                  <div key={`${cat.id}-${k}`}>
+                                    <label className="block text-[9px] text-[#787774] capitalize dark:text-[#888888]">{k}</label>
+                                    <input
+                                      type="text"
+                                      value={data[k] || ''}
+                                      onChange={(e) =>
+                                        setCfg({
+                                          ...cfg,
+                                          [cat.key]: {
+                                            ...(cfg[cat.key] || DEFAULT_CONFIG[cat.key] || {}),
+                                            [k]: e.target.value,
+                                          },
+                                        })
+                                      }
+                                      className="w-full rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#1C1C1C] dark:text-white"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )
                         })}
                       </div>
                     </div>
                   )}
-                </div>
+                </section>
 
-                {/* 5. Batas Aman 2 Jam & Peringatan */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                    5. Batas Aman & Larangan Bawa Pulang
-                  </span>
+                {/* 5. Batas Waktu Konsumsi & Larangan */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      5. Batas Waktu Konsumsi &amp; Larangan
+                    </h2>
+                    <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={cfg.showBatasAman}
+                        onChange={(e) => setCfg({ ...cfg, showBatasAman: e.target.checked })}
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
+                      />
+                      <span>Tampilkan</span>
+                    </label>
+                  </div>
 
-                  <div className="mt-2.5 space-y-2.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <label className="font-semibold text-rose-700 dark:text-rose-400">
-                        Batas Waktu Konsumsi
-                      </label>
-                      <label className="flex items-center gap-1 text-[11px] text-slate-500">
-                        <input
-                          type="checkbox"
-                          checked={cfg.showBatasAman}
-                          onChange={(e) => setCfg({ ...cfg, showBatasAman: e.target.checked })}
-                          className="rounded accent-emerald-600"
+                  {cfg.showBatasAman && (
+                    <div className="space-y-2.5">
+                      <div>
+                        <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">
+                          Teks Judul Batas Waktu (per baris):
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={cfg.judulBatasAman}
+                          onChange={(e) => setCfg({ ...cfg, judulBatasAman: e.target.value })}
+                          className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1 text-xs font-bold text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                          placeholder="HARUS DIKONSUMSI&#10;SEBELUM PUKUL"
                         />
-                        <span>Aktif</span>
-                      </label>
-                    </div>
+                      </div>
 
-                    {cfg.showBatasAman && (
-                      <div className="space-y-2">
-                        {/* Judul Teks */}
-                        <div>
-                          <label className="block text-[10px] text-slate-500 mb-0.5">Judul Teks Peringatan Waktu (per baris):</label>
-                          <textarea
-                            rows={2}
-                            value={cfg.judulBatasAman}
-                            onChange={(e) => setCfg({ ...cfg, judulBatasAman: e.target.value })}
-                            className="w-full rounded border border-rose-300 bg-rose-50/50 px-2 py-1 text-xs font-bold leading-tight text-rose-900 dark:bg-rose-950/30 dark:text-rose-200"
-                            placeholder="HARUS DIKONSUMSI&#10;SEBELUM PUKUL"
+                      {/* Batas Jam / Waktu */}
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <label className="text-[10px] font-medium text-[#787774] dark:text-[#888888]">Batas Jam / Waktu:</label>
+                          <span className="font-mono text-[10px] font-bold text-[#111111] dark:text-white">{cfg.durasiBatas}</span>
+                        </div>
+                        <div className="grid grid-cols-[110px_1fr] gap-1.5">
+                          {/* HTML5 Time Picker */}
+                          <input
+                            type="time"
+                            value={parseTimeToHhMm(cfg.durasiBatas)}
+                            onChange={(e) => {
+                              const timeVal = e.target.value
+                              if (!timeVal) return
+                              // Preserve existing timezone suffix if any (e.g. WIB, WITA, WIT)
+                              const tzMatch = (cfg.durasiBatas || '').match(/\b(WIB|WITA|WIT)\b/i)
+                              const tz = tzMatch ? tzMatch[1].toUpperCase() : 'WIB'
+                              setCfg({ ...cfg, durasiBatas: `${timeVal} ${tz}` })
+                            }}
+                            className="rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 font-mono text-xs font-bold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white cursor-pointer"
+                            title="Pilih jam dari picker"
+                          />
+                          {/* Text input for manual / timezone adjustment */}
+                          <input
+                            type="text"
+                            value={cfg.durasiBatas}
+                            onChange={(e) => setCfg({ ...cfg, durasiBatas: e.target.value })}
+                            className="rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-bold text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                            placeholder="08:00 WIB"
                           />
                         </div>
-
-                        {/* Jam Konsumsi */}
-                        <div>
-                          <label className="block text-[10px] text-slate-500 mb-0.5">Batas Jam / Waktu:</label>
-                          <div className="flex gap-1.5">
-                            <input
-                              type="text"
-                              value={cfg.durasiBatas}
-                              onChange={(e) => setCfg({ ...cfg, durasiBatas: e.target.value })}
-                              className="flex-1 rounded border border-rose-300 bg-white px-2 py-1 text-xs font-black text-rose-900 dark:bg-slate-800 dark:text-rose-200"
-                              placeholder="08:00 WIB"
-                            />
-                          </div>
-                          {/* Quick Preset Buttons */}
-                          <div className="flex flex-wrap gap-1 mt-1.5">
-                            {['08:00 WIB', '09:00 WIB', '09:30 WIB', '10:00 WIB', '11:00 WIB', '12:00 WIB'].map((preset) => (
-                              <button
-                                key={preset}
-                                type="button"
-                                onClick={() => setCfg({ ...cfg, durasiBatas: preset })}
-                                className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 hover:bg-rose-100 hover:text-rose-700 cursor-pointer dark:bg-slate-800 dark:text-slate-300"
-                              >
-                                {preset}
-                              </button>
-                            ))}
-                          </div>
+                        {/* Preset Time Buttons */}
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const now = new Date()
+                              now.setHours(now.getHours() + 2)
+                              const hh = String(now.getHours()).padStart(2, '0')
+                              const mm = String(now.getMinutes()).padStart(2, '0')
+                              setCfg({ ...cfg, durasiBatas: `${hh}:${mm} WIB` })
+                            }}
+                            className="rounded border border-[#111111] bg-[#111111] px-1.5 py-0.5 text-[10px] font-mono font-semibold text-white hover:bg-[#262626] dark:border-white dark:bg-white dark:text-[#111111] cursor-pointer"
+                            title="Set waktu batas 2 jam dari sekarang"
+                          >
+                            +2 Jam Sekarang
+                          </button>
+                          {['08:00 WIB', '09:00 WIB', '09:30 WIB', '10:00 WIB', '11:00 WIB', '12:00 WIB'].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setCfg({ ...cfg, durasiBatas: preset })}
+                              className={`rounded border px-1.5 py-0.5 text-[10px] font-mono cursor-pointer ${
+                                cfg.durasiBatas === preset
+                                  ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                                  : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#181818] dark:text-[#888888] dark:hover:bg-[#222222] dark:hover:text-white'
+                              }`}
+                            >
+                              {preset}
+                            </button>
+                          ))}
                         </div>
+                      </div>
 
-                        {/* Opsi Tanggal */}
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                          <div className="flex items-center justify-between text-xs mb-1">
-                            <label className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
-                              📅 Opsi Tanggal Konsumsi
-                            </label>
-                            <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                      {/* Opsi Tanggal Konsumsi */}
+                      <div className="pt-2 border-t border-[#EAEAEA] dark:border-[#262626]">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <label className="text-[11px] font-medium text-[#111111] dark:text-white">Opsi Tanggal Konsumsi</label>
+                          <label className="flex items-center gap-1 text-[11px] text-[#787774] dark:text-[#888888] cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={cfg.showTanggalBatas}
+                              onChange={(e) => setCfg({ ...cfg, showTanggalBatas: e.target.checked })}
+                              className="rounded accent-neutral-900 dark:accent-neutral-100"
+                            />
+                            <span>Tampilkan</span>
+                          </label>
+                        </div>
+                        {cfg.showTanggalBatas && (
+                          <div className="space-y-2">
+                            <div className="grid grid-cols-[135px_1fr] gap-1.5">
+                              {/* HTML5 Date Picker */}
                               <input
-                                type="checkbox"
-                                checked={cfg.showTanggalBatas}
-                                onChange={(e) => setCfg({ ...cfg, showTanggalBatas: e.target.checked })}
-                                className="rounded accent-emerald-600"
+                                type="date"
+                                value={parseDateToIso(cfg.tanggalBatas) || new Date().toISOString().split('T')[0]}
+                                onChange={(e) => {
+                                  const isoDate = e.target.value
+                                  if (!isoDate) return
+                                  const [y, m, d] = isoDate.split('-').map(Number)
+                                  const dateObj = new Date(y, m - 1, d)
+                                  setCfg({
+                                    ...cfg,
+                                    tanggalBatas: formatDateToPattern(dateObj, 'slash'),
+                                  })
+                                }}
+                                className="rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 font-mono text-xs font-bold text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white cursor-pointer"
+                                title="Pilih tanggal dari kalender picker"
                               />
-                              <span>Tampilkan</span>
-                            </label>
-                          </div>
-                          {cfg.showTanggalBatas && (
-                            <div className="flex items-center gap-2">
+                              {/* Text representation */}
                               <input
                                 type="text"
                                 value={cfg.tanggalBatas}
                                 onChange={(e) => setCfg({ ...cfg, tanggalBatas: e.target.value })}
-                                className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                                placeholder="misal: 09/09/2026 atau 04 September 2026"
+                                className="rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-bold text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                                placeholder="04/09/2026 atau 04 September 2026"
                               />
-                              <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-slate-500 whitespace-nowrap">Font (pt):</span>
-                                <input
-                                  type="number"
-                                  step="0.5"
-                                  min="6"
-                                  max="24"
-                                  value={cfg.fontSizes?.tanggalBatas ?? 10}
-                                  onChange={(e) =>
+                            </div>
+
+                            {/* Quick Date Presets & Format Switcher */}
+                            <div className="flex flex-wrap items-center justify-between gap-1 text-xs">
+                              {/* Presets */}
+                              <div className="flex flex-wrap gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => {
                                     setCfg({
                                       ...cfg,
-                                      fontSizes: { ...(cfg.fontSizes || {}), tanggalBatas: Number(e.target.value) },
+                                      tanggalBatas: formatDateToPattern(new Date(), 'slash'),
                                     })
-                                  }
-                                  className="w-14 rounded border border-slate-300 px-1.5 py-1 text-xs font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                                />
+                                  }}
+                                  className="rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-[10px] font-mono text-[#787774] hover:bg-[#F7F6F3] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#181818] dark:text-[#888888] cursor-pointer"
+                                >
+                                  Hari Ini
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const d = new Date()
+                                    d.setDate(d.getDate() + 1)
+                                    setCfg({
+                                      ...cfg,
+                                      tanggalBatas: formatDateToPattern(d, 'slash'),
+                                    })
+                                  }}
+                                  className="rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-[10px] font-mono text-[#787774] hover:bg-[#F7F6F3] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#181818] dark:text-[#888888] cursor-pointer"
+                                >
+                                  Besok
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const d = new Date()
+                                    d.setDate(d.getDate() + 2)
+                                    setCfg({
+                                      ...cfg,
+                                      tanggalBatas: formatDateToPattern(d, 'slash'),
+                                    })
+                                  }}
+                                  className="rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-[10px] font-mono text-[#787774] hover:bg-[#F7F6F3] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#181818] dark:text-[#888888] cursor-pointer"
+                                >
+                                  Lusa
+                                </button>
+                              </div>
+
+                              {/* Formats */}
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-[#787774] dark:text-[#888888]">Format:</span>
+                                {[
+                                  { id: 'slash', label: 'DD/MM/YYYY' },
+                                  { id: 'long', label: 'Teks Panjang' },
+                                  { id: 'dash', label: 'DD-MM-YYYY' },
+                                ].map((fmt) => (
+                                  <button
+                                    key={fmt.id}
+                                    type="button"
+                                    onClick={() => {
+                                      const iso = parseDateToIso(cfg.tanggalBatas)
+                                      const dateObj = iso ? new Date(iso) : new Date()
+                                      setCfg({
+                                        ...cfg,
+                                        tanggalBatas: formatDateToPattern(dateObj, fmt.id),
+                                      })
+                                    }}
+                                    className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-1.5 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                                  >
+                                    {fmt.label}
+                                  </button>
+                                ))}
                               </div>
                             </div>
-                          )}
-                        </div>
-
-                        {/* Subteks / Catatan Tambahan */}
-                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                          <div className="flex items-center justify-between text-xs mb-1">
-                            <label className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
-                              📝 Subteks / Catatan Tambahan
-                            </label>
-                            <label className="flex items-center gap-1 text-[11px] text-slate-500">
-                              <input
-                                type="checkbox"
-                                checked={cfg.showSubteksBatas ?? true}
-                                onChange={(e) => setCfg({ ...cfg, showSubteksBatas: e.target.checked })}
-                                className="rounded accent-emerald-600"
-                              />
-                              <span>Tampilkan</span>
-                            </label>
                           </div>
-                          {(cfg.showSubteksBatas ?? true) && (
-                            <input
-                              type="text"
-                              value={cfg.subteksBatas}
-                              onChange={(e) => setCfg({ ...cfg, subteksBatas: e.target.value })}
-                              className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                              placeholder="Setelah makanan diterima untuk menjaga kualitas..."
-                            />
-                          )}
-                        </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
-                  <div className="mt-3 border-t border-slate-100 pt-2.5 dark:border-slate-800">
+                  {/* Badges Segera Konsumsi & Larangan */}
+                  <div className="pt-2 border-t border-[#EAEAEA] dark:border-[#262626] space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <label className="font-semibold text-rose-800 dark:text-rose-300">
-                        Peringatan Larangan (Bar Teks Standar)
-                      </label>
-                      <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                      <span className="font-bold text-[#111111] dark:text-white">Badge Petunjuk &amp; Larangan</span>
+                      <label className="flex items-center gap-1 text-[11px] text-[#787774] dark:text-[#888888] cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={cfg.showPeringatan}
-                          onChange={(e) => setCfg({ ...cfg, showPeringatan: e.target.checked })}
-                          className="rounded accent-emerald-600"
+                          checked={cfg.showBadges}
+                          onChange={(e) => setCfg({ ...cfg, showBadges: e.target.checked })}
+                          className="rounded accent-neutral-900 dark:accent-neutral-100"
                         />
                         <span>Aktif</span>
                       </label>
                     </div>
-                    {cfg.showPeringatan && (
-                      <input
-                        type="text"
-                        value={cfg.teksPeringatan}
-                        onChange={(e) => setCfg({ ...cfg, teksPeringatan: e.target.value })}
-                        className="mt-1 w-full rounded border border-rose-300 bg-rose-50/50 px-2 py-1 text-xs font-bold text-rose-900 dark:bg-rose-950/30 dark:text-rose-200"
-                      />
-                    )}
-                  </div>
-                </div>
 
-                {/* 6. Petunjuk Segera Konsumsi & Larangan Bawa Pulang (Badge Komponen) */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      6. Badge Segera Konsumsi & Larangan Bawa Pulang
-                    </span>
-                    <label className="flex items-center gap-1 text-xs text-slate-500">
-                      <input
-                        type="checkbox"
-                        checked={cfg.showBadges}
-                        onChange={(e) => setCfg({ ...cfg, showBadges: e.target.checked })}
-                        className="rounded accent-emerald-600"
-                      />
-                      <span>Tampilkan</span>
-                    </label>
-                  </div>
-
-                  {cfg.showBadges && (
-                    <div className="space-y-3">
-                      {/* Pengaturan Layout & Border */}
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Tata Letak:
-                          </label>
-                          <select
-                            value={cfg.badgeLayout || 'sideBySide'}
-                            onChange={(e) => setCfg({ ...cfg, badgeLayout: e.target.value })}
-                            className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-medium"
-                          >
-                            <option value="sideBySide">Berdampingan (Kiri - Kanan)</option>
-                            <option value="stacked">Atas - Bawah (Stacked)</option>
-                          </select>
+                    {cfg.showBadges && (
+                      <div className="space-y-2 text-xs">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-0.5">Susunan Badge:</label>
+                            <select
+                              value={cfg.badgeLayout || 'stacked'}
+                              onChange={(e) => setCfg({ ...cfg, badgeLayout: e.target.value })}
+                              className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                            >
+                              <option value="stacked">Atas - Bawah (Standar)</option>
+                              <option value="sideBySide">Kiri - Kanan (Berdampingan)</option>
+                            </select>
+                          </div>
+                          <div className="flex items-end pb-1">
+                            <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={cfg.badgeBorder}
+                                onChange={(e) => setCfg({ ...cfg, badgeBorder: e.target.checked })}
+                                className="rounded accent-neutral-900 dark:accent-neutral-100"
+                              />
+                              <span>Border Kotak Badge</span>
+                            </label>
+                          </div>
                         </div>
-                        <div className="flex items-end pb-1.5">
-                          <label className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-slate-300 font-medium">
-                            <input
-                              type="checkbox"
-                              checked={cfg.badgeBorder}
-                              onChange={(e) => setCfg({ ...cfg, badgeBorder: e.target.checked })}
-                              className="rounded accent-emerald-600"
-                            />
-                            <span>Garis Tepi Kotak (Border)</span>
-                          </label>
-                        </div>
-                      </div>
 
-                      {/* Badge 1: Segera Konsumsi (Ikon Piring Sendok Garpu) */}
-                      <div className="rounded-xl border border-slate-200 p-2.5 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-850 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                            🍽️ Badge 1: Segera Konsumsi
-                          </span>
-                          <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                        {/* Badge 1 */}
+                        <div className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-2 dark:border-[#262626] dark:bg-[#141414] space-y-1.5">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold">🍽️ Badge 1: Segera Konsumsi</span>
                             <input
                               type="checkbox"
                               checked={cfg.showBadgeSegera}
                               onChange={(e) => setCfg({ ...cfg, showBadgeSegera: e.target.checked })}
-                              className="rounded accent-emerald-600"
+                              className="rounded accent-neutral-900 dark:accent-neutral-100"
                             />
-                            <span>Aktif</span>
-                          </label>
-                        </div>
-                        {cfg.showBadgeSegera && (
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            <div>
-                              <label className="block text-[10px] text-slate-500 mb-0.5">Judul Baris 1:</label>
+                          </div>
+                          {cfg.showBadgeSegera && (
+                            <div className="grid grid-cols-2 gap-1.5">
                               <input
                                 type="text"
                                 value={cfg.judulBadgeSegera}
                                 onChange={(e) => setCfg({ ...cfg, judulBadgeSegera: e.target.value })}
-                                className="w-full rounded border border-slate-300 px-2 py-1 text-xs font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                 placeholder="SEGERA KONSUMSI"
+                                className="w-full rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#1C1C1C] dark:text-white"
                               />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] text-slate-500 mb-0.5">Subteks Baris 2:</label>
                               <input
                                 type="text"
                                 value={cfg.subBadgeSegera}
                                 onChange={(e) => setCfg({ ...cfg, subBadgeSegera: e.target.value })}
-                                className="w-full rounded border border-slate-300 px-2 py-1 text-xs font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                 placeholder="SETELAH DITERIMA"
+                                className="w-full rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#1C1C1C] dark:text-white"
                               />
                             </div>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
 
-                      {/* Badge 2: Larangan Bawa Pulang */}
-                      <div className="rounded-xl border border-rose-200 p-2.5 bg-rose-50/30 dark:border-rose-900/50 dark:bg-rose-950/20 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
-                            🚫 Badge 2: Larangan Bawa Pulang
-                          </span>
-                          <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                        {/* Badge 2 */}
+                        <div className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-2 dark:border-[#262626] dark:bg-[#141414] space-y-1.5">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-bold">🚫 Badge 2: Larangan Bawa Pulang</span>
                             <input
                               type="checkbox"
                               checked={cfg.showBadgeLarangan}
                               onChange={(e) => setCfg({ ...cfg, showBadgeLarangan: e.target.checked })}
-                              className="rounded accent-emerald-600"
+                              className="rounded accent-neutral-900 dark:accent-neutral-100"
                             />
-                            <span>Aktif</span>
-                          </label>
-                        </div>
-                        {cfg.showBadgeLarangan && (
-                          <div className="space-y-2 text-xs">
-                            <div className="grid grid-cols-2 gap-2">
-                              <div>
-                                <label className="block text-[10px] text-slate-500 mb-0.5">Judul Baris 1:</label>
-                                <input
-                                  type="text"
-                                  value={cfg.judulBadgeLarangan}
-                                  onChange={(e) => setCfg({ ...cfg, judulBadgeLarangan: e.target.value })}
-                                  className="w-full rounded border border-rose-300 px-2 py-1 text-xs font-bold text-rose-900 dark:border-rose-800 dark:bg-slate-800 dark:text-rose-200"
-                                  placeholder="TIDAK BOLEH"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[10px] text-slate-500 mb-0.5">Subteks Baris 2:</label>
-                                <input
-                                  type="text"
-                                  value={cfg.subBadgeLarangan}
-                                  onChange={(e) => setCfg({ ...cfg, subBadgeLarangan: e.target.value })}
-                                  className="w-full rounded border border-rose-300 px-2 py-1 text-xs font-bold text-rose-900 dark:border-rose-800 dark:bg-slate-800 dark:text-rose-200"
-                                  placeholder="DIBAWA PULANG"
-                                />
-                              </div>
-                            </div>
-                            <div>
-                              <label className="block text-[10px] text-slate-500 mb-0.5">URL / File Ikon Larangan:</label>
+                          </div>
+                          {cfg.showBadgeLarangan && (
+                            <div className="grid grid-cols-2 gap-1.5">
                               <input
                                 type="text"
-                                value={cfg.iconLaranganUrl || '/img/larangan_dibawa_pulang.png'}
-                                onChange={(e) => setCfg({ ...cfg, iconLaranganUrl: e.target.value })}
-                                className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                                placeholder="/img/larangan_dibawa_pulang.png"
+                                value={cfg.judulBadgeLarangan}
+                                onChange={(e) => setCfg({ ...cfg, judulBadgeLarangan: e.target.value })}
+                                placeholder="TIDAK BOLEH"
+                                className="w-full rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#1C1C1C] dark:text-white"
+                              />
+                              <input
+                                type="text"
+                                value={cfg.subBadgeLarangan}
+                                onChange={(e) => setCfg({ ...cfg, subBadgeLarangan: e.target.value })}
+                                placeholder="DIBAWA PULANG"
+                                className="w-full rounded border border-[#EAEAEA] bg-white px-1.5 py-0.5 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#1C1C1C] dark:text-white"
                               />
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                </section>
 
-                {/* 7. Footer Media Sosial */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+                {/* 6. Footer Sosmed & Edukasi */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      7. Footer Media Sosial
-                    </span>
-                    <label className="flex items-center gap-1 text-xs text-slate-500">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      6. Media Sosial &amp; Edukasi
+                    </h2>
+                    <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={cfg.showSosmed}
                         onChange={(e) => setCfg({ ...cfg, showSosmed: e.target.checked })}
-                        className="rounded accent-emerald-600"
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
                       />
-                      <span>Tampilkan</span>
+                      <span>Tampilkan Sosmed</span>
                     </label>
                   </div>
 
                   {cfg.showSosmed && (
-                    <div className="mt-2.5 space-y-2">
+                    <div className="space-y-1.5 text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-pink-600">📸 Instagram:</span>
+                        <span className="w-16 font-mono text-[10px] text-[#787774] dark:text-[#888888]">Instagram</span>
                         <input
                           type="text"
                           value={cfg.igHandle}
                           onChange={(e) => setCfg({ ...cfg, igHandle: e.target.value })}
-                          placeholder="@sppg_jeketro_gnik_grobogan"
-                          className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                          placeholder="@sppgdefault"
+                          className="flex-1 rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-blue-600">📘 Facebook:</span>
+                        <span className="w-16 font-mono text-[10px] text-[#787774] dark:text-[#888888]">Facebook</span>
                         <input
                           type="text"
                           value={cfg.fbHandle}
                           onChange={(e) => setCfg({ ...cfg, fbHandle: e.target.value })}
-                          placeholder="@sppg_facebook"
-                          className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                          placeholder="@sppgdefault"
+                          className="flex-1 rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200">🎵 TikTok:</span>
+                        <span className="w-16 font-mono text-[10px] text-[#787774] dark:text-[#888888]">TikTok</span>
                         <input
                           type="text"
                           value={cfg.tiktokHandle}
                           onChange={(e) => setCfg({ ...cfg, tiktokHandle: e.target.value })}
-                          placeholder="@sppgjeketro"
-                          className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                          placeholder="@sppgdefault"
+                          className="flex-1 rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                         />
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* 7. Edukasi: Kenapa Harus Tepat Waktu? (Opsional) */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                      7. Edukasi: Kenapa Harus Tepat Waktu? (Opsional)
-                    </span>
-                    <label className="flex items-center gap-1 text-xs text-slate-500">
-                      <input
-                        type="checkbox"
-                        checked={cfg.showEdukasi}
-                        onChange={(e) => setCfg({ ...cfg, showEdukasi: e.target.checked })}
-                        className="rounded accent-emerald-600"
-                      />
-                      <span>Aktif</span>
-                    </label>
-                  </div>
-
-                  {cfg.showEdukasi && (
-                    <div className="mt-2.5 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">⏱️</span>
-                        <input
-                          type="text"
-                          value={cfg.edukasiItem1}
-                          onChange={(e) => setCfg({ ...cfg, edukasiItem1: e.target.value })}
-                          className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">🛑</span>
-                        <input
-                          type="text"
-                          value={cfg.edukasiItem2}
-                          onChange={(e) => setCfg({ ...cfg, edukasiItem2: e.target.value })}
-                          className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">🍽️</span>
-                        <input
-                          type="text"
-                          value={cfg.edukasiItem3}
-                          onChange={(e) => setCfg({ ...cfg, edukasiItem3: e.target.value })}
-                          className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                </section>
 
               </div>
             )}
 
-            {/* TAB 2: PENGATURAN FONT & UKURAN TEKS */}
+            {/* ══════════════════════════════════════════════════════════════
+                TAB 2: TIPOGRAFI & PITA ORNAMEN
+            ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'font' && (
               <div className="space-y-4">
-                {/* 1. Pilihan Jenis Huruf (Font Family) */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      🔤 Jenis Huruf (Font Family)
-                    </span>
-                  </div>
-                  
+                
+                {/* Font Family Selection */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                    Jenis Huruf (Font Family)
+                  </h2>
                   <div>
-                    <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">
-                      Pilih Font untuk Seluruh Teks Stiker:
-                    </label>
                     <select
                       value={cfg.fontFamily || FONT_OPTIONS[0].value}
                       onChange={(e) => setCfg({ ...cfg, fontFamily: e.target.value })}
-                      className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-medium"
+                      className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1.5 text-xs text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                     >
                       {FONT_OPTIONS.map((font) => (
-                        <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                        <option key={font.value} value={font.value}>
                           {font.label}
                         </option>
                       ))}
                     </select>
                   </div>
-
-                  <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 dark:bg-slate-800/60 dark:border-slate-700/60 text-center">
-                    <span className="text-[11px] text-slate-500 block mb-0.5">Pratinjau Font Terpilih:</span>
-                    <span style={{ fontFamily: cfg.fontFamily || FONT_OPTIONS[0].value }} className="text-sm font-black text-slate-900 dark:text-white">
-                      BADAN GIZI NASIONAL (BGN) — 1234567890
+                  <div className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-2 text-center dark:border-[#262626] dark:bg-[#141414]">
+                    <span style={{ fontFamily: cfg.fontFamily || FONT_OPTIONS[0].value }} className="text-xs font-bold text-[#111111] dark:text-white">
+                      SPPG BADAN GIZI NASIONAL — 0123456789
                     </span>
                   </div>
-                </div>
+                </section>
 
-                {/* 2. Pita Ornamen Dekorasi Label Resmi BGN */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3">
+                {/* Pita Dekorasi Ornamen BGN */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      ✨ Pita Dekorasi Ornamen Label
-                    </span>
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      Pita Ornamen Dekorasi Label
+                    </h2>
+                    <label className="flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#888888] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={(cfg.showPattern ?? true) && cfg.patternPos !== 'none'}
                         onChange={(e) => setCfg({ ...cfg, showPattern: e.target.checked, patternPos: e.target.checked ? 'both' : 'none' })}
-                        className="rounded accent-emerald-600"
+                        className="rounded accent-neutral-900 dark:accent-neutral-100"
                       />
-                      <span>Aktifkan Dekorasi</span>
+                      <span>Aktifkan</span>
                     </label>
                   </div>
 
                   {(cfg.showPattern ?? true) && cfg.patternPos !== 'none' && (
                     <div className="space-y-3 pt-1">
-                      {/* Posisi Pita Dekorasi */}
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Posisi Penempatan Pita Dekorasi:
-                        </label>
-                        <div className="grid grid-cols-3 gap-1.5 text-xs">
+                        <label className="block text-[10px] text-[#787774] dark:text-[#888888] mb-1">Posisi Pita:</label>
+                        <div className="grid grid-cols-3 gap-1.5">
                           {[
-                            { id: 'both', label: '✨ Atas & Bawah' },
-                            { id: 'top', label: '⬆️ Bawah Kop' },
-                            { id: 'bottom', label: '⬇️ Atas Footer' },
+                            { id: 'both', label: 'Atas & Bawah' },
+                            { id: 'top', label: 'Bawah Kop' },
+                            { id: 'bottom', label: 'Atas Footer' },
                           ].map((pos) => (
                             <button
                               key={pos.id}
                               type="button"
                               onClick={() => setCfg({ ...cfg, patternPos: pos.id })}
-                              className={`py-1 px-1.5 rounded text-[11px] font-semibold border cursor-pointer ${
+                              className={`rounded py-1 px-1.5 text-xs font-medium border cursor-pointer ${
                                 (cfg.patternPos || 'both') === pos.id
-                                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                                  : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
+                                  ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                                  : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
                               }`}
                             >
                               {pos.label}
@@ -1728,700 +1673,408 @@ export default function StikerMakanPage() {
                         </div>
                       </div>
 
-                      {/* Varian Motif: Putih vs Warna BGN */}
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                          Pilihan Varian Motif:
-                        </label>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <button
-                            type="button"
-                            onClick={() => setCfg({ ...cfg, patternType: 'color', patternUrl: '/img/pattern4.png' })}
-                            className={`py-1.5 px-2 rounded-lg text-left border cursor-pointer ${
-                              (cfg.patternType || 'color') === 'color'
-                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
-                                : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
-                            }`}
-                          >
-                            <div className="text-[11px]">🎨 Warna Asli BGN</div>
-                            <div className="text-[10px] text-slate-500 font-normal">Navy & Emas Resmi</div>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setCfg({ ...cfg, patternType: 'white', patternUrl: '/img/pattern4-white.png' })}
-                            className={`py-1.5 px-2 rounded-lg text-left border cursor-pointer ${
-                              cfg.patternType === 'white'
-                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
-                                : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
-                            }`}
-                          >
-                            <div className="text-[11px]">⚪ Garis Putih</div>
-                            <div className="text-[10px] text-slate-500 font-normal">Monokrom / Minimalis</div>
-                          </button>
-                        </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setCfg({ ...cfg, patternType: 'color', patternUrl: '/img/pattern4.png' })}
+                          className={`rounded p-2 text-left border cursor-pointer ${
+                            (cfg.patternType || 'color') === 'color'
+                              ? 'border-[#111111] bg-[#F7F6F3] text-[#111111] dark:border-white dark:bg-[#1F1F1F] dark:text-white'
+                              : 'border-[#EAEAEA] bg-white text-[#787774] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
+                          }`}
+                        >
+                          <div className="text-xs font-bold">Warna Asli BGN</div>
+                          <div className="text-[10px] opacity-75">Navy &amp; Emas</div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCfg({ ...cfg, patternType: 'white', patternUrl: '/img/pattern4-white.png' })}
+                          className={`rounded p-2 text-left border cursor-pointer ${
+                            cfg.patternType === 'white'
+                              ? 'border-[#111111] bg-[#F7F6F3] text-[#111111] dark:border-white dark:bg-[#1F1F1F] dark:text-white'
+                              : 'border-[#EAEAEA] bg-white text-[#787774] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
+                          }`}
+                        >
+                          <div className="text-xs font-bold">Monokrom Putih</div>
+                          <div className="text-[10px] opacity-75">Minimalis</div>
+                        </button>
                       </div>
 
-                      {/* Slider Tinggi Pita */}
                       <div>
-                        <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
-                          <span>Tinggi Pita Dekorasi:</span>
-                          <span className="font-bold text-emerald-600">{cfg.patternHeightMm || 6} mm</span>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-[#787774] dark:text-[#888888]">Tinggi Pita Dekorasi:</span>
+                          <span className="font-mono font-bold">{cfg.patternHeightMm || 7.5} mm</span>
                         </div>
                         <input
                           type="range"
                           min="3"
                           max="14"
                           step="0.5"
-                          value={cfg.patternHeightMm || 6}
+                          value={cfg.patternHeightMm || 7.5}
                           onChange={(e) => setCfg({ ...cfg, patternHeightMm: parseFloat(e.target.value) })}
-                          className="w-full accent-emerald-600 cursor-pointer"
-                        />
-                      </div>
-
-                      {/* Slider Opasitas */}
-                      <div>
-                        <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
-                          <span>Opasitas Motif:</span>
-                          <span className="font-bold text-emerald-600">
-                            {Math.round((cfg.patternOpacity ?? 0.85) * 100)}%
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min="0.1"
-                          max="1.0"
-                          step="0.05"
-                          value={cfg.patternOpacity ?? 0.85}
-                          onChange={(e) => setCfg({ ...cfg, patternOpacity: parseFloat(e.target.value) })}
-                          className="w-full accent-emerald-600 cursor-pointer"
-                        />
-                      </div>
-
-                      {/* Preview Box Pita Motif */}
-                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:bg-slate-800/60 dark:border-slate-700/60">
-                        <span className="text-[10px] text-slate-500 block mb-1 font-semibold">Pratinjau Pita Ornamen Label:</span>
-                        <div
-                          style={{
-                            width: '100%',
-                            height: `${cfg.patternHeightMm || 6}mm`,
-                            backgroundImage: `url(${cfg.patternType === 'white' ? '/img/pattern4-white.png' : '/img/pattern4.png'})`,
-                            backgroundRepeat: 'repeat-x',
-                            backgroundPosition: 'center',
-                            backgroundSize: `auto ${cfg.patternHeightMm || 6}mm`,
-                            opacity: cfg.patternOpacity ?? 0.85,
-                            borderRadius: '2px',
-                          }}
+                          className="w-full accent-neutral-900 dark:accent-neutral-100 cursor-pointer"
                         />
                       </div>
                     </div>
                   )}
-                </div>
+                </section>
 
-                {/* 2. Pengaturan Ukuran Font per Bagian (pt) */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-3.5">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      📏 Ukuran Font per Bagian (pt)
-                    </span>
+                {/* Ukuran Font Per Bagian */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#EAEAEA] pb-2 dark:border-[#262626]">
+                    <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                      Ukuran Font &amp; Logo (pt / mm)
+                    </h2>
                     <button
                       type="button"
                       onClick={() => setCfg({
                         ...cfg,
-                        fontSizes: {
-                          judul: 18,
-                          namaDapur: 12,
-                          namaMitra: 8,
-                          judulGizi: 12,
-                          headerBox: 10,
-                          isiMenu: 8,
-                          isiGizi: 8,
-                          batasAman: 16,
-                          durasiBatas: 16,
-                          subteksBatas: 9,
-                          larangan: 16,
-                          sosmed: 8,
-                          edukasi: 7,
-                        },
-                        logoSizeMm: 50,
+                        fontSizes: DEFAULT_CONFIG.fontSizes,
+                        logoSizeMm: DEFAULT_CONFIG.logoSizeMm,
                       })}
-                      className="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 cursor-pointer underline dark:text-emerald-400"
+                      className="text-[10px] font-mono text-[#787774] underline hover:text-[#111111] dark:text-[#888888] dark:hover:text-white cursor-pointer"
                     >
-                      🔄 Reset Default BGN
+                      Reset Default
                     </button>
                   </div>
 
-                  {/* Section A: Kop Atas & Logo */}
-                  <div className="space-y-2">
-                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">A. Kop Atas & Logo</div>
-                    <div className="grid grid-cols-2 gap-2.5 text-xs">
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Judul Label (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="8"
-                          max="36"
-                          value={cfg.fontSizes?.judul ?? 18}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), judul: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Ukuran Logo (mm)</label>
-                        <input
-                          type="number"
-                          step="1"
-                          min="15"
-                          max="80"
-                          value={cfg.logoSizeMm ?? 50}
-                          onChange={(e) => setCfg({ ...cfg, logoSizeMm: Number(e.target.value) })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                        <span className="text-[10px] text-slate-500">= {((cfg.logoSizeMm ?? 50) / 10).toFixed(1)} cm</span>
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Nama SPPG (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="6"
-                          max="24"
-                          value={cfg.fontSizes?.namaDapur ?? 12}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), namaDapur: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Nama Yayasan / Mitra (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="5"
-                          max="18"
-                          value={cfg.fontSizes?.namaMitra ?? 8}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), namaMitra: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
+                  <div className="grid grid-cols-2 gap-2.5 text-xs">
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Judul Atas (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="8"
+                        max="40"
+                        value={cfg.fontSizes?.judul ?? 29.5}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), judul: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Ukuran Logo (mm)</label>
+                      <input
+                        type="number"
+                        step="1"
+                        min="15"
+                        max="80"
+                        value={cfg.logoSizeMm ?? 50}
+                        onChange={(e) => setCfg({ ...cfg, logoSizeMm: Number(e.target.value) })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Nama SPPG (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="6"
+                        max="24"
+                        value={cfg.fontSizes?.namaDapur ?? 12}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), namaDapur: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Nama Yayasan (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="5"
+                        max="18"
+                        value={cfg.fontSizes?.namaMitra ?? 10}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), namaMitra: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Isi Menu (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="5"
+                        max="16"
+                        value={cfg.fontSizes?.isiMenu ?? 8}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), isiMenu: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Isi Gizi (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="5"
+                        max="16"
+                        value={cfg.fontSizes?.isiGizi ?? 8}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), isiGizi: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Jam Batas Waktu (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="8"
+                        max="32"
+                        value={cfg.fontSizes?.durasiBatas ?? 16}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), durasiBatas: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Badge Teks (pt)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="6"
+                        max="20"
+                        value={cfg.fontSizes?.badgeTeks ?? 10}
+                        onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), badgeTeks: Number(e.target.value) } })}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
                     </div>
                   </div>
+                </section>
 
-                  {/* Section B: Box Menu & Kandungan Gizi */}
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">B. Box Menu & Kandungan Gizi</div>
-                    <div className="grid grid-cols-2 gap-2.5 text-xs">
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Header Box (Menu/Porsi) (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="6"
-                          max="20"
-                          value={cfg.fontSizes?.headerBox ?? 10}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), headerBox: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Judul Gizi (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="6"
-                          max="20"
-                          value={cfg.fontSizes?.judulGizi ?? 12}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), judulGizi: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Isi Daftar Menu (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="5"
-                          max="16"
-                          value={cfg.fontSizes?.isiMenu ?? 8}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), isiMenu: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Isi Nilai Gizi (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="5"
-                          max="16"
-                          value={cfg.fontSizes?.isiGizi ?? 8}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), isiGizi: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section C: Batas Waktu & Peringatan */}
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">C. Batas Waktu & Peringatan</div>
-                    <div className="grid grid-cols-2 gap-2.5 text-xs">
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Judul Batas Aman (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="8"
-                          max="28"
-                          value={cfg.fontSizes?.batasAman ?? 16}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), batasAman: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Durasi "2 JAM" (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="8"
-                          max="32"
-                          value={cfg.fontSizes?.durasiBatas ?? 16}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), durasiBatas: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Tanggal Konsumsi (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="6"
-                          max="24"
-                          value={cfg.fontSizes?.tanggalBatas ?? 10}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), tanggalBatas: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Subteks Batas Aman (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="5"
-                          max="16"
-                          value={cfg.fontSizes?.subteksBatas ?? 9}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), subteksBatas: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Larangan Bawa Pulang (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="8"
-                          max="28"
-                          value={cfg.fontSizes?.larangan ?? 16}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), larangan: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section D: Badge Petunjuk & Larangan */}
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">D. Badge Petunjuk & Larangan</div>
-                    <div className="grid grid-cols-2 gap-2.5 text-xs">
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Judul Teks Badge (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="6"
-                          max="20"
-                          value={cfg.fontSizes?.badgeTeks ?? 10}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), badgeTeks: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Subteks Badge (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="5"
-                          max="16"
-                          value={cfg.fontSizes?.badgeSubteks ?? 8}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), badgeSubteks: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Tinggi Ikon Badge (mm)</label>
-                        <input
-                          type="number"
-                          step="1"
-                          min="6"
-                          max="28"
-                          value={cfg.fontSizes?.badgeIconSizeMm ?? 12}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), badgeIconSizeMm: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section E: Media Sosial */}
-                  <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">E. Footer Media Sosial</div>
-                    <div className="grid grid-cols-2 gap-2.5 text-xs">
-                      <div>
-                        <label className="block text-slate-600 dark:text-slate-400">Akun Sosial Media (pt)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="5"
-                          max="16"
-                          value={cfg.fontSizes?.sosmed ?? 8}
-                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), sosmed: Number(e.target.value) } })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
               </div>
             )}
 
-            {/* TAB 3: MARGIN KERTAS & GAP */}
+            {/* ══════════════════════════════════════════════════════════════
+                TAB 3: TATA LETAK & KERTAS F4
+            ══════════════════════════════════════════════════════════════ */}
             {activeTab === 'layout' && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-                <div>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Jumlah Kolom di Lembar F4 (Lebar 210 mm)
-                  </span>
-                  <div className="mt-1.5 grid grid-cols-2 gap-2">
+              <div className="space-y-4">
+                
+                {/* Kolom Stiker */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                    Jumlah Kolom di Lembar F4 (210 mm)
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setKolom(2)}
-                      className={`min-h-[42px] rounded-lg p-2 text-center text-xs font-bold cursor-pointer ${
+                      className={`rounded p-2 text-center text-xs font-semibold border cursor-pointer ${
                         kolom === 2
-                          ? 'border-2 border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                          : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                          : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
                       }`}
                     >
-                      ✂️ 2 Kolom (Lebar ~{stickerWidthMm.toFixed(1)} mm)
+                      <div className="font-bold">2 Kolom</div>
+                      <div className="font-mono text-[10px] opacity-80">Lebar ~{stickerWidthMm.toFixed(1)} mm</div>
                     </button>
                     <button
                       type="button"
                       onClick={() => setKolom(3)}
-                      className={`min-h-[42px] rounded-lg p-2 text-center text-xs font-bold cursor-pointer ${
+                      className={`rounded p-2 text-center text-xs font-semibold border cursor-pointer ${
                         kolom === 3
-                          ? 'border-2 border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                          : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                          ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                          : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
                       }`}
                     >
-                      ✂️ 3 Kolom (Lebar ~{stickerWidthMm.toFixed(1)} mm)
+                      <div className="font-bold">3 Kolom</div>
+                      <div className="font-mono text-[10px] opacity-80">Lebar ~{stickerWidthMm.toFixed(1)} mm</div>
                     </button>
                   </div>
-                </div>
+                </section>
 
-                {/* Presisi Margin */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div>
-                    <label className="block text-slate-600 dark:text-slate-400">Margin Atas (mm)</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={marginAtas}
-                      onChange={(e) => setMarginAtas(Number(e.target.value))}
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    />
-                    <span className="text-[10px] text-emerald-600">= {(marginAtas / 10).toFixed(1)} cm</span>
-                  </div>
-                  <div>
-                    <label className="block text-slate-600 dark:text-slate-400">Margin Bawah (mm)</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={marginBawah}
-                      onChange={(e) => setMarginBawah(Number(e.target.value))}
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    />
-                    <span className="text-[10px] text-emerald-600">= {(marginBawah / 10).toFixed(1)} cm</span>
-                  </div>
-                  <div>
-                    <label className="block text-slate-600 dark:text-slate-400">Margin Kiri (mm)</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={marginKiri}
-                      onChange={(e) => setMarginKiri(Number(e.target.value))}
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    />
-                    <span className="text-[10px] text-emerald-600">= {(marginKiri / 10).toFixed(1)} cm</span>
-                  </div>
-                  <div>
-                    <label className="block text-slate-600 dark:text-slate-400">Margin Kanan (mm)</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={marginKanan}
-                      onChange={(e) => setMarginKanan(Number(e.target.value))}
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    />
-                    <span className="text-[10px] text-emerald-600">= {(marginKanan / 10).toFixed(1)} cm</span>
-                  </div>
-                  <div>
-                    <label className="block font-bold text-emerald-700 dark:text-emerald-400">Gap Antar Stiker (mm)</label>
-                    <div className="flex items-center gap-1.5 mt-0.5">
+                {/* Presisi Margin Lembar F4 */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                    Margin Kertas &amp; Celah Potong (mm)
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2.5 text-xs">
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Margin Atas (mm)</label>
                       <input
                         type="number"
                         step="0.5"
-                        min="0"
-                        max="30"
-                        value={gapAntarStiker}
-                        onChange={(e) => setGapAntarStiker(Number(e.target.value))}
-                        className="w-20 rounded border border-emerald-500 bg-emerald-50/50 px-2 py-1 text-slate-900 dark:bg-emerald-950/30 dark:text-white font-semibold"
+                        value={marginAtas}
+                        onChange={(e) => setMarginAtas(Number(e.target.value))}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                       />
-                      <span className="text-[10px] text-emerald-600 font-semibold">= {(gapAntarStiker / 10).toFixed(1)} cm</span>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {[
-                        { label: '0 mm (Menyatu Full)', val: 0 },
-                        { label: '5 mm', val: 5 },
-                        { label: '10 mm (1 cm)', val: 10 },
-                      ].map((g) => (
-                        <button
-                          key={g.val}
-                          type="button"
-                          onClick={() => setGapAntarStiker(g.val)}
-                          className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border cursor-pointer ${
-                            gapAntarStiker === g.val
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
-                              : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
-                          }`}
-                        >
-                          {g.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-slate-600 dark:text-slate-400">Susunan Tabel Gizi</label>
-                    <select
-                      value={susunanGizi}
-                      onChange={(e) => setSusunanGizi(e.target.value)}
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    >
-                      <option value="stacked">Bertumpuk (Atas-Bawah — Standar BGN)</option>
-                      <option value="sideBySide">Berdampingan (Kiri-Kanan)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-slate-600 dark:text-slate-400">Garis Tepi Kartu Luar</label>
-                    <select
-                      value={borderStyle}
-                      onChange={(e) => setBorderStyle(e.target.value)}
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                    >
-                      <option value="none">Tanpa Garis Luar (Polos / Standar)</option>
-                      <option value="border-subtle">Garis Tipis Abu-Abu</option>
-                      <option value="border-black">Garis Hitam Tegas</option>
-                      <option value="border-green">Garis Hijau SPPG</option>
-                    </select>
-                  </div>
-
-                  <div className="col-span-2 pt-1">
-                    <label className="block text-slate-600 dark:text-slate-400 font-semibold mb-1">
-                      Kelengkungan Sudut Tabel (Menu &amp; Gizi):
-                    </label>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Margin Bawah (mm)</label>
                       <input
                         type="number"
-                        min="0"
-                        max="20"
-                        value={cfg.tableRadius ?? 3}
-                        onChange={(e) => setCfg({ ...cfg, tableRadius: Number(e.target.value) })}
-                        className="w-16 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                        step="0.5"
+                        value={marginBawah}
+                        onChange={(e) => setMarginBawah(Number(e.target.value))}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                       />
-                      <span className="text-xs text-slate-500">px</span>
-                      <div className="flex flex-wrap items-center gap-1">
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Margin Kiri (mm)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        value={marginKiri}
+                        onChange={(e) => setMarginKiri(Number(e.target.value))}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888]">Margin Kanan (mm)</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        value={marginKanan}
+                        onChange={(e) => setMarginKanan(Number(e.target.value))}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs font-mono font-bold dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
+                      />
+                    </div>
+                    <div className="col-span-2 pt-1 border-t border-[#EAEAEA] dark:border-[#262626]">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[#111111] dark:text-white font-semibold">Gap Celah Antar Stiker (mm):</label>
+                        <span className="font-mono font-bold text-xs">{gapAntarStiker} mm</span>
+                      </div>
+                      <div className="flex gap-1.5">
                         {[
-                          { label: 'Siku (0)', val: 0 },
-                          { label: '2px (Halus)', val: 2 },
-                          { label: '4px (Sedang)', val: 4 },
-                          { label: '6px (Bulat)', val: 6 },
-                          { label: '8px (Ekstra)', val: 8 },
-                        ].map((r) => (
+                          { label: '0 mm (Rapat Full)', val: 0 },
+                          { label: '5 mm (0.5 cm)', val: 5 },
+                          { label: '10 mm (1.0 cm)', val: 10 },
+                        ].map((g) => (
                           <button
-                            key={r.val}
+                            key={g.val}
                             type="button"
-                            onClick={() => setCfg({ ...cfg, tableRadius: r.val })}
-                            className={`px-2 py-0.5 rounded text-[11px] font-semibold border cursor-pointer ${
-                              (cfg.tableRadius ?? 3) === r.val
-                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
-                                : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300'
+                            onClick={() => setGapAntarStiker(g.val)}
+                            className={`flex-1 rounded py-1 text-[11px] font-mono border cursor-pointer ${
+                              gapAntarStiker === g.val
+                                ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                                : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
                             }`}
                           >
-                            {r.label}
+                            {g.label}
                           </button>
                         ))}
                       </div>
                     </div>
                   </div>
-                </div>
+                </section>
 
-                {/* Skala Kepadatan */}
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Kepadatan Teks / Ukuran Font
-                  </label>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    {['compact', 'normal', 'spacious'].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setScaleFont(s)}
-                        className={`py-1.5 rounded border capitalize cursor-pointer ${
-                          scaleFont === s
-                            ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
-                            : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
-                        }`}
+                {/* Gaya Tepi & Skala Kepadatan */}
+                <section className="rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818] space-y-3">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-[#EAEAEA]">
+                    Opsi Format Cetak
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888] mb-0.5">Mode Warna:</label>
+                      <select
+                        value={colorMode}
+                        onChange={(e) => setColorMode(e.target.value)}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                       >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 3: PANDUAN MICROSOFT WORD */}
-            {activeTab === 'word-guide' && (
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 shadow-xs dark:border-emerald-900/50 dark:bg-emerald-950/30 text-xs space-y-3">
-                <div className="font-bold text-emerald-900 dark:text-emerald-200 text-sm">
-                  📄 Panduan Pasang Stiker di Microsoft Word
-                </div>
-
-                <div className="rounded-xl bg-white p-3 border border-emerald-100 dark:bg-slate-900 dark:border-emerald-900/40 space-y-1.5">
-                  <div className="font-bold text-slate-800 dark:text-slate-200">Langkah 1: Set Kertas F4 di Word</div>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    1. Buka Ms Word &gt; Tab <strong>Layout</strong> &gt; <strong>Size</strong> &gt; <strong>More Paper Sizes</strong>.<br />
-                    2. Masukkan <strong>Width: 21.0 cm</strong>, <strong>Height: 33.0 cm</strong>.<br />
-                    3. Tab <strong>Margins</strong>: Atur Top: 0.5 cm, Bottom: 0.5 cm, Left: 1.0 cm, Right: 1.0 cm.
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-white p-3 border border-emerald-100 dark:bg-slate-900 dark:border-emerald-900/40 space-y-1.5">
-                  <div className="font-bold text-slate-800 dark:text-slate-200">Langkah 2: Tempel Gambar</div>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    • Klik tombol <strong>"Salin (CTRL+V di Word)"</strong> di web &gt; lalu tekan <strong>CTRL + V</strong> di Word.<br />
-                    • Atau klik <strong>"Unduh 1 Stiker PNG"</strong> &gt; <strong>Insert Picture</strong> di Word.
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-white p-3 border border-emerald-100 dark:bg-slate-900 dark:border-emerald-900/40 space-y-1.5">
-                  <div className="font-bold text-slate-800 dark:text-slate-200">Langkah 3: Atur Ukuran Gambar</div>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    1. Klik kanan gambar &gt; <strong>Wrap Text</strong> &gt; pilih <strong>In Front of Text</strong>.<br />
-                    2. Klik tab <strong>Picture Format</strong> &gt; atur:
-                    <br />• Tinggi: <strong>{(stickerHeightMm / 10).toFixed(1)} cm</strong>
-                    <br />• Lebar: <strong>{(stickerWidthMm / 10).toFixed(1)} cm</strong><br />
-                    3. Copy paste stiker tersebut menjadi 2 atau 3 stiker berjajar ke samping dengan jarak 1 cm!
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 4: BACKUP / EDIT JSON */}
-            {activeTab === 'json-backup' && (
-              <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-xs dark:border-amber-900/50 dark:bg-amber-950/20 text-xs space-y-4">
-                <div>
-                  <div className="font-bold text-amber-900 dark:text-amber-200 text-sm">
-                    💾 Unduh, Edit, &amp; Impor Konfigurasi JSON
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400 mt-1">
-                    Anda dapat mengunduh seluruh isi dan ukuran stiker ke file <code>.json</code>, mengeditnya sendiri atau meminta asisten AI memodifikasinya, lalu mengunggah / menempelkannya kembali ke sini.
-                  </p>
-                </div>
-
-                {/* Tombol Aksi Cepat JSON */}
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleDownloadConfigJson}
-                    className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 cursor-pointer active:scale-98 transition-transform"
-                  >
-                    <span>📥 Unduh File .JSON</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => jsonInputRef.current?.click()}
-                    className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-400 bg-white px-3 py-2 text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-50 dark:bg-slate-900 dark:text-amber-300 dark:border-amber-700 cursor-pointer active:scale-98 transition-transform"
-                  >
-                    <span>📤 Unggah File .JSON</span>
-                  </button>
-                </div>
-
-                {/* Editor Textarea JSON */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="font-bold text-slate-700 dark:text-slate-300">
-                      Editor Teks JSON Langsung:
-                    </label>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
-                          setExportMsg('🔄 Teks JSON diperbarui dari desain saat ini.')
-                          setTimeout(() => setExportMsg(''), 3000)
-                        }}
-                        className="rounded px-2 py-0.5 text-[10px] font-semibold text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
-                        title="Tarik kembali settingan stiker saat ini ke kotak JSON"
+                        <option value="color">Full Color (Standar)</option>
+                        <option value="bw">Monokrom (Hitam Putih)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[#787774] dark:text-[#888888] mb-0.5">Border Kartu Stiker:</label>
+                      <select
+                        value={borderStyle}
+                        onChange={(e) => setBorderStyle(e.target.value)}
+                        className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2 py-1 text-xs text-[#111111] dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-white"
                       >
-                        🔄 Muat Ulang
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (navigator.clipboard) {
-                            navigator.clipboard.writeText(rawJsonText || JSON.stringify(getCurrentFullConfig(), null, 2))
-                            setExportMsg('📋 Teks JSON berhasil disalin ke clipboard!')
-                            setTimeout(() => setExportMsg(''), 3000)
-                          }
-                        }}
-                        className="rounded px-2 py-0.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/40 cursor-pointer"
-                        title="Salin teks JSON ini"
-                      >
-                        📋 Salin Teks
-                      </button>
+                        <option value="none">Tanpa Garis Luar (Polos)</option>
+                        <option value="border-subtle">Garis Tipis Abu-Abu</option>
+                        <option value="border-black">Garis Hitam Tegas</option>
+                        <option value="border-green">Garis Hijau SPPG</option>
+                      </select>
                     </div>
                   </div>
+                </section>
 
-                  <textarea
-                    rows={14}
-                    value={rawJsonText}
-                    onChange={(e) => setRawJsonText(e.target.value)}
-                    placeholder="Paste atau edit konfigurasi JSON di sini..."
-                    className="w-full rounded-xl border border-slate-300 bg-white p-2.5 font-mono text-[11px] leading-relaxed text-slate-900 shadow-inner focus:border-amber-500 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 dark:text-emerald-400"
-                    spellCheck={false}
-                  />
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════════════════════
+                TAB 4: PANDUAN MICROSOFT WORD
+            ══════════════════════════════════════════════════════════════ */}
+            {activeTab === 'word-guide' && (
+              <div className="rounded-lg border border-[#EAEAEA] bg-white p-4 text-xs space-y-3 dark:border-[#262626] dark:bg-[#181818]">
+                <div className="font-bold text-[#111111] dark:text-white text-sm">
+                  Panduan Pasang Stiker di Microsoft Word
                 </div>
 
-                {/* Tombol Terapkan JSON */}
+                <div className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-3 dark:border-[#262626] dark:bg-[#141414] space-y-1">
+                  <div className="font-bold text-[#111111] dark:text-white">1. Atur Ukuran Kertas F4</div>
+                  <p className="text-[#787774] dark:text-[#888888] leading-relaxed">
+                    Buka Word &gt; <strong>Layout</strong> &gt; <strong>Size</strong> &gt; <strong>More Paper Sizes</strong>. Masukkan Width: <strong>21.0 cm</strong>, Height: <strong>33.0 cm</strong>. Set Margin: Atas 0.5 cm, Bawah 0.5 cm, Kiri 0.5 cm, Kanan 0.5 cm.
+                  </p>
+                </div>
+
+                <div className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-3 dark:border-[#262626] dark:bg-[#141414] space-y-1">
+                  <div className="font-bold text-[#111111] dark:text-white">2. Salin &amp; Tempel Gambar</div>
+                  <p className="text-[#787774] dark:text-[#888888] leading-relaxed">
+                    Klik tombol <strong>"Salin (Word)"</strong> di atas, lalu tekan <strong>CTRL + V</strong> di Word. Atau klik <strong>"Unduh 1 PNG"</strong> &gt; Insert Picture.
+                  </p>
+                </div>
+
+                <div className="rounded border border-[#EAEAEA] bg-[#F7F6F3] p-3 dark:border-[#262626] dark:bg-[#141414] space-y-1">
+                  <div className="font-bold text-[#111111] dark:text-white">3. Atur Ukuran Presisi Gambar</div>
+                  <p className="text-[#787774] dark:text-[#888888] leading-relaxed">
+                    Klik kanan gambar &gt; <strong>Wrap Text</strong> &gt; <strong>In Front of Text</strong>. Di tab Picture Format, atur Tinggi: <strong>{(stickerHeightMm / 10).toFixed(1)} cm</strong> dan Lebar: <strong>{(stickerWidthMm / 10).toFixed(1)} cm</strong>. Copy paste stiker sesuai jumlah kolom.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════════════════════
+                TAB 5: BACKUP & EDIT JSON
+            ══════════════════════════════════════════════════════════════ */}
+            {activeTab === 'json-backup' && (
+              <div className="rounded-lg border border-[#EAEAEA] bg-white p-4 text-xs space-y-3 dark:border-[#262626] dark:bg-[#181818]">
+                <div className="flex items-center justify-between">
+                  <div className="font-bold text-[#111111] dark:text-white">
+                    Konfigurasi JSON
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
+                        notify('Teks JSON dimuat ulang')
+                      }}
+                      className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-2 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                    >
+                      Reload
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (navigator.clipboard) {
+                          navigator.clipboard.writeText(rawJsonText || JSON.stringify(getCurrentFullConfig(), null, 2))
+                          notify('Teks JSON disalin')
+                        }
+                      }}
+                      className="rounded border border-[#EAEAEA] bg-[#F7F6F3] px-2 py-0.5 text-[10px] font-mono text-[#787774] hover:text-[#111111] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888] cursor-pointer"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                </div>
+
+                <textarea
+                  rows={14}
+                  value={rawJsonText}
+                  onChange={(e) => setRawJsonText(e.target.value)}
+                  placeholder="Paste JSON config..."
+                  className="w-full rounded border border-[#EAEAEA] bg-[#FBFBFA] p-2.5 font-mono text-[11px] leading-relaxed text-[#111111] focus:border-neutral-900 focus:outline-hidden dark:border-[#2E2E2E] dark:bg-[#121212] dark:text-[#38ef7d]"
+                  spellCheck={false}
+                />
+
                 <div className="flex flex-col gap-2">
                   <button
                     type="button"
                     onClick={handleApplyRawJson}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 cursor-pointer active:scale-98 transition-transform"
+                    className="w-full rounded-md bg-[#111111] py-2 text-xs font-semibold text-white transition-transform hover:bg-[#262626] active:scale-[0.98] dark:bg-[#EAEAEA] dark:text-[#111111] dark:hover:bg-white cursor-pointer"
                   >
-                    <span>✨ Terapkan Perubahan JSON ke Desain Stiker</span>
+                    Terapkan Perubahan JSON
                   </button>
-
                   <button
                     type="button"
                     onClick={() => {
@@ -2440,13 +2093,12 @@ export default function StikerMakanPage() {
                         setColorMode(DEFAULT_LAYOUT.colorMode)
                         setShowGarisPotong(DEFAULT_LAYOUT.showGarisPotong)
                         setRawJsonText(JSON.stringify({ _meta: { app: 'StikerLabelBGN', version: '2.0', exportedAt: new Date().toISOString() }, cfg: DEFAULT_CONFIG, layout: DEFAULT_LAYOUT }, null, 2))
-                        setExportMsg('🔄 Desain dikembalikan ke standar awal!')
-                        setTimeout(() => setExportMsg(''), 3000)
+                        notify('Desain dikembalikan ke standar awal BGN')
                       }
                     }}
-                    className="text-[11px] text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 text-center py-1 cursor-pointer"
+                    className="text-[11px] text-[#787774] hover:text-rose-600 dark:text-[#888888] dark:hover:text-rose-400 py-1 text-center cursor-pointer"
                   >
-                    Kembalikan ke Setelan Standar Awal
+                    Reset ke Standar Awal BGN
                   </button>
                 </div>
               </div>
@@ -2454,24 +2106,28 @@ export default function StikerMakanPage() {
 
           </div>
 
-          {/* ── PANEL KANAN: PREVIEW INTERAKTIF LEMBAR F4 ── */}
-          <section aria-label="Preview Lembar Kerja F4" className="lg:sticky lg:top-4">
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                👁️ Preview Lembar F4 (210 × 330 mm)
-              </h2>
-              
-              <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                <span>Zoom:</span>
-                {[0.4, 0.45, 0.55].map((z) => (
+          {/* ── RIGHT PANEL: INTERACTIVE LIVE PREVIEW F4 ── */}
+          <section aria-label="Preview Lembar F4" className="lg:sticky lg:top-4 flex flex-col gap-2">
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-[#111111] dark:text-white">
+                  Live Preview F4 (210 × 330 mm)
+                </h2>
+              </div>
+
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-1 text-xs">
+                {[0.38, 0.42, 0.5, 0.6].map((z) => (
                   <button
                     key={z}
                     type="button"
                     onClick={() => setZoomPreview(z)}
-                    className={`rounded px-2 py-0.5 text-xs font-semibold cursor-pointer ${
+                    className={`rounded px-1.5 py-0.5 font-mono text-[10px] border cursor-pointer ${
                       zoomPreview === z
-                        ? 'border border-emerald-600 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
-                        : 'border border-slate-300 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                        ? 'border-[#111111] bg-[#111111] text-white dark:border-white dark:bg-white dark:text-[#111111]'
+                        : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#181818] dark:text-[#888888]'
                     }`}
                   >
                     {Math.round(z * 100)}%
@@ -2480,9 +2136,8 @@ export default function StikerMakanPage() {
               </div>
             </div>
 
-            {/* Container Preview Sheet */}
-            <div className="flex max-h-[85vh] justify-center overflow-auto rounded-2xl bg-slate-200 p-6 shadow-inner dark:bg-slate-900/80">
-              {/* Fisik Kertas F4 */}
+            {/* F4 Paper Sheet Container */}
+            <div className="flex max-h-[82vh] justify-center overflow-auto rounded-lg border border-[#EAEAEA] bg-[#EFEFEF] p-4 dark:border-[#262626] dark:bg-[#161616]">
               <div
                 style={{
                   width: `${paperWidthMm}mm`,
@@ -2490,7 +2145,7 @@ export default function StikerMakanPage() {
                   transform: `scale(${zoomPreview})`,
                   transformOrigin: 'top center',
                   background: '#ffffff',
-                  boxShadow: '0 12px 30px rgba(0,0,0,0.18)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                   boxSizing: 'border-box',
                   position: 'relative',
                   overflow: 'hidden',
@@ -2504,7 +2159,7 @@ export default function StikerMakanPage() {
                   flexDirection: 'row',
                 }}
               >
-                {/* Zona Margin Printer Kiri & Kanan */}
+                {/* Visual Guides: Margins */}
                 <div
                   style={{
                     position: 'absolute',
@@ -2512,8 +2167,8 @@ export default function StikerMakanPage() {
                     bottom: 0,
                     left: 0,
                     width: `${marginKiri}mm`,
-                    background: 'repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.05) 5px, rgba(239, 68, 68, 0.15) 5px, rgba(239, 68, 68, 0.15) 10px)',
-                    borderRight: '1px dashed #ef4444',
+                    background: 'rgba(239, 68, 68, 0.04)',
+                    borderRight: '1px dashed rgba(239, 68, 68, 0.3)',
                     pointerEvents: 'none',
                     zIndex: 2,
                   }}
@@ -2526,15 +2181,13 @@ export default function StikerMakanPage() {
                     bottom: 0,
                     right: 0,
                     width: `${marginKanan}mm`,
-                    background: 'repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.05) 5px, rgba(239, 68, 68, 0.15) 5px, rgba(239, 68, 68, 0.15) 10px)',
-                    borderLeft: '1px dashed #ef4444',
+                    background: 'rgba(239, 68, 68, 0.04)',
+                    borderLeft: '1px dashed rgba(239, 68, 68, 0.3)',
                     pointerEvents: 'none',
                     zIndex: 2,
                   }}
                   title="Margin Kanan Printer"
                 />
-
-                {/* Zona Margin Atas & Bawah */}
                 <div
                   style={{
                     position: 'absolute',
@@ -2542,12 +2195,12 @@ export default function StikerMakanPage() {
                     left: 0,
                     right: 0,
                     height: `${marginAtas}mm`,
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    borderBottom: '1px dashed #3b82f6',
+                    background: 'rgba(59, 130, 246, 0.04)',
+                    borderBottom: '1px dashed rgba(59, 130, 246, 0.3)',
                     pointerEvents: 'none',
                     zIndex: 2,
                   }}
-                  title="Margin Atas (0.5 cm)"
+                  title="Margin Atas"
                 />
                 <div
                   style={{
@@ -2556,29 +2209,31 @@ export default function StikerMakanPage() {
                     left: 0,
                     right: 0,
                     height: `${marginBawah}mm`,
-                    background: 'rgba(59, 130, 246, 0.08)',
-                    borderTop: '1px dashed #3b82f6',
+                    background: 'rgba(59, 130, 246, 0.04)',
+                    borderTop: '1px dashed rgba(59, 130, 246, 0.3)',
                     pointerEvents: 'none',
                     zIndex: 2,
                   }}
-                  title="Margin Bawah (0.5 cm)"
+                  title="Margin Bawah"
                 />
 
-                {/* Stiker Cards & Gap */}
+                {/* Stiker Cards */}
                 {renderSheetContent()}
               </div>
             </div>
 
-            <div className="mt-2.5 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-              <span>Dimensi 1 Stiker: <strong>{(stickerWidthMm / 10).toFixed(1)} cm × {(stickerHeightMm / 10).toFixed(1)} cm</strong></span>
-              <span>Gap Potong: <strong>{(gapAntarStiker / 10).toFixed(1)} cm</strong> (✂️ di tengah)</span>
+            {/* Footer Metrics */}
+            <div className="flex items-center justify-between text-[11px] font-mono text-[#787774] dark:text-[#888888] px-1">
+              <span>1 Stiker: {(stickerWidthMm / 10).toFixed(1)} × {(stickerHeightMm / 10).toFixed(1)} cm</span>
+              <span>Gap: {(gapAntarStiker / 10).toFixed(1)} cm (Garis Potong ✂)</span>
             </div>
+
           </section>
 
         </div>
       </div>
 
-      {/* ─── CETAK NYATA: ELEMEN KHUSUS PRINT BROWSER (@media print) ─── */}
+      {/* ─── PRINT BROWSER ROOT ELEMENT (@media print) ─── */}
       <div
         id="stiker-print-root"
         style={{
@@ -2608,7 +2263,7 @@ export default function StikerMakanPage() {
         </div>
       </div>
 
-      {/* ─── TARGET ELEMEN KHUSUS EXPORT GAMBAR (OFF-SCREEN SCALE 1:1 RESOLUSI PENUH) ─── */}
+      {/* ─── OFF-SCREEN 1:1 HD EXPORT RENDER TARGETS ─── */}
       <div
         style={{
           position: 'fixed',
@@ -2620,7 +2275,7 @@ export default function StikerMakanPage() {
         }}
         aria-hidden="true"
       >
-        {/* 1. Target Export 1 Stiker Tunggal */}
+        {/* Single Sticker Export */}
         <div
           id="export-single-stiker"
           style={{
@@ -2629,7 +2284,7 @@ export default function StikerMakanPage() {
             boxSizing: 'border-box',
             padding: `${paddingStiker}mm`,
             border: cardBorder,
-            borderRadius: borderStyle === 'none' ? '0' : '5px',
+            borderRadius: borderStyle === 'none' ? '0' : '4px',
             background: '#ffffff',
             display: 'flex',
             flexDirection: 'column',
@@ -2638,7 +2293,7 @@ export default function StikerMakanPage() {
           {renderStikerContent()}
         </div>
 
-        {/* 2. Target Export Full Sheet F4 */}
+        {/* Full F4 Sheet Export */}
         <div
           id="export-full-sheet"
           style={{
