@@ -33,8 +33,9 @@ export default function StikerLabel({
     headerBox: 10,
     isiMenu: 8,
     isiGizi: 8,
-    batasAman: 16,
+    batasAman: 11,
     durasiBatas: 16,
+    tanggalBatas: 10,
     subteksBatas: 9,
     larangan: 16,
     badgeTeks: 10,
@@ -48,6 +49,7 @@ export default function StikerLabel({
   const logoSize = cfg?.logoSizeMm || 50
   const activeFontFamily = cfg?.fontFamily || fontFamily || "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
   const giziIconType = cfg?.giziIconType || 'emoji' // 'emoji', 'bullet', 'none'
+  const tableRadius = cfg?.tableRadius !== undefined ? cfg.tableRadius : 3
 
   // Pengaturan Pola Ornamen Dekorasi Label (Bukan di dalam header tabel)
   const showPattern = cfg?.showPattern ?? true
@@ -233,7 +235,7 @@ export default function StikerLabel({
         <div
           style={{
             border: `1.5pt solid ${blackColor}`,
-            borderRadius: '2px',
+            borderRadius: `${tableRadius}px`,
             overflow: 'hidden',
             background: '#ffffff',
             width: '100%',
@@ -307,7 +309,7 @@ export default function StikerLabel({
               style={{
                 flex: 1,
                 border: `1.5pt solid ${blackColor}`,
-                borderRadius: '2px',
+                borderRadius: `${tableRadius}px`,
                 overflow: 'hidden',
                 background: '#ffffff',
               }}
@@ -368,7 +370,7 @@ export default function StikerLabel({
               style={{
                 flex: 1,
                 border: `1.5pt solid ${blackColor}`,
-                borderRadius: '2px',
+                borderRadius: `${tableRadius}px`,
                 overflow: 'hidden',
                 background: '#ffffff',
               }}
@@ -440,12 +442,29 @@ export default function StikerLabel({
                 fontSize: `${fs.batasAman * fontMultiplier}pt`,
                 fontWeight: '900',
                 color: redColor,
-                letterSpacing: '0.03em',
-                lineHeight: 1.15,
+                letterSpacing: '0.02em',
+                lineHeight: 1.2,
                 textTransform: 'uppercase',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                width: '100%',
               }}
             >
-              {cfg.judulBatasAman || 'HARUS DIKONSUMSI SEBELUM PUKUL'}
+              {(cfg.judulBatasAman || 'HARUS DIKONSUMSI\nSEBELUM PUKUL')
+                .split('\n')
+                .map((line, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      display: 'block',
+                      maxWidth: '100%',
+                    }}
+                  >
+                    {line}
+                  </span>
+                ))}
             </div>
             
             {/* Jam Batas Konsumsi + Ikon Jam */}
@@ -480,7 +499,7 @@ export default function StikerLabel({
             {cfg.showTanggalBatas && cfg.tanggalBatas && (
               <div
                 style={{
-                  fontSize: `${(fs.subteksBatas || 9) * fontMultiplier}pt`,
+                  fontSize: `${(fs.tanggalBatas || 10) * fontMultiplier}pt`,
                   fontWeight: '900',
                   color: blackColor,
                   letterSpacing: '0.04em',

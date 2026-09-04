@@ -43,7 +43,7 @@ const DEFAULT_CONFIG = {
   
   // 6. Batas Waktu Konsumsi
   showBatasAman: true,
-  judulBatasAman: 'HARUS DIKONSUMSI SEBELUM PUKUL',
+  judulBatasAman: 'HARUS DIKONSUMSI\nSEBELUM PUKUL',
   durasiBatas: '08:00 WIB',
   showTanggalBatas: true,
   tanggalBatas: '09/09/2026',
@@ -85,6 +85,7 @@ const DEFAULT_CONFIG = {
   // 10. Pengaturan Font & Ukuran Teks (pt)
   fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   giziIconType: 'emoji', // 'emoji', 'bullet', 'none'
+  tableRadius: 3, // Kelengkungan sudut kotak tabel menu & gizi (px)
   logoSizeMm: 50, // 5 cm x 5 cm
   showPattern: true, // Pita Ornamen Dekorasi BGN (PATTERN4)
   patternType: 'color', // 'color' (PATTERN4) atau 'white' (PATTERN4_WHITE)
@@ -99,8 +100,9 @@ const DEFAULT_CONFIG = {
     headerBox: 10,
     isiMenu: 8,
     isiGizi: 8,
-    batasAman: 16,
+    batasAman: 11,
     durasiBatas: 16,
+    tanggalBatas: 10,
     subteksBatas: 9,
     larangan: 16,
     badgeTeks: 10,
@@ -928,6 +930,35 @@ export default function StikerMakanPage() {
                         className="w-full rounded-md border border-slate-300 px-2.5 py-1.5 text-xs leading-relaxed text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                         placeholder="Ketik 1 menu per baris..."
                       />
+
+                      {/* Rounded / Sudut Melengkung Tabel */}
+                      <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                          Sudut Melengkung Tabel (Menu &amp; Gizi):
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {[
+                            { label: 'Siku (0)', val: 0 },
+                            { label: '2px', val: 2 },
+                            { label: '4px', val: 4 },
+                            { label: '6px', val: 6 },
+                            { label: '8px', val: 8 },
+                          ].map((r) => (
+                            <button
+                              key={r.val}
+                              type="button"
+                              onClick={() => setCfg({ ...cfg, tableRadius: r.val })}
+                              className={`px-2 py-0.5 rounded text-[11px] font-semibold border cursor-pointer ${
+                                (cfg.tableRadius ?? 3) === r.val
+                                  ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
+                                  : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300'
+                              }`}
+                            >
+                              {r.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1063,13 +1094,13 @@ export default function StikerMakanPage() {
                       <div className="space-y-2">
                         {/* Judul Teks */}
                         <div>
-                          <label className="block text-[10px] text-slate-500 mb-0.5">Judul Teks Peringatan Waktu:</label>
-                          <input
-                            type="text"
+                          <label className="block text-[10px] text-slate-500 mb-0.5">Judul Teks Peringatan Waktu (per baris):</label>
+                          <textarea
+                            rows={2}
                             value={cfg.judulBatasAman}
                             onChange={(e) => setCfg({ ...cfg, judulBatasAman: e.target.value })}
-                            className="w-full rounded border border-rose-300 bg-rose-50/50 px-2 py-1 text-xs font-bold text-rose-900 dark:bg-rose-950/30 dark:text-rose-200"
-                            placeholder="HARUS DIKONSUMSI SEBELUM PUKUL"
+                            className="w-full rounded border border-rose-300 bg-rose-50/50 px-2 py-1 text-xs font-bold leading-tight text-rose-900 dark:bg-rose-950/30 dark:text-rose-200"
+                            placeholder="HARUS DIKONSUMSI&#10;SEBELUM PUKUL"
                           />
                         </div>
 
@@ -1117,13 +1148,32 @@ export default function StikerMakanPage() {
                             </label>
                           </div>
                           {cfg.showTanggalBatas && (
-                            <input
-                              type="text"
-                              value={cfg.tanggalBatas}
-                              onChange={(e) => setCfg({ ...cfg, tanggalBatas: e.target.value })}
-                              className="w-full rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                              placeholder="misal: 09/09/2026 atau 04 September 2026"
-                            />
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={cfg.tanggalBatas}
+                                onChange={(e) => setCfg({ ...cfg, tanggalBatas: e.target.value })}
+                                className="flex-1 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                placeholder="misal: 09/09/2026 atau 04 September 2026"
+                              />
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-slate-500 whitespace-nowrap">Font (pt):</span>
+                                <input
+                                  type="number"
+                                  step="0.5"
+                                  min="6"
+                                  max="24"
+                                  value={cfg.fontSizes?.tanggalBatas ?? 10}
+                                  onChange={(e) =>
+                                    setCfg({
+                                      ...cfg,
+                                      fontSizes: { ...(cfg.fontSizes || {}), tanggalBatas: Number(e.target.value) },
+                                    })
+                                  }
+                                  className="w-14 rounded border border-slate-300 px-1.5 py-1 text-xs font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                />
+                              </div>
+                            </div>
                           )}
                         </div>
 
@@ -1779,6 +1829,18 @@ export default function StikerMakanPage() {
                         />
                       </div>
                       <div>
+                        <label className="block text-slate-600 dark:text-slate-400">Tanggal Konsumsi (pt)</label>
+                        <input
+                          type="number"
+                          step="0.5"
+                          min="6"
+                          max="24"
+                          value={cfg.fontSizes?.tanggalBatas ?? 10}
+                          onChange={(e) => setCfg({ ...cfg, fontSizes: { ...(cfg.fontSizes || {}), tanggalBatas: Number(e.target.value) } })}
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white font-semibold"
+                        />
+                      </div>
+                      <div>
                         <label className="block text-slate-600 dark:text-slate-400">Subteks Batas Aman (pt)</label>
                         <input
                           type="number"
@@ -1984,6 +2046,45 @@ export default function StikerMakanPage() {
                       <option value="border-black">Garis Hitam Tegas</option>
                       <option value="border-green">Garis Hijau SPPG</option>
                     </select>
+                  </div>
+
+                  <div className="col-span-2 pt-1">
+                    <label className="block text-slate-600 dark:text-slate-400 font-semibold mb-1">
+                      Kelengkungan Sudut Tabel (Menu &amp; Gizi):
+                    </label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        max="20"
+                        value={cfg.tableRadius ?? 3}
+                        onChange={(e) => setCfg({ ...cfg, tableRadius: Number(e.target.value) })}
+                        className="w-16 rounded border border-slate-300 px-2 py-1 text-xs text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                      />
+                      <span className="text-xs text-slate-500">px</span>
+                      <div className="flex flex-wrap items-center gap-1">
+                        {[
+                          { label: 'Siku (0)', val: 0 },
+                          { label: '2px (Halus)', val: 2 },
+                          { label: '4px (Sedang)', val: 4 },
+                          { label: '6px (Bulat)', val: 6 },
+                          { label: '8px (Ekstra)', val: 8 },
+                        ].map((r) => (
+                          <button
+                            key={r.val}
+                            type="button"
+                            onClick={() => setCfg({ ...cfg, tableRadius: r.val })}
+                            className={`px-2 py-0.5 rounded text-[11px] font-semibold border cursor-pointer ${
+                              (cfg.tableRadius ?? 3) === r.val
+                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
+                                : 'border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            {r.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
