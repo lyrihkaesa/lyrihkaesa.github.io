@@ -28,7 +28,7 @@ export default function StikerLabel({
   const fs = {
     judul: 18,
     namaDapur: 12,
-    namaMitra: 8,
+    namaMitra: 10,
     judulGizi: 12,
     headerBox: 10,
     isiMenu: 8,
@@ -38,7 +38,7 @@ export default function StikerLabel({
     subteksBatas: 9,
     larangan: 16,
     badgeTeks: 10,
-    badgeSubteks: 8,
+    badgeSubteks: 10,
     badgeIconSizeMm: 12,
     sosmed: 8,
     edukasi: 7,
