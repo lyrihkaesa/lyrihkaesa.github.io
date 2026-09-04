@@ -47,6 +47,7 @@ const DEFAULT_CONFIG = {
   durasiBatas: '08:00 WIB',
   showTanggalBatas: true,
   tanggalBatas: '09/09/2026',
+  showSubteksBatas: false,
   subteksBatas: 'Setelah makanan diterima untuk menjaga kualitas dan keamanan makanan',
   
   // 7. Badge Petunjuk Konsumsi & Larangan Bawa Pulang
@@ -91,7 +92,7 @@ const DEFAULT_CONFIG = {
   patternHeightMm: 6, // Tinggi pita dekorasi (mm)
   patternOpacity: 0.85,
   fontSizes: {
-    judul: 18,
+    judul: 26,
     namaDapur: 12,
     namaMitra: 8,
     judulGizi: 12,
@@ -108,6 +109,21 @@ const DEFAULT_CONFIG = {
     sosmed: 8,
     edukasi: 7,
   },
+}
+
+const DEFAULT_LAYOUT = {
+  kolom: 3,
+  marginAtas: 5,
+  marginBawah: 5,
+  marginKiri: 5,
+  marginKanan: 5,
+  gapAntarStiker: 10,
+  paddingStiker: 0,
+  borderStyle: 'none',
+  susunanGizi: 'stacked',
+  scaleFont: 'normal',
+  colorMode: 'color',
+  showGarisPotong: true,
 }
 
 const FONT_OPTIONS = [
@@ -142,27 +158,29 @@ export default function StikerMakanPage() {
   const [cfg, setCfg] = useState(DEFAULT_CONFIG)
   
   // Layout & Margin Kertas F4 (210 x 330 mm)
-  const [kolom, setKolom] = useState(2) // 2 atau 3 kolom
-  const [marginAtas, setMarginAtas] = useState(5) // 0.5 cm
-  const [marginBawah, setMarginBawah] = useState(5) // 0.5 cm
-  const [marginKiri, setMarginKiri] = useState(10) // 1.0 cm limit printer
-  const [marginKanan, setMarginKanan] = useState(10) // 1.0 cm limit printer
-  const [gapAntarStiker, setGapAntarStiker] = useState(10) // 1.0 cm gap
-  const [paddingStiker, setPaddingStiker] = useState(3.5) // padding dalam stiker (mm)
+  const [kolom, setKolom] = useState(DEFAULT_LAYOUT.kolom) // 2 atau 3 kolom
+  const [marginAtas, setMarginAtas] = useState(DEFAULT_LAYOUT.marginAtas) // 0.5 cm
+  const [marginBawah, setMarginBawah] = useState(DEFAULT_LAYOUT.marginBawah) // 0.5 cm
+  const [marginKiri, setMarginKiri] = useState(DEFAULT_LAYOUT.marginKiri) // 0.5 cm
+  const [marginKanan, setMarginKanan] = useState(DEFAULT_LAYOUT.marginKanan) // 0.5 cm
+  const [gapAntarStiker, setGapAntarStiker] = useState(DEFAULT_LAYOUT.gapAntarStiker) // 1.0 cm gap
+  const [paddingStiker, setPaddingStiker] = useState(DEFAULT_LAYOUT.paddingStiker) // padding dalam stiker (mm)
   
   // Opsi Tampilan
-  const [borderStyle, setBorderStyle] = useState('none') // 'none', 'border-subtle', 'border-green'
-  const [susunanGizi, setSusunanGizi] = useState('stacked') // 'stacked' atau 'sideBySide'
-  const [scaleFont, setScaleFont] = useState('normal') // 'compact', 'normal', 'spacious'
-  const [colorMode, setColorMode] = useState('color')
-  const [showGarisPotong, setShowGarisPotong] = useState(true)
+  const [borderStyle, setBorderStyle] = useState(DEFAULT_LAYOUT.borderStyle) // 'none', 'border-subtle', 'border-green'
+  const [susunanGizi, setSusunanGizi] = useState(DEFAULT_LAYOUT.susunanGizi) // 'stacked' atau 'sideBySide'
+  const [scaleFont, setScaleFont] = useState(DEFAULT_LAYOUT.scaleFont) // 'compact', 'normal', 'spacious'
+  const [colorMode, setColorMode] = useState(DEFAULT_LAYOUT.colorMode)
+  const [showGarisPotong, setShowGarisPotong] = useState(DEFAULT_LAYOUT.showGarisPotong)
   const [zoomPreview, setZoomPreview] = useState(0.45)
   
   // Status Export
   const [isExporting, setIsExporting] = useState(false)
   const [exportMsg, setExportMsg] = useState('')
-  const [activeTab, setActiveTab] = useState('konten') // 'konten', 'layout', 'word-guide'
+  const [activeTab, setActiveTab] = useState('konten') // 'konten', 'font', 'layout', 'word-guide', 'json-backup'
   const fileInputRef = useRef(null)
+  const jsonInputRef = useRef(null)
+  const [rawJsonText, setRawJsonText] = useState('')
 
   // Ukuran Fisik F4 (mm)
   const paperWidthMm = 210
@@ -190,6 +208,30 @@ export default function StikerMakanPage() {
   if (scaleFont === 'compact') fontMultiplier = 0.88
   if (scaleFont === 'spacious') fontMultiplier = 1.08
 
+  // Helper Full Config Object
+  const getCurrentFullConfig = () => ({
+    _meta: {
+      app: 'StikerLabelBGN',
+      version: '2.0',
+      exportedAt: new Date().toISOString(),
+    },
+    cfg,
+    layout: {
+      kolom,
+      marginAtas,
+      marginBawah,
+      marginKiri,
+      marginKanan,
+      gapAntarStiker,
+      paddingStiker,
+      borderStyle,
+      susunanGizi,
+      scaleFont,
+      colorMode,
+      showGarisPotong,
+    },
+  })
+
   // Handle Logo Upload
   const handleUploadLogo = (e) => {
     const file = e.target.files?.[0]
@@ -202,19 +244,98 @@ export default function StikerMakanPage() {
     }
   }
 
-  // ─── Export Handlers ────────────────────────────────────────────────────────
+  // ─── Export / Import Config JSON ──────────────────────────────────────────
+  const handleDownloadConfigJson = () => {
+    try {
+      const fullConfig = getCurrentFullConfig()
+      const jsonStr = JSON.stringify(fullConfig, null, 2)
+      const blob = new Blob([jsonStr], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      const safeName = (cfg.namaDapur || 'BGN').replace(/[^a-zA-Z0-9]/g, '_')
+      link.download = `stiker_config_${safeName}.json`
+      link.href = url
+      link.click()
+      URL.revokeObjectURL(url)
+
+      setExportMsg('💾 File config JSON berhasil diunduh! Anda bisa mengeditnya dan membagikannya ke saya.')
+      setTimeout(() => setExportMsg(''), 4500)
+    } catch (err) {
+      console.error(err)
+      setExportMsg('❌ Gagal unduh JSON: ' + err.message)
+    }
+  }
+
+  const handleApplyConfigObject = (parsed) => {
+    if (parsed.cfg) {
+      setCfg((prev) => ({ ...prev, ...parsed.cfg }))
+      if (parsed.layout) {
+        if (parsed.layout.kolom !== undefined) setKolom(parsed.layout.kolom)
+        if (parsed.layout.marginAtas !== undefined) setMarginAtas(parsed.layout.marginAtas)
+        if (parsed.layout.marginBawah !== undefined) setMarginBawah(parsed.layout.marginBawah)
+        if (parsed.layout.marginKiri !== undefined) setMarginKiri(parsed.layout.marginKiri)
+        if (parsed.layout.marginKanan !== undefined) setMarginKanan(parsed.layout.marginKanan)
+        if (parsed.layout.gapAntarStiker !== undefined) setGapAntarStiker(parsed.layout.gapAntarStiker)
+        if (parsed.layout.paddingStiker !== undefined) setPaddingStiker(parsed.layout.paddingStiker)
+        if (parsed.layout.borderStyle !== undefined) setBorderStyle(parsed.layout.borderStyle)
+        if (parsed.layout.susunanGizi !== undefined) setSusunanGizi(parsed.layout.susunanGizi)
+        if (parsed.layout.scaleFont !== undefined) setScaleFont(parsed.layout.scaleFont)
+        if (parsed.layout.colorMode !== undefined) setColorMode(parsed.layout.colorMode)
+        if (parsed.layout.showGarisPotong !== undefined) setShowGarisPotong(parsed.layout.showGarisPotong)
+      }
+    } else {
+      // Direct config format
+      setCfg((prev) => ({ ...prev, ...parsed }))
+    }
+  }
+
+  const handleImportConfigJson = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result)
+        handleApplyConfigObject(parsed)
+        setRawJsonText(JSON.stringify(parsed, null, 2))
+        setExportMsg('✅ Config JSON berhasil dimuat & diterapkan ke stiker!')
+        setTimeout(() => setExportMsg(''), 4500)
+      } catch (err) {
+        console.error(err)
+        setExportMsg('❌ Format file JSON tidak valid: ' + err.message)
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
+  const handleApplyRawJson = () => {
+    try {
+      if (!rawJsonText.trim()) throw new Error('Teks JSON tidak boleh kosong')
+      const parsed = JSON.parse(rawJsonText)
+      handleApplyConfigObject(parsed)
+      setExportMsg('✅ Teks JSON berhasil diterapkan ke seluruh stiker!')
+      setTimeout(() => setExportMsg(''), 4500)
+    } catch (err) {
+      setExportMsg('❌ Gagal menerapkan JSON: ' + err.message)
+    }
+  }
+
+  // ─── Export Handlers (Ultra-High Resolution ~400 DPI) ────────────────────────
   const handleDownloadSinglePng = async () => {
     try {
       setIsExporting(true)
-      setExportMsg('⏳ Merender 1 stiker resolusi tinggi (~350 DPI)...')
+      setExportMsg('⏳ Merender 1 stiker resolusi sangat tinggi (400 DPI)...')
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-single-stiker')
       if (!el) throw new Error('Elemen export tidak ditemukan')
 
       const dataUrl = await htmlToImage.toPng(el, {
         quality: 1.0,
-        pixelRatio: 3.5,
+        pixelRatio: 4.0,
         backgroundColor: '#ffffff',
+        cacheBust: true,
       })
 
       const link = document.createElement('a')
@@ -222,7 +343,7 @@ export default function StikerMakanPage() {
       link.href = dataUrl
       link.click()
 
-      setExportMsg('✅ 1 Stiker PNG berhasil diunduh! Siap dimasukkan ke Microsoft Word.')
+      setExportMsg('✅ 1 Stiker PNG resolusi tinggi siap dicetak / dimasukkan ke Ms Word!')
       setTimeout(() => setExportMsg(''), 4500)
     } catch (err) {
       console.error(err)
@@ -235,20 +356,21 @@ export default function StikerMakanPage() {
   const handleCopySinglePng = async () => {
     try {
       setIsExporting(true)
-      setExportMsg('⏳ Menyalin gambar stiker ke clipboard...')
+      setExportMsg('⏳ Menyalin gambar stiker resolusi tinggi ke clipboard...')
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-single-stiker')
       if (!el) throw new Error('Elemen export tidak ditemukan')
 
       const blob = await htmlToImage.toBlob(el, {
         quality: 1.0,
-        pixelRatio: 3.0,
+        pixelRatio: 3.5,
         backgroundColor: '#ffffff',
+        cacheBust: true,
       })
 
       if (navigator.clipboard && window.ClipboardItem) {
         await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-        setExportMsg('📋 Gambar stiker berhasil disalin! Buka Microsoft Word dan tekan CTRL + V.')
+        setExportMsg('📋 Gambar stiker HD berhasil disalin! Langsung buka Word dan tekan CTRL + V.')
       } else {
         throw new Error('Clipboard API tidak didukung di browser ini.')
       }
@@ -264,15 +386,16 @@ export default function StikerMakanPage() {
   const handleDownloadFullSheetPng = async () => {
     try {
       setIsExporting(true)
-      setExportMsg('⏳ Merender lembar F4 utuh resolusi tinggi...')
+      setExportMsg('⏳ Merender lembar F4 utuh resolusi tinggi (400 DPI)...')
       const htmlToImage = await loadHtmlToImage()
       const el = document.getElementById('export-full-sheet')
       if (!el) throw new Error('Elemen lembar F4 tidak ditemukan')
 
       const dataUrl = await htmlToImage.toPng(el, {
         quality: 1.0,
-        pixelRatio: 3.0,
+        pixelRatio: 3.5,
         backgroundColor: '#ffffff',
+        cacheBust: true,
       })
 
       const link = document.createElement('a')
@@ -280,7 +403,7 @@ export default function StikerMakanPage() {
       link.href = dataUrl
       link.click()
 
-      setExportMsg('✅ Lembar F4 utuh berhasil diunduh!')
+      setExportMsg('✅ Lembar F4 utuh resolusi tinggi berhasil diunduh!')
       setTimeout(() => setExportMsg(''), 4500)
     } catch (err) {
       console.error(err)
@@ -320,6 +443,8 @@ export default function StikerMakanPage() {
         background: '#ffffff',
         overflow: 'hidden',
         flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {renderStikerContent()}
@@ -407,42 +532,79 @@ export default function StikerMakanPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100">
-      {/* ─── PRINT CSS STYLES ─── */}
+      {/* ─── PRINT CSS STYLES (STANDAR MODERN CETAK PRESISI F4) ─── */}
       <style>{`
         @page {
           size: 210mm 330mm portrait;
-          margin: 0;
+          margin: 0mm !important;
+        }
+        @page :first {
+          margin: 0mm !important;
+        }
+        @page :left {
+          margin: 0mm !important;
+        }
+        @page :right {
+          margin: 0mm !important;
+        }
+        @media screen {
+          #stiker-print-root {
+            display: none !important;
+          }
         }
         @media print {
-          * {
+          *, *::before, *::after {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
+            box-sizing: border-box !important;
           }
           html, body {
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
             width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
             height: 330mm !important;
+            min-height: 330mm !important;
+            max-height: 330mm !important;
+            overflow: hidden !important;
           }
-          nav, footer, header, .navbar, .footer, .no-print, [class*="navbar"], [class*="footer"], .no-print-area {
+          /* Sembunyikan elemen antarmuka website */
+          .no-print-area, nav, footer, header, .navbar, .footer, .no-print,
+          [class*="navbar"], [class*="footer"], .docusaurus-highlight-code-line, .theme-layout-navbar {
             display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
+          /* Tampilkan khusus kontainer cetak lembar F4 */
           #stiker-print-root {
             display: block !important;
+            visibility: visible !important;
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
             width: 210mm !important;
             height: 330mm !important;
             margin: 0 !important;
-            padding: 0 !important;
             background: #ffffff !important;
             box-shadow: none !important;
             overflow: hidden !important;
             break-inside: avoid !important;
             page-break-inside: avoid !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+            z-index: 9999999 !important;
+          }
+          #stiker-print-root * {
+            visibility: visible !important;
+          }
+          img, svg {
+            image-rendering: -webkit-optimize-contrast !important;
+            image-rendering: crisp-edges !important;
           }
         }
       `}</style>
@@ -464,6 +626,32 @@ export default function StikerMakanPage() {
 
             {/* Action Buttons Toolbar */}
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDownloadConfigJson}
+                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl bg-amber-600 px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 active:scale-[0.98] transition-transform"
+                title="Download seluruh konfigurasi stiker dalam format file .json untuk diedit / disimpan"
+              >
+                <span>💾 Unduh JSON</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => jsonInputRef.current?.click()}
+                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-xs font-bold text-amber-800 shadow-xs hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 active:scale-[0.98] transition-transform"
+                title="Buka file .json konfigurasi yang sudah diedit"
+              >
+                <span>📂 Impor JSON</span>
+              </button>
+
+              <input
+                type="file"
+                ref={jsonInputRef}
+                accept=".json,application/json"
+                onChange={handleImportConfigJson}
+                style={{ display: 'none' }}
+              />
+
               <button
                 type="button"
                 onClick={handleDownloadSinglePng}
@@ -555,6 +743,20 @@ export default function StikerMakanPage() {
             }`}
           >
             💡 Cara Pakai di Ms Word
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('json-backup')
+              setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
+            }}
+            className={`border-b-2 px-3.5 py-2 text-xs font-bold transition-colors cursor-pointer ${
+              activeTab === 'json-backup'
+                ? 'border-amber-600 text-amber-700 dark:border-amber-400 dark:text-amber-400'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
+            }`}
+          >
+            💾 Backup / Edit JSON
           </button>
         </div>
 
@@ -925,16 +1127,31 @@ export default function StikerMakanPage() {
                           )}
                         </div>
 
-                        {/* Subteks Keterangan */}
-                        <div>
-                          <label className="block text-[10px] text-slate-500 mb-0.5">Subteks / Catatan Tambahan:</label>
-                          <input
-                            type="text"
-                            value={cfg.subteksBatas}
-                            onChange={(e) => setCfg({ ...cfg, subteksBatas: e.target.value })}
-                            className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-                            placeholder="Setelah makanan diterima untuk menjaga kualitas..."
-                          />
+                        {/* Subteks / Catatan Tambahan */}
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <label className="font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
+                              📝 Subteks / Catatan Tambahan
+                            </label>
+                            <label className="flex items-center gap-1 text-[11px] text-slate-500">
+                              <input
+                                type="checkbox"
+                                checked={cfg.showSubteksBatas ?? true}
+                                onChange={(e) => setCfg({ ...cfg, showSubteksBatas: e.target.checked })}
+                                className="rounded accent-emerald-600"
+                              />
+                              <span>Tampilkan</span>
+                            </label>
+                          </div>
+                          {(cfg.showSubteksBatas ?? true) && (
+                            <input
+                              type="text"
+                              value={cfg.subteksBatas}
+                              onChange={(e) => setCfg({ ...cfg, subteksBatas: e.target.value })}
+                              className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                              placeholder="Setelah makanan diterima untuk menjaga kualitas..."
+                            />
+                          )}
                         </div>
                       </div>
                     )}
@@ -1828,6 +2045,123 @@ export default function StikerMakanPage() {
                     <br />• Lebar: <strong>{(stickerWidthMm / 10).toFixed(1)} cm</strong><br />
                     3. Copy paste stiker tersebut menjadi 2 atau 3 stiker berjajar ke samping dengan jarak 1 cm!
                   </p>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: BACKUP / EDIT JSON */}
+            {activeTab === 'json-backup' && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/40 p-4 shadow-xs dark:border-amber-900/50 dark:bg-amber-950/20 text-xs space-y-4">
+                <div>
+                  <div className="font-bold text-amber-900 dark:text-amber-200 text-sm">
+                    💾 Unduh, Edit, &amp; Impor Konfigurasi JSON
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-400 mt-1">
+                    Anda dapat mengunduh seluruh isi dan ukuran stiker ke file <code>.json</code>, mengeditnya sendiri atau meminta asisten AI memodifikasinya, lalu mengunggah / menempelkannya kembali ke sini.
+                  </p>
+                </div>
+
+                {/* Tombol Aksi Cepat JSON */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadConfigJson}
+                    className="flex items-center justify-center gap-1.5 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 cursor-pointer active:scale-98 transition-transform"
+                  >
+                    <span>📥 Unduh File .JSON</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => jsonInputRef.current?.click()}
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-400 bg-white px-3 py-2 text-xs font-bold text-amber-900 shadow-xs hover:bg-amber-50 dark:bg-slate-900 dark:text-amber-300 dark:border-amber-700 cursor-pointer active:scale-98 transition-transform"
+                  >
+                    <span>📤 Unggah File .JSON</span>
+                  </button>
+                </div>
+
+                {/* Editor Textarea JSON */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-slate-700 dark:text-slate-300">
+                      Editor Teks JSON Langsung:
+                    </label>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRawJsonText(JSON.stringify(getCurrentFullConfig(), null, 2))
+                          setExportMsg('🔄 Teks JSON diperbarui dari desain saat ini.')
+                          setTimeout(() => setExportMsg(''), 3000)
+                        }}
+                        className="rounded px-2 py-0.5 text-[10px] font-semibold text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer"
+                        title="Tarik kembali settingan stiker saat ini ke kotak JSON"
+                      >
+                        🔄 Muat Ulang
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard.writeText(rawJsonText || JSON.stringify(getCurrentFullConfig(), null, 2))
+                            setExportMsg('📋 Teks JSON berhasil disalin ke clipboard!')
+                            setTimeout(() => setExportMsg(''), 3000)
+                          }
+                        }}
+                        className="rounded px-2 py-0.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/40 cursor-pointer"
+                        title="Salin teks JSON ini"
+                      >
+                        📋 Salin Teks
+                      </button>
+                    </div>
+                  </div>
+
+                  <textarea
+                    rows={14}
+                    value={rawJsonText}
+                    onChange={(e) => setRawJsonText(e.target.value)}
+                    placeholder="Paste atau edit konfigurasi JSON di sini..."
+                    className="w-full rounded-xl border border-slate-300 bg-white p-2.5 font-mono text-[11px] leading-relaxed text-slate-900 shadow-inner focus:border-amber-500 focus:outline-hidden dark:border-slate-700 dark:bg-slate-950 dark:text-emerald-400"
+                    spellCheck={false}
+                  />
+                </div>
+
+                {/* Tombol Terapkan JSON */}
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={handleApplyRawJson}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 cursor-pointer active:scale-98 transition-transform"
+                  >
+                    <span>✨ Terapkan Perubahan JSON ke Desain Stiker</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Kembalikan seluruh isi dan ukuran ke setelan bawaan standar BGN?')) {
+                        setCfg(DEFAULT_CONFIG)
+                        setKolom(DEFAULT_LAYOUT.kolom)
+                        setMarginAtas(DEFAULT_LAYOUT.marginAtas)
+                        setMarginBawah(DEFAULT_LAYOUT.marginBawah)
+                        setMarginKiri(DEFAULT_LAYOUT.marginKiri)
+                        setMarginKanan(DEFAULT_LAYOUT.marginKanan)
+                        setGapAntarStiker(DEFAULT_LAYOUT.gapAntarStiker)
+                        setPaddingStiker(DEFAULT_LAYOUT.paddingStiker)
+                        setBorderStyle(DEFAULT_LAYOUT.borderStyle)
+                        setSusunanGizi(DEFAULT_LAYOUT.susunanGizi)
+                        setScaleFont(DEFAULT_LAYOUT.scaleFont)
+                        setColorMode(DEFAULT_LAYOUT.colorMode)
+                        setShowGarisPotong(DEFAULT_LAYOUT.showGarisPotong)
+                        setRawJsonText(JSON.stringify({ _meta: { app: 'StikerLabelBGN', version: '2.0', exportedAt: new Date().toISOString() }, cfg: DEFAULT_CONFIG, layout: DEFAULT_LAYOUT }, null, 2))
+                        setExportMsg('🔄 Desain dikembalikan ke standar awal!')
+                        setTimeout(() => setExportMsg(''), 3000)
+                      }
+                    }}
+                    className="text-[11px] text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 text-center py-1 cursor-pointer"
+                  >
+                    Kembalikan ke Setelan Standar Awal
+                  </button>
                 </div>
               </div>
             )}

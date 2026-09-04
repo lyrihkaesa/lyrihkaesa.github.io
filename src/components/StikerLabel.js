@@ -124,14 +124,14 @@ export default function StikerLabel({
       {/* ═══════════════════════════════════════════════════════════════════════
           1. KOP ATAS: JUDUL, LOGO, SPPG, MITRA
       ═══════════════════════════════════════════════════════════════════════ */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', position: 'relative' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', position: 'relative', paddingTop: '4pt' }}>
         
         {/* Judul Atas (Melengkung Arched / Teks Biasa) */}
         {cfg.showJudul && cfg.judul && (
           cfg.judulArch ? (
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBottom: '-4px' }}>
-              <svg viewBox="0 0 280 48" style={{ width: '96%', overflow: 'visible' }}>
-                <path id="curve-path" d="M 14 44 A 140 75 0 0 1 266 44" fill="transparent" />
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', paddingTop: '2pt', marginBottom: (cfg.showLogo && cfg.logoUrl) ? '-8pt' : '0pt' }}>
+              <svg viewBox="0 0 280 54" style={{ width: '96%', overflow: 'visible', display: 'block' }}>
+                <path id="curve-path" d="M 10 46 A 135 38 0 0 1 270 46" fill="transparent" />
                 <text
                   fill={blackColor}
                   fontSize={`${fs.judul * fontMultiplier}`}
@@ -154,9 +154,10 @@ export default function StikerLabel({
                 fontSize: `${fs.judul * fontMultiplier}pt`,
                 letterSpacing: '0.04em',
                 textTransform: 'uppercase',
-                padding: '2pt 2pt',
+                padding: '2pt 2pt 1pt 2pt',
                 lineHeight: 1.15,
                 color: blackColor,
+                width: '100%',
               }}
             >
               {cfg.judul}
@@ -166,7 +167,7 @@ export default function StikerLabel({
 
         {/* Logo Badan Gizi Nasional */}
         {cfg.showLogo && cfg.logoUrl && (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '2pt 0' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '0' }}>
             <img
               src={cfg.logoUrl}
               alt="Logo BGN"
@@ -491,8 +492,8 @@ export default function StikerLabel({
               </div>
             )}
 
-            {/* Subteks Batas Aman */}
-            {cfg.subteksBatas && (
+            {/* Subteks Batas Aman / Catatan Tambahan */}
+            {(cfg.showSubteksBatas ?? true) && cfg.subteksBatas && (
               <div
                 style={{
                   fontSize: `${fs.subteksBatas * fontMultiplier}pt`,
@@ -500,7 +501,7 @@ export default function StikerLabel({
                   color: blackColor,
                   lineHeight: 1.25,
                   maxWidth: '96%',
-                  margin: '0 auto',
+                  margin: '1.5pt auto 0 auto',
                 }}
               >
                 {cfg.subteksBatas}
