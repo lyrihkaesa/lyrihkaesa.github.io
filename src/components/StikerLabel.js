@@ -161,7 +161,7 @@ export default function StikerLabel({
         {cfg.showJudul && cfg.judul && (
           cfg.judulArch ? (
             (() => {
-              const h = Math.max(5, Math.min(60, Number(cfg.archCurvature ?? 25)))
+              const h = Math.max(5, Math.min(75, Number(cfg.archCurvature ?? 55)))
               const userOffset = Number(cfg.logoOffsetPt ?? 0)
               const spanHalfWidth = 120 // Setengah bentang (X=20 ke X=260)
               const R = Number(((spanHalfWidth * spanHalfWidth + h * h) / (2 * h)).toFixed(2)) // Jari-jari lingkaran sejati

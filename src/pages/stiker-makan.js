@@ -7,8 +7,8 @@ const DEFAULT_CONFIG = {
   showJudul: true,
   judul: 'LABEL MAKANAN',
   judulArch: true, // Teks melengkung di atas logo
-  archCurvature: 25, // Derajat kelengkungan busur lingkaran sejati (6 - 55)
-  logoOffsetPt: 0, // Offset jarak vertikal logo ke judul (pt)
+  archCurvature: 55, // Derajat kelengkungan busur lingkaran sejati (6 - 75)
+  logoOffsetPt: 14, // Offset jarak vertikal logo ke judul (pt)
   
   // 2. Logo BGN
   showLogo: true,
@@ -115,15 +115,16 @@ const DEFAULT_CONFIG = {
   // 10. Pengaturan Font & Ukuran Teks (pt)
   fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   giziIconType: 'emoji', // 'emoji', 'bullet', 'none'
-  tableRadius: 3, // Kelengkungan sudut kotak tabel menu & gizi (px)
+  tableRadius: 4, // Kelengkungan sudut kotak tabel menu & gizi (px)
   logoSizeMm: 50, // 5 cm x 5 cm
   showPattern: true, // Pita Ornamen Dekorasi BGN (PATTERN4)
   patternType: 'color', // 'color' (PATTERN4) atau 'white' (PATTERN4_WHITE)
+  patternUrl: '/img/pattern4.png',
   patternPos: 'both', // 'both', 'top', 'bottom', 'none'
-  patternHeightMm: 6, // Tinggi pita dekorasi (mm)
-  patternOpacity: 0.85,
+  patternHeightMm: 7.5, // Tinggi pita dekorasi (mm)
+  patternOpacity: 1,
   fontSizes: {
-    judul: 26,
+    judul: 29.5,
     namaDapur: 12,
     namaMitra: 10,
     judulGizi: 11,
@@ -856,32 +857,32 @@ export default function StikerMakanPage() {
                             <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
                               <span className="font-semibold">Tingkat Kelengkungan Busur:</span>
                               <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                                {cfg.archCurvature ?? 25}
+                                {cfg.archCurvature ?? 55}
                               </span>
                             </div>
                             <input
                               type="range"
                               min="6"
-                              max="55"
+                              max="75"
                               step="1"
-                              value={cfg.archCurvature ?? 25}
+                              value={cfg.archCurvature ?? 55}
                               onChange={(e) => setCfg({ ...cfg, archCurvature: Number(e.target.value) })}
                               className="w-full accent-emerald-600 cursor-pointer"
                             />
                             <div className="flex flex-wrap gap-1 text-xs">
                               {[
-                                { label: 'Landai (12)', val: 12 },
-                                { label: 'Halus (18)', val: 18 },
-                                { label: 'Standar (25)', val: 25 },
-                                { label: 'Melengkung (35)', val: 35 },
-                                { label: 'Tinggi (45)', val: 45 },
+                                { label: 'Landai (18)', val: 18 },
+                                { label: 'Sedang (35)', val: 35 },
+                                { label: 'Standar (55)', val: 55 },
+                                { label: 'Tinggi (65)', val: 65 },
+                                { label: 'Ekstrem (75)', val: 75 },
                               ].map((p) => (
                                 <button
                                   key={p.val}
                                   type="button"
                                   onClick={() => setCfg({ ...cfg, archCurvature: p.val })}
                                   className={`px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer ${
-                                    (cfg.archCurvature ?? 25) === p.val
+                                    (cfg.archCurvature ?? 55) === p.val
                                       ? 'border-emerald-600 bg-emerald-600 text-white font-bold'
                                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
                                   }`}
