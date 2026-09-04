@@ -34,8 +34,9 @@ export default function StikerLabel({
     .filter(Boolean)
 
   const isBW = colorMode === 'bw'
+  const primaryColor = isBW ? '#000000' : (cfg?.primaryColor || '#071e48')
   const redColor = isBW ? '#000000' : '#dc2626'
-  const blackColor = '#000000'
+  const blackColor = primaryColor
 
   // Pengaturan Ukuran Font Dinamis
   const fs = {

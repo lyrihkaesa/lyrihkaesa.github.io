@@ -176,6 +176,7 @@ const DEFAULT_CONFIG = {
 
   // 9. Tipografi & Ornamen
   fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  primaryColor: '#071e48',
   giziIconType: 'emoji',
   tableRadius: 4,
   logoSizeMm: 50,
@@ -220,7 +221,7 @@ const DEFAULT_LAYOUT = {
   scaleFont: 'normal',
   colorMode: 'color',
   showGarisPotong: true,
-  showIkonGunting: true
+  showIkonGunting: false
 }
 
 const FONT_OPTIONS = [
@@ -306,7 +307,7 @@ export default function StikerMakanPage() {
 
   let cardBorder = 'none'
   if (borderStyle === 'border-subtle') cardBorder = '1px solid #e2e8f0'
-  if (borderStyle === 'border-black') cardBorder = '1.2px solid #111111'
+  if (borderStyle === 'border-black') cardBorder = `1.2px solid ${cfg.primaryColor || '#071e48'}`
   if (borderStyle === 'border-green') cardBorder = '1.2px solid #15803d'
 
   let fontMultiplier = 1
@@ -1903,6 +1904,112 @@ export default function StikerMakanPage() {
                   </div>
                 </section>
 
+                {/* Warna Utama Stiker (Color Picker & Hex) */}
+                <section className='space-y-3 rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]'>
+                  <div className='flex items-center justify-between border-b border-[#EAEAEA] pb-2 dark:border-[#262626]'>
+                    <div>
+                      <h2 className='text-xs font-bold tracking-wider text-[#111111] uppercase dark:text-[#EAEAEA]'>
+                        Warna Utama Stiker (Primary Color)
+                      </h2>
+                      <p className='text-[10px] text-[#787774] dark:text-[#888888]'>
+                        Warna teks judul, SPPG, border &amp; header tabel, jam, dan sosmed.
+                      </p>
+                    </div>
+                    <button
+                      type='button'
+                      onClick={() => setCfg({ ...cfg, primaryColor: '#071e48' })}
+                      className='cursor-pointer font-mono text-[10px] text-[#787774] underline hover:text-[#111111] dark:text-[#888888] dark:hover:text-white'
+                    >
+                      Reset Default (#071e48)
+                    </button>
+                  </div>
+
+                  <div className='flex flex-wrap items-center gap-3'>
+                    {/* Native Color Picker Swatch */}
+                    <div className='flex items-center gap-2'>
+                      <label className='relative flex h-9 w-12 cursor-pointer items-center justify-center overflow-hidden rounded border border-[#EAEAEA] shadow-xs dark:border-[#2E2E2E]'>
+                        <input
+                          type='color'
+                          value={
+                            cfg.primaryColor && /^#[0-9A-Fa-f]{6}$/.test(cfg.primaryColor)
+                              ? cfg.primaryColor
+                              : '#071e48'
+                          }
+                          onChange={(e) => setCfg({ ...cfg, primaryColor: e.target.value })}
+                          className='absolute -inset-2 h-14 w-16 cursor-pointer border-0 p-0'
+                        />
+                      </label>
+                    </div>
+
+                    {/* Hex Input Box */}
+                    <div className='flex min-w-[130px] flex-1 items-center rounded border border-[#EAEAEA] bg-[#FBFBFA] px-2.5 py-1.5 font-mono text-xs dark:border-[#2E2E2E] dark:bg-[#121212]'>
+                      <span className='font-bold text-[#787774] select-none dark:text-[#888888]'>
+                        HEX:
+                      </span>
+                      <input
+                        type='text'
+                        value={cfg.primaryColor || '#071e48'}
+                        onChange={(e) => {
+                          let val = e.target.value.trim()
+                          if (val && !val.startsWith('#')) {
+                            val = '#' + val
+                          }
+                          setCfg({ ...cfg, primaryColor: val })
+                        }}
+                        placeholder='#071e48'
+                        maxLength={7}
+                        className='ml-1.5 w-full bg-transparent font-bold text-[#111111] uppercase focus:outline-hidden dark:text-white'
+                      />
+                    </div>
+
+                    {/* Preview Badge Swatch */}
+                    <div
+                      style={{ backgroundColor: cfg.primaryColor || '#071e48' }}
+                      className='flex h-9 items-center justify-center rounded px-3 text-xs font-bold text-white shadow-xs'
+                    >
+                      <span>CONTOH TEKS</span>
+                    </div>
+                  </div>
+
+                  {/* Preset Colors */}
+                  <div>
+                    <label className='mb-1.5 block text-[10px] font-semibold text-[#787774] dark:text-[#888888]'>
+                      Preset Warna Cepat:
+                    </label>
+                    <div className='grid grid-cols-3 gap-1.5 sm:grid-cols-6'>
+                      {[
+                        { label: 'BGN Navy (Default)', hex: '#071e48' },
+                        { label: 'Hitam Pekat', hex: '#000000' },
+                        { label: 'Hijau SPPG', hex: '#064e3b' },
+                        { label: 'Biru Navy', hex: '#1e3a8a' },
+                        { label: 'Marun Tua', hex: '#881337' },
+                        { label: 'Slate Dark', hex: '#334155' }
+                      ].map((preset) => {
+                        const isSelected =
+                          (cfg.primaryColor || '#071e48').toLowerCase() === preset.hex.toLowerCase()
+                        return (
+                          <button
+                            key={preset.hex}
+                            type='button'
+                            onClick={() => setCfg({ ...cfg, primaryColor: preset.hex })}
+                            className={`flex cursor-pointer items-center gap-1.5 rounded border p-1.5 text-left text-[10px] transition-all ${
+                              isSelected
+                                ? 'border-[#111111] bg-[#F7F6F3] font-bold text-[#111111] ring-1 ring-[#111111] dark:border-white dark:bg-[#1E1E1E] dark:text-white dark:ring-white'
+                                : 'border-[#EAEAEA] bg-white text-[#787774] hover:bg-[#F7F6F3] dark:border-[#2E2E2E] dark:bg-[#141414] dark:text-[#888888]'
+                            }`}
+                          >
+                            <span
+                              style={{ backgroundColor: preset.hex }}
+                              className='h-3.5 w-3.5 shrink-0 rounded-full border border-black/10'
+                            />
+                            <span className='truncate'>{preset.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </section>
+
                 {/* Pita Dekorasi Ornamen BGN */}
                 <section className='space-y-3 rounded-lg border border-[#EAEAEA] bg-white p-4 dark:border-[#262626] dark:bg-[#181818]'>
                   <div className='flex items-center justify-between'>
@@ -2779,7 +2886,9 @@ export default function StikerMakanPage() {
               </span>
               <span>
                 Gap: {(gapAntarStiker / 10).toFixed(1)} cm
-                {gapAntarStiker > 0 && showGarisPotong && showIkonGunting ? ' (Garis Potong ✂)' : ''}
+                {gapAntarStiker > 0 && showGarisPotong && showIkonGunting
+                  ? ' (Garis Potong ✂)'
+                  : ''}
                 {gapAntarStiker > 0 && showGarisPotong && !showIkonGunting ? ' (Garis Potong)' : ''}
                 {gapAntarStiker > 0 && !showGarisPotong ? ' (Polos)' : ''}
                 {gapAntarStiker === 0 ? ' (Rapat)' : ''}
