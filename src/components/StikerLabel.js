@@ -303,9 +303,11 @@ export default function StikerLabel({
             border: `1.5pt solid ${blackColor}`,
             borderRadius: `${tableRadius}px`,
             overflow: 'hidden',
-            background: '#ffffff',
+            background: blackColor,
             width: '100%',
             boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <div
@@ -319,14 +321,14 @@ export default function StikerLabel({
               padding: '3pt 4pt',
               textTransform: 'uppercase',
               lineHeight: 1.15,
-              margin: '-1px -1px 0 -1px',
-              width: 'calc(100% + 2px)',
+              width: '100%',
               boxSizing: 'border-box',
+              margin: 0,
             }}
           >
             {cfg.judulMenu || 'MENU'}
           </div>
-          <div style={{ padding: '4pt 7pt' }}>
+          <div style={{ padding: '4pt 7pt', background: '#ffffff', flex: 1, width: '100%', boxSizing: 'border-box' }}>
             {menuList.map((item, idx) => (
               <div
                 key={idx}
@@ -386,8 +388,10 @@ export default function StikerLabel({
                     border: `1.5pt solid ${blackColor}`,
                     borderRadius: `${tableRadius}px`,
                     overflow: 'hidden',
-                    background: '#ffffff',
+                    background: blackColor,
                     boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
                   <div
@@ -400,14 +404,15 @@ export default function StikerLabel({
                       letterSpacing: '0.05em',
                       padding: '2.5pt 4pt',
                       textTransform: 'uppercase',
-                      margin: '-1px -1px 0 -1px',
-                      width: 'calc(100% + 2px)',
+                      lineHeight: 1.15,
+                      width: '100%',
                       boxSizing: 'border-box',
+                      margin: 0,
                     }}
                   >
                     {cat.title}
                   </div>
-                  <div style={{ padding: '3.5pt 6pt' }}>
+                  <div style={{ padding: '3.5pt 6pt', background: '#ffffff', flex: 1, width: '100%', boxSizing: 'border-box' }}>
                     {rows.map((row, i) => (
                       <div
                         key={i}
