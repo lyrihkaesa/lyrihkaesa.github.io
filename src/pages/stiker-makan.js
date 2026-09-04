@@ -7,6 +7,8 @@ const DEFAULT_CONFIG = {
   showJudul: true,
   judul: 'LABEL MAKANAN',
   judulArch: true, // Teks melengkung di atas logo
+  archCurvature: 25, // Derajat kelengkungan busur lingkaran sejati (6 - 55)
+  logoOffsetPt: 0, // Offset jarak vertikal logo ke judul (pt)
   
   // 2. Logo BGN
   showLogo: true,
@@ -726,16 +728,9 @@ export default function StikerMakanPage() {
                 onClick={handleDownloadFullSheetPng}
                 disabled={isExporting}
                 className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-indigo-700 disabled:opacity-50 active:scale-[0.98] transition-transform"
+                title="Download 1 lembar F4 utuh resolusi tinggi berisi stiker berjajar"
               >
                 <span>📄 Unduh Lembar F4 Utuh</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="inline-flex min-h-[42px] cursor-pointer items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 active:scale-[0.98] transition-transform"
-              >
-                <span>🖨️ Cetak Browser</span>
               </button>
             </div>
           </div>
@@ -845,15 +840,83 @@ export default function StikerMakanPage() {
                         placeholder="Judul Label (misal: LABEL MAKANAN)"
                         className="w-full rounded-md border border-slate-300 px-2.5 py-1 text-xs text-slate-900 focus-visible:outline-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                       />
-                      <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
-                        <input
-                          type="checkbox"
-                          checked={cfg.judulArch}
-                          onChange={(e) => setCfg({ ...cfg, judulArch: e.target.checked })}
-                          className="rounded accent-emerald-600"
-                        />
-                        <span>Teks Melengkung (Arched) di atas logo</span>
-                      </label>
+                      <div className="space-y-2 pt-1">
+                        <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                          <input
+                            type="checkbox"
+                            checked={cfg.judulArch}
+                            onChange={(e) => setCfg({ ...cfg, judulArch: e.target.checked })}
+                            className="rounded accent-emerald-600"
+                          />
+                          <span>Teks Melengkung (Arched) di atas logo</span>
+                        </label>
+
+                        {cfg.judulArch && (
+                          <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-2.5 dark:border-emerald-900/40 dark:bg-emerald-950/20 space-y-2">
+                            <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
+                              <span className="font-semibold">Tingkat Kelengkungan Busur:</span>
+                              <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                {cfg.archCurvature ?? 25}
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min="6"
+                              max="55"
+                              step="1"
+                              value={cfg.archCurvature ?? 25}
+                              onChange={(e) => setCfg({ ...cfg, archCurvature: Number(e.target.value) })}
+                              className="w-full accent-emerald-600 cursor-pointer"
+                            />
+                            <div className="flex flex-wrap gap-1 text-xs">
+                              {[
+                                { label: 'Landai (12)', val: 12 },
+                                { label: 'Halus (18)', val: 18 },
+                                { label: 'Standar (25)', val: 25 },
+                                { label: 'Melengkung (35)', val: 35 },
+                                { label: 'Tinggi (45)', val: 45 },
+                              ].map((p) => (
+                                <button
+                                  key={p.val}
+                                  type="button"
+                                  onClick={() => setCfg({ ...cfg, archCurvature: p.val })}
+                                  className={`px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer ${
+                                    (cfg.archCurvature ?? 25) === p.val
+                                      ? 'border-emerald-600 bg-emerald-600 text-white font-bold'
+                                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {p.label}
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Slider Offset Jarak Vertikal Logo ke Judul */}
+                            <div className="pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 space-y-1">
+                              <div className="flex items-center justify-between text-xs text-slate-700 dark:text-slate-300">
+                                <span className="font-semibold">Jarak Vertikal Logo ke Judul:</span>
+                                <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                                  {(cfg.logoOffsetPt ?? 0) > 0 ? `+${cfg.logoOffsetPt} pt` : `${cfg.logoOffsetPt ?? 0} pt`}
+                                </span>
+                              </div>
+                              <input
+                                type="range"
+                                min="-25"
+                                max="20"
+                                step="1"
+                                value={cfg.logoOffsetPt ?? 0}
+                                onChange={(e) => setCfg({ ...cfg, logoOffsetPt: Number(e.target.value) })}
+                                className="w-full accent-emerald-600 cursor-pointer"
+                              />
+                              <div className="flex justify-between text-[10px] text-slate-500">
+                                <span>Lebih Rapat (Ke Atas)</span>
+                                <span>Bawaan (0)</span>
+                                <span>Lebih Renggang (Ke Bawah)</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

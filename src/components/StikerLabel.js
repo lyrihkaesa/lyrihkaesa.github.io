@@ -160,23 +160,59 @@ export default function StikerLabel({
         {/* Judul Atas (Melengkung Arched / Teks Biasa) */}
         {cfg.showJudul && cfg.judul && (
           cfg.judulArch ? (
-            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', paddingTop: '2pt', marginBottom: (cfg.showLogo && cfg.logoUrl) ? '-8pt' : '0pt' }}>
-              <svg viewBox="0 0 280 54" style={{ width: '96%', overflow: 'visible', display: 'block' }}>
-                <path id="curve-path" d="M 10 46 A 135 38 0 0 1 270 46" fill="transparent" />
-                <text
-                  fill={blackColor}
-                  fontSize={`${fs.judul * fontMultiplier}`}
-                  fontWeight="900"
-                  fontFamily={activeFontFamily}
-                  letterSpacing="2"
-                  textAnchor="middle"
+            (() => {
+              const h = Math.max(5, Math.min(60, Number(cfg.archCurvature ?? 25)))
+              const userOffset = Number(cfg.logoOffsetPt ?? 0)
+              const spanHalfWidth = 120 // Setengah bentang (X=20 ke X=260)
+              const R = Number(((spanHalfWidth * spanHalfWidth + h * h) / (2 * h)).toFixed(2)) // Jari-jari lingkaran sejati
+              const topY = 10
+              const startY = topY + h
+              const endY = topY + h
+              const svgHeight = Math.max(30, startY + 14)
+
+              // Margin negatif dinamis proporsional terhadap kedalaman busur h
+              const autoMarginBottomPt = (cfg.showLogo && cfg.logoUrl)
+                ? -Math.round(h * 0.65 + 6)
+                : 0
+              const totalMarginBottomPt = autoMarginBottomPt + userOffset
+
+              return (
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    paddingTop: '2pt',
+                    marginBottom: `${totalMarginBottomPt}pt`,
+                    position: 'relative',
+                    zIndex: 2,
+                  }}
                 >
-                  <textPath href="#curve-path" startOffset="50%" textAnchor="middle">
-                    {cfg.judul}
-                  </textPath>
-                </text>
-              </svg>
-            </div>
+                  <svg
+                    viewBox={`0 0 280 ${svgHeight}`}
+                    style={{ width: '96%', overflow: 'visible', display: 'block' }}
+                  >
+                    <path
+                      id="curve-path"
+                      d={`M 20 ${startY} A ${R} ${R} 0 0 1 260 ${endY}`}
+                      fill="transparent"
+                    />
+                    <text
+                      fill={blackColor}
+                      fontSize={`${fs.judul * fontMultiplier}`}
+                      fontWeight="900"
+                      fontFamily={activeFontFamily}
+                      letterSpacing="2"
+                      textAnchor="middle"
+                    >
+                      <textPath href="#curve-path" startOffset="50%" textAnchor="middle">
+                        {cfg.judul}
+                      </textPath>
+                    </text>
+                  </svg>
+                </div>
+              )
+            })()
           ) : (
             <div
               style={{
