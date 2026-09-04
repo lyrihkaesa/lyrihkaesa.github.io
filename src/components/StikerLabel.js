@@ -13,6 +13,10 @@ export default function StikerLabel({
   fontMultiplier = 1,
   colorMode = 'color',
   fontFamily,
+  paddingStiker = 0,
+  sheetOffsetX = 0,
+  extendLeftMm = 0,
+  extendRightMm = 0,
 }) {
   // Parsing daftar menu per baris
   const menuList = (cfg.menuText || '')
@@ -78,20 +82,30 @@ export default function StikerLabel({
     { l: 'Serat', v: cfg.giziKecil?.serat, u: 'gr', icon: '🥦' },
   ]
 
-  // Helper Renderer Pita Ornamen Dekorasi Label
+  // Helper Renderer Pita Ornamen Dekorasi Label (Full Bleed ke ujung kertas kiri & kanan)
   const renderDecorationRibbon = (key) => {
     if (!showPattern || patternPos === 'none') return null
+    const totalExtraWidth = paddingStiker * 2 + (extendLeftMm || 0) + (extendRightMm || 0)
+    const totalLeftOffset = paddingStiker + (extendLeftMm || 0)
+
     return (
       <div
         key={key}
         style={{
-          width: '100%',
+          width: totalExtraWidth > 0 ? `calc(100% + ${totalExtraWidth}mm)` : '100%',
+          marginLeft: totalLeftOffset > 0 ? `-${totalLeftOffset}mm` : '0',
+          marginTop: '2pt',
+          marginBottom: '2pt',
           height: `${patternHeightMm}mm`,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           overflow: 'hidden',
-          margin: '2pt 0',
+          padding: 0,
+          boxSizing: 'border-box',
+          flexShrink: 0,
+          position: 'relative',
+          zIndex: 5,
         }}
       >
         <div
@@ -100,7 +114,7 @@ export default function StikerLabel({
             height: '100%',
             backgroundImage: `url(${patternUrl})`,
             backgroundRepeat: 'repeat-x',
-            backgroundPosition: 'center',
+            backgroundPosition: `${-sheetOffsetX}mm center`,
             backgroundSize: `auto ${patternHeightMm}mm`,
             opacity: patternOpacity,
             filter: isBW ? 'grayscale(100%) brightness(0)' : 'none',
@@ -126,7 +140,16 @@ export default function StikerLabel({
       {/* ═══════════════════════════════════════════════════════════════════════
           1. KOP ATAS: JUDUL, LOGO, SPPG, MITRA
       ═══════════════════════════════════════════════════════════════════════ */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', position: 'relative', paddingTop: '4pt' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          position: 'relative',
+          paddingTop: '4pt',
+        }}
+      >
         
         {/* Judul Atas (Melengkung Arched / Teks Biasa) */}
         {cfg.showJudul && cfg.judul && (
@@ -239,6 +262,7 @@ export default function StikerLabel({
             overflow: 'hidden',
             background: '#ffffff',
             width: '100%',
+            boxSizing: 'border-box',
           }}
         >
           <div
@@ -252,6 +276,9 @@ export default function StikerLabel({
               padding: '3pt 4pt',
               textTransform: 'uppercase',
               lineHeight: 1.15,
+              margin: '-1px -1px 0 -1px',
+              width: 'calc(100% + 2px)',
+              boxSizing: 'border-box',
             }}
           >
             {cfg.judulMenu || 'MENU'}
@@ -312,6 +339,7 @@ export default function StikerLabel({
                 borderRadius: `${tableRadius}px`,
                 overflow: 'hidden',
                 background: '#ffffff',
+                boxSizing: 'border-box',
               }}
             >
               <div
@@ -324,6 +352,9 @@ export default function StikerLabel({
                   letterSpacing: '0.05em',
                   padding: '2.5pt 4pt',
                   textTransform: 'uppercase',
+                  margin: '-1px -1px 0 -1px',
+                  width: 'calc(100% + 2px)',
+                  boxSizing: 'border-box',
                 }}
               >
                 PORSI BESAR
@@ -373,6 +404,7 @@ export default function StikerLabel({
                 borderRadius: `${tableRadius}px`,
                 overflow: 'hidden',
                 background: '#ffffff',
+                boxSizing: 'border-box',
               }}
             >
               <div
@@ -385,6 +417,9 @@ export default function StikerLabel({
                   letterSpacing: '0.05em',
                   padding: '2.5pt 4pt',
                   textTransform: 'uppercase',
+                  margin: '-1px -1px 0 -1px',
+                  width: 'calc(100% + 2px)',
+                  boxSizing: 'border-box',
                 }}
               >
                 PORSI KECIL

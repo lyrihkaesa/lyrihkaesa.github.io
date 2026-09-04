@@ -420,40 +420,57 @@ export default function StikerMakanPage() {
   }
 
   // ─── RENDER KOMPONEN STIKER SATU PER SATU ──────────────────────────────────
-  const renderStikerContent = () => (
+  const renderStikerContent = (sheetOffsetX = 0, extendLeftMm = 0, extendRightMm = 0) => (
     <StikerLabel
       cfg={cfg}
       kolom={kolom}
       susunanGizi={susunanGizi}
       fontMultiplier={fontMultiplier}
       colorMode={colorMode}
+      paddingStiker={paddingStiker}
+      sheetOffsetX={sheetOffsetX}
+      extendLeftMm={extendLeftMm}
+      extendRightMm={extendRightMm}
     />
   )
 
   // Render 1 Stiker Card Box
-  const renderStikerCard = (idx) => (
-    <article
-      key={`stiker-${idx}`}
-      aria-label={`Stiker Label ${idx + 1}`}
-      style={{
-        width: `${stickerWidthMm}mm`,
-        height: `${stickerHeightMm}mm`,
-        boxSizing: 'border-box',
-        padding: `${paddingStiker}mm`,
-        border: cardBorder,
-        borderRadius: borderStyle === 'none' ? '0' : '5px',
-        background: '#ffffff',
-        overflow: 'hidden',
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {renderStikerContent()}
-    </article>
-  )
+  const renderStikerCard = (idx) => {
+    // Posisi fisik X awal kartu dari tepi kiri kertas F4
+    const cardPhysicalX = marginKiri + idx * (stickerWidthMm + gapAntarStiker)
 
-  // Render Celah Gap Antar Stiker (1 cm dengan Garis Potong ✂️ di Tengah)
+    // Perpanjang ke pojok paling kiri lembar kertas jika kolom 0
+    const extendLeftMm = idx === 0 ? marginKiri : 0
+    // Perpanjang ke gap kanan, atau ke pojok paling kanan lembar kertas jika kolom terakhir
+    const extendRightMm = idx < kolom - 1 ? gapAntarStiker : marginKanan
+    // Offset background dari titik awal fisik (X=0) pita
+    const sheetOffsetX = idx === 0 ? 0 : cardPhysicalX
+
+    return (
+      <article
+        key={`stiker-${idx}`}
+        aria-label={`Stiker Label ${idx + 1}`}
+        style={{
+          width: `${stickerWidthMm}mm`,
+          height: `${stickerHeightMm}mm`,
+          boxSizing: 'border-box',
+          padding: `${paddingStiker}mm`,
+          border: cardBorder,
+          borderRadius: borderStyle === 'none' ? '0' : '5px',
+          background: '#ffffff',
+          overflow: 'visible',
+          position: 'relative',
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {renderStikerContent(sheetOffsetX, extendLeftMm, extendRightMm)}
+      </article>
+    )
+  }
+
+  // Render Celah Gap Antar Stiker (Garis Potong ✂️ di Tengah)
   const renderGapAntarStiker = (idx) => {
     if (!showGarisPotong && gapAntarStiker <= 0) return null
     return (
@@ -468,6 +485,7 @@ export default function StikerMakanPage() {
           justifyContent: 'center',
           alignItems: 'center',
           flexShrink: 0,
+          pointerEvents: 'none',
         }}
       >
         {showGarisPotong && (
@@ -480,6 +498,7 @@ export default function StikerMakanPage() {
               width: '1px',
               borderLeft: '1px dashed #9ca3af',
               transform: 'translateX(-50%)',
+              zIndex: 10,
             }}
           />
         )}
@@ -495,7 +514,7 @@ export default function StikerMakanPage() {
                 color: '#64748b',
                 background: '#ffffff',
                 lineHeight: 1,
-                zIndex: 10,
+                zIndex: 11,
               }}
             >
               ✂️
@@ -510,7 +529,7 @@ export default function StikerMakanPage() {
                 color: '#64748b',
                 background: '#ffffff',
                 lineHeight: 1,
-                zIndex: 10,
+                zIndex: 11,
               }}
             >
               ✂️
@@ -2014,14 +2033,38 @@ export default function StikerMakanPage() {
                   </div>
                   <div>
                     <label className="block font-bold text-emerald-700 dark:text-emerald-400">Gap Antar Stiker (mm)</label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={gapAntarStiker}
-                      onChange={(e) => setGapAntarStiker(Number(e.target.value))}
-                      className="w-full rounded border border-emerald-500 bg-emerald-50/50 px-2 py-1 text-slate-900 dark:bg-emerald-950/30 dark:text-white"
-                    />
-                    <span className="text-[10px] text-emerald-600 font-semibold">= {(gapAntarStiker / 10).toFixed(1)} cm</span>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        max="30"
+                        value={gapAntarStiker}
+                        onChange={(e) => setGapAntarStiker(Number(e.target.value))}
+                        className="w-20 rounded border border-emerald-500 bg-emerald-50/50 px-2 py-1 text-slate-900 dark:bg-emerald-950/30 dark:text-white font-semibold"
+                      />
+                      <span className="text-[10px] text-emerald-600 font-semibold">= {(gapAntarStiker / 10).toFixed(1)} cm</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {[
+                        { label: '0 mm (Menyatu Full)', val: 0 },
+                        { label: '5 mm', val: 5 },
+                        { label: '10 mm (1 cm)', val: 10 },
+                      ].map((g) => (
+                        <button
+                          key={g.val}
+                          type="button"
+                          onClick={() => setGapAntarStiker(g.val)}
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-semibold border cursor-pointer ${
+                            gapAntarStiker === g.val
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-bold dark:bg-emerald-950/40 dark:text-emerald-300'
+                              : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          {g.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-slate-600 dark:text-slate-400">Susunan Tabel Gizi</label>
@@ -2308,6 +2351,7 @@ export default function StikerMakanPage() {
                   boxShadow: '0 12px 30px rgba(0,0,0,0.18)',
                   boxSizing: 'border-box',
                   position: 'relative',
+                  overflow: 'hidden',
                   flexShrink: 0,
                   marginBottom: `-${paperHeightMm * (1 - zoomPreview)}mm`,
                   paddingLeft: `${marginKiri}mm`,
@@ -2329,7 +2373,7 @@ export default function StikerMakanPage() {
                     background: 'repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.05) 5px, rgba(239, 68, 68, 0.15) 5px, rgba(239, 68, 68, 0.15) 10px)',
                     borderRight: '1px dashed #ef4444',
                     pointerEvents: 'none',
-                    zIndex: 20,
+                    zIndex: 2,
                   }}
                   title="Margin Kiri Printer"
                 />
@@ -2343,7 +2387,7 @@ export default function StikerMakanPage() {
                     background: 'repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.05) 5px, rgba(239, 68, 68, 0.15) 5px, rgba(239, 68, 68, 0.15) 10px)',
                     borderLeft: '1px dashed #ef4444',
                     pointerEvents: 'none',
-                    zIndex: 20,
+                    zIndex: 2,
                   }}
                   title="Margin Kanan Printer"
                 />
@@ -2359,7 +2403,7 @@ export default function StikerMakanPage() {
                     background: 'rgba(59, 130, 246, 0.08)',
                     borderBottom: '1px dashed #3b82f6',
                     pointerEvents: 'none',
-                    zIndex: 20,
+                    zIndex: 2,
                   }}
                   title="Margin Atas (0.5 cm)"
                 />
@@ -2373,7 +2417,7 @@ export default function StikerMakanPage() {
                     background: 'rgba(59, 130, 246, 0.08)',
                     borderTop: '1px dashed #3b82f6',
                     pointerEvents: 'none',
-                    zIndex: 20,
+                    zIndex: 2,
                   }}
                   title="Margin Bawah (0.5 cm)"
                 />
@@ -2460,6 +2504,7 @@ export default function StikerMakanPage() {
             height: `${paperHeightMm}mm`,
             boxSizing: 'border-box',
             background: '#ffffff',
+            overflow: 'hidden',
             paddingLeft: `${marginKiri}mm`,
             paddingRight: `${marginKanan}mm`,
             paddingTop: `${marginAtas}mm`,
