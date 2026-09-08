@@ -78,6 +78,12 @@ const config = {
       // Replace with your project's social card
       image: 'img/ksa-logo-gradient-blue.png',
 
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: false,
+        respectPrefersColorScheme: true
+      },
+
       docs: {
         sidebar: {
           autoCollapseCategories: true,
