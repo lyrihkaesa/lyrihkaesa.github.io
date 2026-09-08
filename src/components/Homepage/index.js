@@ -1,126 +1,46 @@
+import React from 'react'
 import Layout from '@theme/Layout'
-// import Heading from '@theme/Heading'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 
-// Import ikon-ikon
-// import { FiExternalLink, FiGithub, FiMessageSquare, FiMail, FiTwitter } from 'react-icons/fi'
-// import { FaDiscord } from 'react-icons/fa6'
-import {
-  SiLaravel,
-  SiFlutter,
-  SiReact,
-  SiTailwindcss,
-  SiMysql,
-  SiPostgresql,
-  SiLivewire,
-  SiAlpinedotjs,
-  SiFilament,
-  SiDocker
-} from 'react-icons/si'
 import AboutSection from './AboutSection'
-import ContactSection from './ContactSection'
 import TechStack from './TechStack'
 import ProjectsSection from './ProjectsSection'
-
-const techItems = [
-  {
-    name: 'Laravel',
-    icon: <SiLaravel className='h-8 w-8 text-red-500' />,
-    link: '/laravel'
-  },
-  {
-    name: 'Flutter',
-    icon: <SiFlutter className='h-8 w-8 text-blue-400' />,
-    link: '/flutter'
-  },
-  {
-    name: 'Filament',
-    icon: <SiFilament className='h-8 w-8 text-amber-500' />,
-    link: '#'
-  },
-  {
-    name: 'Livewire',
-    icon: <SiLivewire className='h-8 w-8 text-pink-500' />,
-    link: '#'
-  },
-  {
-    name: 'AlpineJS',
-    icon: <SiAlpinedotjs className='h-8 w-8 text-blue-500' />,
-    link: '#'
-  },
-  {
-    name: 'React',
-    icon: <SiReact className='h-8 w-8 text-blue-500' />,
-    link: '#'
-  },
-  {
-    name: 'Tailwind CSS',
-    icon: <SiTailwindcss className='h-8 w-8 text-cyan-400' />,
-    link: '#'
-  },
-  {
-    name: 'PostgreSQL',
-    icon: <SiPostgresql className='h-8 w-8 text-blue-600' />,
-    link: '#'
-  },
-  {
-    name: 'MySQL',
-    icon: <SiMysql className='h-8 w-8 text-blue-600' />,
-    link: '#'
-  },
-  {
-    name: 'Docker',
-    icon: <SiDocker className='h-8 w-8 text-blue-600' />,
-    link: '#'
-  }
-]
+import RecentArticlesSection from './RecentArticlesSection'
+import ContactSection from './ContactSection'
 
 const projects = [
   {
     title: 'Filament Starter Kit',
-    desc: 'Stater Kit Untuk mempermudah Pembuatan Aplikasi dengan Laravel dan Filament.',
-    tech: ['Flutter', 'Dart'],
+    desc: 'Starter kit untuk mempercepat pembuatan aplikasi modern berbasis Laravel dan Filament PHP.',
+    tech: ['Laravel', 'Filament v3', 'Livewire', 'Tailwind CSS'],
     image: '/img/images-dark.webp',
+    featured: true,
+    category: 'Web & Laravel',
     links: {
       live: 'https://github.com/lyrihkaesa/filament-starter-kit',
-      repo: '/filament-starter-kit'
+      repo: 'https://github.com/lyrihkaesa/filament-starter-kit',
+      docs: '/filament-starter-kit'
     }
   },
   {
     title: 'Flutter Starter Kit',
-    desc: 'Stater Kit Untuk mempermudah Pembuatan Aplikasi Flutter.',
-    tech: ['Flutter', 'Dart'],
+    desc: 'Starter kit modular dengan arsitektur bersih untuk mempercepat pembuatan aplikasi Flutter siap produksi.',
+    tech: ['Flutter', 'Dart', 'Clean Architecture'],
     image: '/img/images-dark.webp',
+    featured: true,
+    category: 'Mobile & Flutter',
     links: {
       live: 'https://github.com/lyrihkaesa/flutter_starter_kit',
-      repo: '/flutter_starter_kit'
-    }
-  },
-  {
-    title: '(Flast) Installer Flutter Starter Kit',
-    desc: 'Installer untuk Flutter Starter Kit.',
-    tech: ['Flutter', 'Dart'],
-    image: '/img/images-dark.webp',
-    links: {
-      live: 'https://github.com/lyrihkaesa/flast',
-      repo: 'https://github.com/lyrihkaesa/flast'
-    }
-  },
-  {
-    title: 'Mason Brick Flutter Starter Kit',
-    desc: 'Mason Brick untuk Flutter Starter Kit.',
-    tech: ['Flutter', 'Dart', 'Mason'],
-    image: '/img/images-dark.webp',
-    links: {
-      live: 'https://github.com/lyrihkaesa/bricks_flutter_starter_kit',
-      repo: 'https://github.com/lyrihkaesa/bricks_flutter_starter_kit'
+      repo: 'https://github.com/lyrihkaesa/flutter_starter_kit'
     }
   },
   {
     title: 'Kaesa Laravel Extension Pack',
-    desc: 'Laravel Ekstension Pack untuk VS Code.',
-    tech: ['Laravel', 'PHP', 'Extension Pack', 'VSCode'],
+    desc: 'Paket ekstensi VS Code pilihan untuk mengoptimalkan efisiensi pengembangan Laravel & Blade.',
+    tech: ['Laravel', 'PHP', 'VS Code', 'Extension Pack'],
     image: '/img/projects/laravel-extension-pack-vscode.png',
+    featured: true,
+    category: 'Tools & DevOps',
     links: {
       live: 'https://marketplace.visualstudio.com/items?itemName=lyrihkaesa.kaesa-laravel-extension-pack',
       repo: 'https://github.com/lyrihkaesa/vscode-laravel-extension-pack'
@@ -128,25 +48,49 @@ const projects = [
   },
   {
     title: 'Mikrotik Hotspot Template',
-    desc: 'Template untuk Mikrotik Hotspot dengan Tailwind CSS dan AlpineJS.',
-    tech: ['Mikrotik', 'Template', 'Hotspot', 'Tailwind CSS', 'AlpineJS'],
+    desc: 'Template landing page hotspot MikroTik responsif dan modern dengan Tailwind CSS & Alpine.js.',
+    tech: ['MikroTik', 'Tailwind CSS', 'Alpine.js', 'Networking'],
     image: '/img/projects/mikrotik-hotspot-template.png',
+    featured: true,
+    category: 'Web & Laravel',
     links: {
       live: 'https://github.com/lyrihkaesa/mikrotik-hotspot-template',
       repo: 'https://github.com/lyrihkaesa/mikrotik-hotspot-template'
     }
   },
   {
+    title: '(Flast) Installer Flutter Starter Kit',
+    desc: 'CLI installer otomatis untuk inisiasi template Flutter Starter Kit dengan cepat.',
+    tech: ['Flutter', 'Dart', 'CLI Tool'],
+    image: '/img/images-dark.webp',
+    category: 'Tools & DevOps',
+    links: {
+      live: 'https://github.com/lyrihkaesa/flast',
+      repo: 'https://github.com/lyrihkaesa/flast'
+    }
+  },
+  {
+    title: 'Mason Brick Flutter Starter Kit',
+    desc: 'Generator template Mason Brick untuk scaffolding modul dan widget Flutter terstandar.',
+    tech: ['Flutter', 'Dart', 'Mason'],
+    image: '/img/images-dark.webp',
+    category: 'Tools & DevOps',
+    links: {
+      live: 'https://github.com/lyrihkaesa/bricks_flutter_starter_kit',
+      repo: 'https://github.com/lyrihkaesa/bricks_flutter_starter_kit'
+    }
+  },
+  {
     title: 'Barberia',
-    desc: 'Aplikasi pemesanan barber.',
-    tech: ['Flutter', 'NextJS', 'Firebase'],
+    desc: 'Aplikasi reservasi jadwal layanan barber modern berbasis web & mobile.',
+    tech: ['Flutter', 'Next.js', 'Firebase'],
     image: '/img/projects/barberia.png',
+    category: 'Mobile & Flutter',
     links: {
       live: 'https://barberia-web.vercel.app/',
       repo: 'https://github.com/C22-024'
     }
   }
-  // ... data proyek lainnya
 ]
 
 export default function Home({ homePageBlogMetadata, recentPosts }) {
@@ -154,13 +98,17 @@ export default function Home({ homePageBlogMetadata, recentPosts }) {
 
   return (
     <Layout
-      title={`${siteConfig.title}`}
-      description='Tempat menyimpan catatan dan protofolio untuk Kaesa yang pelupa.'
+      title={`${siteConfig.title} - Fullstack Developer & Network Engineer`}
+      description='Catatan teknis, dokumentasi, dan portofolio pengembangan web & mobile Kaesa Lyrih.'
     >
-      <main className='container mx-auto px-4 py-12'>
+      <main className='relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12'>
         <AboutSection />
-        <TechStack items={techItems} />
+        <TechStack />
         <ProjectsSection projects={projects} />
+        <RecentArticlesSection
+          recentPosts={recentPosts}
+          homePageBlogMetadata={homePageBlogMetadata}
+        />
         <ContactSection />
       </main>
     </Layout>
