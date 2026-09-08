@@ -614,8 +614,9 @@ const config = {
       {
         path: 'blog',
         editLocalizedFiles: false,
-        blogTitle: 'Blog',
-        blogDescription: 'Blog description is here ...',
+        blogTitle: 'Catatan & Blog Teknis',
+        blogDescription:
+          'Kumpulan catatan eksplorasi seputar web engineering, mobile Flutter, DevOps, dan solusi teknis.',
         blogSidebarCount: 'ALL',
         blogSidebarTitle: 'List blog',
         routeBasePath: 'blog',

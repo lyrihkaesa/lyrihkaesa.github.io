@@ -27,36 +27,22 @@ function BlogListPageMetadata(props) {
   )
 }
 
-function BlogHomepageBanner(props) {
+function BlogHeader(props) {
   const blogMetadata = props.metadata
-  const imageDefault = {
-    urlBannerBg:
-      'https://res.cloudinary.com/thanhnam/image/upload/v1696174608/thanhnamnguyen.dev/blog/blog-banner_othakp.png',
-    urlAvatar:
-      'https://res.cloudinary.com/thanhnam/image/upload/v1715137157/project/docusaurus-material-ui-template/logo_wnw5lv.png'
-  }
 
   return (
-    <div className='blog'>
-      <div className='relative'>
-        <Image
-          img={useBaseUrl(imageDefault.urlBannerBg)}
-          alt='Blog banner'
-          className='rounded-lg'
-          loading='lazy'
-        />
-        <Image
-          img={useBaseUrl(imageDefault.urlAvatar)}
-          alt='avatar blog'
-          className='absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 transform rounded-full bg-white p-2'
-          width={100}
-          height={100}
-          loading='lazy'
-        />
-      </div>
-      <div className='my-20 text-center'>
-        <h2 className='mb-2 text-xl font-bold md:text-2xl lg:text-3xl'>{blogMetadata.blogTitle}</h2>
-        <p className=''>{blogMetadata.blogDescription}</p>
+    <div className='relative mb-12 overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-b from-indigo-50/50 via-white to-slate-50 p-8 text-center sm:p-12 dark:border-slate-800 dark:from-slate-900/60 dark:via-slate-950 dark:to-slate-950'>
+      {/* Ambient background glow */}
+      <div className='pointer-events-none absolute -top-12 left-1/2 -z-10 h-64 w-96 -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-500/10 via-indigo-500/15 to-violet-500/10 blur-3xl' />
+
+      <div className='mx-auto max-w-2xl'>
+        <h1 className='text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl dark:text-white'>
+          {blogMetadata.blogTitle || 'Catatan & Blog Teknis'}
+        </h1>
+        <p className='mx-auto mt-3 max-w-lg text-sm leading-relaxed text-slate-600 sm:text-base dark:text-slate-400'>
+          {blogMetadata.blogDescription ||
+            'Eksplorasi seputar web engineering, mobile Flutter, DevOps, dan solusi masalah teknis.'}
+        </p>
       </div>
     </div>
   )
@@ -67,7 +53,7 @@ function BlogListPageContent(props) {
 
   return (
     <BlogLayout sidebar={sidebar}>
-      <BlogHomepageBanner {...props} />
+      <BlogHeader {...props} />
       <BlogPostItems items={items} />
       <BlogPagination metadata={metadata} />
     </BlogLayout>
