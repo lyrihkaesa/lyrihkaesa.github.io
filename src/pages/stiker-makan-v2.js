@@ -37,6 +37,14 @@ import {
   QrCode,
   Link2,
   Sliders,
+  Eye,
+  Ruler,
+  Loader2,
+  AlertCircle,
+  Save,
+  HardDrive,
+  RefreshCw,
+  Trash2,
 } from 'lucide-react'
 
 // Helper format tanggal Indonesia
@@ -228,6 +236,7 @@ const loadHtmlToImage = () => {
 }
 
 const STORAGE_KEY = 'stiker_ompreng_v2_config'
+const STORAGE_META_KEY = 'stiker_ompreng_v2_meta'
 
 export default function StikerMakanV2Page() {
   const [cfg, setCfg] = useState(DEFAULT_CFG)
@@ -244,6 +253,11 @@ export default function StikerMakanV2Page() {
   const [toastMessage, setToastMessage] = useState(null)
   const [showConfigModal, setShowConfigModal] = useState(false)
   const [configJsonInput, setConfigJsonInput] = useState('')
+  const [configError, setConfigError] = useState(null)
+  const [mobileView, setMobileView] = useState('editor') // 'editor' | 'preview'
+  const [hasSavedData, setHasSavedData] = useState(false)
+  const [lastSavedTime, setLastSavedTime] = useState(null)
+  const [storageSizeBytes, setStorageSizeBytes] = useState(0)
   const fileInputRef = useRef(null)
 
   // Show auto-dismiss toast
@@ -254,7 +268,7 @@ export default function StikerMakanV2Page() {
     }, 3500)
   }
 
-  // Load Saved Config from LocalStorage
+  // Load Saved Config & Meta from LocalStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -265,6 +279,17 @@ export default function StikerMakanV2Page() {
             parsed.tanggalKonsumsi = getTodayISO()
           }
           setCfg((prev) => ({ ...prev, ...parsed }))
+          setHasSavedData(true)
+          setStorageSizeBytes(new Blob([saved]).size)
+        }
+        const meta = localStorage.getItem(STORAGE_META_KEY)
+        if (meta) {
+          const parsedMeta = JSON.parse(meta)
+          if (parsedMeta.savedTime) setLastSavedTime(parsedMeta.savedTime)
+          if (parsedMeta.colorMode) setColorMode(parsedMeta.colorMode)
+          if (parsedMeta.cetakTarget) setCetakTarget(parsedMeta.cetakTarget)
+          if (parsedMeta.showCropMarks !== undefined) setShowCropMarks(parsedMeta.showCropMarks)
+          if (parsedMeta.jumlahCetak) setJumlahCetak(parsedMeta.jumlahCetak)
         }
       } catch (e) {
         console.warn('Gagal membaca saved config:', e)
@@ -272,17 +297,98 @@ export default function StikerMakanV2Page() {
     }
   }, [])
 
-  // Save Config to LocalStorage
+  // Save Config to LocalStorage (Auto-sync)
   const updateCfg = (newValues) => {
     setCfg((prev) => {
       const updated = { ...prev, ...newValues }
       if (typeof window !== 'undefined') {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+          const jsonStr = JSON.stringify(updated)
+          localStorage.setItem(STORAGE_KEY, jsonStr)
+          setHasSavedData(true)
+          setStorageSizeBytes(new Blob([jsonStr]).size)
         } catch (e) {}
       }
       return updated
     })
+  }
+
+  // Handle Explicit Save to LocalStorage
+  const handleSaveToLocalStorage = () => {
+    if (typeof window === 'undefined') return
+    try {
+      const now = new Date()
+      const timeStr = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())} WIB`
+      const jsonCfg = JSON.stringify(cfg)
+      const metaObj = {
+        savedTime: timeStr,
+        savedIso: now.toISOString(),
+        colorMode,
+        cetakTarget,
+        showCropMarks,
+        jumlahCetak,
+      }
+      localStorage.setItem(STORAGE_KEY, jsonCfg)
+      localStorage.setItem(STORAGE_META_KEY, JSON.stringify(metaObj))
+      setLastSavedTime(timeStr)
+      setHasSavedData(true)
+      setStorageSizeBytes(new Blob([jsonCfg]).size)
+      triggerToast(`Konfigurasi tersimpan di Local Storage (${timeStr})`)
+    } catch (e) {
+      triggerToast('Gagal menyimpan ke Local Storage: ' + e.message)
+    }
+  }
+
+  // Handle Restore from LocalStorage
+  const handleRestoreFromLocalStorage = () => {
+    if (typeof window === 'undefined') return
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (!saved) {
+        triggerToast('Belum ada data konfigurasi yang tersimpan di browser ini')
+        return
+      }
+      const parsed = JSON.parse(saved)
+      if (parsed.tanggalKonsumsi && !/^\d{4}-\d{2}-\d{2}$/.test(parsed.tanggalKonsumsi)) {
+        parsed.tanggalKonsumsi = getTodayISO()
+      }
+      setCfg((prev) => ({ ...prev, ...parsed }))
+      const meta = localStorage.getItem(STORAGE_META_KEY)
+      if (meta) {
+        const parsedMeta = JSON.parse(meta)
+        if (parsedMeta.savedTime) setLastSavedTime(parsedMeta.savedTime)
+        if (parsedMeta.colorMode) setColorMode(parsedMeta.colorMode)
+        if (parsedMeta.cetakTarget) setCetakTarget(parsedMeta.cetakTarget)
+        if (parsedMeta.showCropMarks !== undefined) setShowCropMarks(parsedMeta.showCropMarks)
+        if (parsedMeta.jumlahCetak) setJumlahCetak(parsedMeta.jumlahCetak)
+      }
+      triggerToast('Data konfigurasi berhasil dipulihkan dari Local Storage')
+    } catch (e) {
+      triggerToast('Gagal memulihkan dari Local Storage: ' + e.message)
+    }
+  }
+
+  // Handle Clear LocalStorage & Reset to Defaults
+  const handleClearLocalStorage = () => {
+    if (typeof window === 'undefined') return
+    if (!window.confirm('Hapus seluruh data konfigurasi di Local Storage dan reset ke pengaturan awal?')) {
+      return
+    }
+    try {
+      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(STORAGE_META_KEY)
+      setHasSavedData(false)
+      setLastSavedTime(null)
+      setStorageSizeBytes(0)
+      setCfg(DEFAULT_CFG)
+      setColorMode('bw')
+      setCetakTarget('alternating')
+      setShowCropMarks(false)
+      setJumlahCetak(1)
+      triggerToast('Penyimpanan lokal dibersihkan & reset ke standar awal')
+    } catch (e) {
+      triggerToast('Gagal membersihkan data: ' + e.message)
+    }
   }
 
   // Handle Logo File Upload (Base64)
@@ -445,7 +551,7 @@ export default function StikerMakanV2Page() {
       link.click()
       triggerToast(`Berhasil mengunduh ${filename}.png (300 DPI)`)
     } catch (err) {
-      alert('Gagal mengunduh gambar: ' + err.message)
+      triggerToast('Gagal mengunduh gambar: ' + err.message)
     } finally {
       setIsExporting(false)
     }
@@ -465,13 +571,13 @@ export default function StikerMakanV2Page() {
       })
 
       if (!navigator.clipboard || !window.ClipboardItem) {
-        throw new Error('Clipboard API gambar tidak didukung di browser ini.')
+        throw new Error('Clipboard API gambar tidak didukung di browser ini')
       }
 
       await navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blob }),
       ])
-      triggerToast('Gambar stiker berhasil disalin ke clipboard! Siap di-paste ke WA/Word.')
+      triggerToast('Gambar stiker berhasil disalin ke clipboard (300 DPI)')
     } catch (err) {
       triggerToast('Gagal menyalin: ' + err.message)
     } finally {
@@ -484,7 +590,7 @@ export default function StikerMakanV2Page() {
     try {
       const jsonStr = JSON.stringify(cfg, null, 2)
       navigator.clipboard.writeText(jsonStr)
-      triggerToast('Konfigurasi berhasil disalin ke clipboard dalam format JSON!')
+      triggerToast('Konfigurasi disalin ke clipboard (JSON)')
     } catch (e) {
       triggerToast('Gagal menyalin konfigurasi: ' + e.message)
     }
@@ -497,9 +603,10 @@ export default function StikerMakanV2Page() {
       updateCfg(parsed)
       setShowConfigModal(false)
       setConfigJsonInput('')
-      triggerToast('Konfigurasi berhasil diimpor dan diterapkan!')
+      setConfigError(null)
+      triggerToast('Konfigurasi berhasil diimpor dan diterapkan')
     } catch (e) {
-      alert('Format JSON tidak valid: ' + e.message)
+      setConfigError('Format JSON tidak valid: ' + e.message)
     }
   }
 
@@ -509,7 +616,7 @@ export default function StikerMakanV2Page() {
 
   return (
     <main
-      className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-200 dark:selection:bg-blue-900"
+      className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white relative dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(37,99,235,0.14),rgba(2,6,23,0))]"
       style={{ accentColor: '#2563eb' }}
     >
       {/* ─── PRINT CSS STYLES (PRESISI THERMAL 70 × 50 mm & 140 × 50 mm) ─── */}
@@ -563,43 +670,70 @@ export default function StikerMakanV2Page() {
         <aside
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl shadow-2xl border border-slate-700 dark:border-slate-200 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900/95 dark:bg-slate-900/95 text-white dark:text-slate-100 rounded-xl shadow-[0_12px_28px_-8px_rgba(15,23,42,0.35)] dark:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.8)] border border-slate-700/80 dark:border-slate-700 text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200"
         >
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" />
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
+          <button
+            type="button"
+            onClick={() => setToastMessage(null)}
+            className="ml-1.5 p-1 rounded-md text-slate-400 hover:text-white dark:text-slate-300 dark:hover:text-white cursor-pointer transition-colors"
+            aria-label="Tutup notifikasi"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </aside>
       )}
 
       {/* ─── HEADER / NAVIGATION BAR (NO PRINT) ─── */}
-      <header className="no-print-area border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <header className="no-print-area border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xs dark:shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-sm shadow-sm ring-1 ring-white/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-md ring-1 ring-white/20 shrink-0 select-none">
               7×5
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-lg font-bold tracking-tight m-0 text-slate-900 dark:text-white">
-                  Stiker Makan V2 — Standar BGN 2026
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-base sm:text-lg font-bold tracking-tight m-0 text-slate-900 dark:text-white text-balance">
+                  Stiker Makan V2
                 </h1>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                  <ShieldCheck className="w-3 h-3" /> SE BGN 2026
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 whitespace-nowrap shadow-2xs">
+                  <ShieldCheck className="w-3 h-3" /> Standar BGN 2026
                 </span>
+                <span className="hidden md:inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-cyan-300 border border-slate-200 dark:border-slate-800 whitespace-nowrap font-mono">
+                  Thermal Ready · 70 × 50 mm
+                </span>
+                {hasSavedData && (
+                  <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60 whitespace-nowrap font-mono tabular-nums shadow-2xs">
+                    <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    <span>Tersimpan {lastSavedTime ? `(${lastSavedTime})` : ''}</span>
+                  </span>
+                )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 m-0">
+              <p className="text-xs text-slate-500 dark:text-blue-200/80 m-0 hidden sm:block">
                 Generator Label Thermal Roll 70 × 50 mm • Khusus Dapur SPPG &amp; Kotak Pengaduan
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <Link
               to="/stiker-makan"
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             >
               <span>←</span>
-              <span>Versi 1 (Menu &amp; Gizi)</span>
+              <span className="hidden xs:inline sm:inline">Versi 1</span>
             </Link>
+
+            <button
+              type="button"
+              onClick={handleSaveToLocalStorage}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-400 dark:border-emerald-700/60 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none shadow-2xs"
+              title="Simpan konfigurasi ke Local Storage browser"
+            >
+              <Save className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Simpan</span>
+            </button>
 
             <button
               type="button"
@@ -609,55 +743,83 @@ export default function StikerMakanV2Page() {
                   triggerToast('Konfigurasi dikembalikan ke default')
                 }
               }}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
               title="Reset semua pengaturan ke standar awal"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Default</span>
+              <span className="hidden sm:inline">Reset Default</span>
             </button>
 
             <button
               type="button"
               onClick={() => setShowConfigModal(true)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
-              title="Salin atau Impor Konfigurasi"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+              title="Kelola Penyimpanan Lokal atau Impor/Ekspor JSON"
             >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Bagikan / Backup</span>
+              <HardDrive className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
+              <span className="hidden sm:inline">Data &amp; Backup</span>
             </button>
 
             <button
               type="button"
               onClick={handleCleanThermalPrint}
-              className="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow flex items-center gap-1.5 transition-all cursor-pointer"
+              className="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs hover:shadow flex items-center gap-1.5 transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Cetak Thermal ({printPages.length})</span>
+              <span>Cetak ({printPages.length})</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* ─── WORKSPACE (NO PRINT) ─── */}
-      <div className="no-print-area max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <div className="no-print-area max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         
+        {/* ─── MOBILE VIEW SWITCHER (< 1024px) ─── */}
+        <div className="lg:hidden sticky top-[57px] z-30 mb-4 bg-slate-100/90 dark:bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center">
+          <button
+            type="button"
+            onClick={() => setMobileView('editor')}
+            className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
+              mobileView === 'editor'
+                ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs ring-1 ring-slate-200 dark:ring-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Sliders className="w-4 h-4" />
+            <span>Pengaturan</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileView('preview')}
+            className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
+              mobileView === 'preview'
+                ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-xs ring-1 ring-slate-200 dark:ring-slate-700'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Eye className="w-4 h-4" />
+            <span>Pratinjau ({activeTab === 'kiri' ? 'Kiri' : activeTab === 'kanan' ? 'Kanan' : activeTab === 'sepasang' ? '14×5' : 'Ompreng'})</span>
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* ─── PANEL KONTROL KIRI (EDITOR SETTINGS) ─── */}
-          <section className="lg:col-span-5 flex flex-col gap-4">
+          <section className={`lg:col-span-5 flex-col gap-4 ${mobileView === 'editor' ? 'flex' : 'hidden lg:flex'}`}>
             
             {/* Navigasi Kategori Editor (Tabs / All) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between gap-2">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-1.5 sm:p-2 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between gap-2">
               <nav role="tablist" aria-label="Kategori Pengaturan Label" className="flex items-center gap-1 flex-1 overflow-x-auto text-xs font-semibold">
                 <button
                   type="button"
                   role="tab"
                   aria-selected={editorTab === 'cetak'}
                   onClick={() => setEditorTab('cetak')}
-                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     editorTab === 'cetak' && editorMode === 'tabs'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Printer className="w-3.5 h-3.5" />
@@ -669,10 +831,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={editorTab === 'identitas'}
                   onClick={() => setEditorTab('identitas')}
-                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     editorTab === 'identitas' && editorMode === 'tabs'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Building2 className="w-3.5 h-3.5" />
@@ -684,10 +846,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={editorTab === 'pengaduan'}
                   onClick={() => setEditorTab('pengaduan')}
-                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     editorTab === 'pengaduan' && editorMode === 'tabs'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
@@ -699,10 +861,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={editorTab === 'tipografi'}
                   onClick={() => setEditorTab('tipografi')}
-                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     editorTab === 'tipografi' && editorMode === 'tabs'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Type className="w-3.5 h-3.5" />
@@ -714,7 +876,7 @@ export default function StikerMakanV2Page() {
                 type="button"
                 onClick={() => setEditorMode((prev) => (prev === 'tabs' ? 'all' : 'tabs'))}
                 title={editorMode === 'tabs' ? 'Buka Semua Bagian' : 'Sederhanakan dengan Tab'}
-                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white text-[11px] font-semibold flex items-center gap-1 cursor-pointer shrink-0"
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-[11px] font-semibold flex items-center gap-1 cursor-pointer shrink-0 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{editorMode === 'tabs' ? 'Lihat Semua' : 'Mode Tab'}</span>
@@ -732,7 +894,7 @@ export default function StikerMakanV2Page() {
                       <Printer className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       <span>Opsi Cetak Printer Thermal</span>
                     </h3>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 font-mono">
                       Ukuran: 70 × 50 mm
                     </span>
                   </div>
@@ -746,74 +908,74 @@ export default function StikerMakanV2Page() {
                       <button
                         type="button"
                         onClick={() => { setCetakTarget('kiri'); setActiveTab('kiri'); }}
-                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'kiri'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
                         <div className="font-bold flex items-center gap-1.5">
                           <Tag className="w-3.5 h-3.5 text-blue-600" />
                           <span>Label Kiri Saja</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">SPPG &amp; Batas Waktu (70×50)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">SPPG &amp; Batas Waktu (70×50)</div>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { setCetakTarget('kanan'); setActiveTab('kanan'); }}
-                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'kanan'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
                         <div className="font-bold flex items-center gap-1.5">
                           <Tag className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Label Kanan Saja</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">Larangan &amp; Pengaduan (70×50)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-emerald-200/80 mt-0.5">Larangan &amp; Pengaduan (70×50)</div>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { setCetakTarget('alternating'); setActiveTab('sepasang'); }}
-                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'alternating'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
                         <div className="font-bold flex items-center gap-1.5">
                           <RotateCw className="w-3.5 h-3.5 text-indigo-600" />
                           <span>Bergantian (Urut)</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">1 Kiri, lalu 1 Kanan urut</div>
+                        <div className="text-[10px] text-slate-500 dark:text-indigo-200/80 mt-0.5">1 Kiri, lalu 1 Kanan urut</div>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { setCetakTarget('both_batch'); setActiveTab('sepasang'); }}
-                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'both_batch'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
                         <div className="font-bold flex items-center gap-1.5">
                           <Layers className="w-3.5 h-3.5 text-purple-600" />
                           <span>Batch Terpisah</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">N Kiri dulu, lalu N Kanan</div>
+                        <div className="text-[10px] text-slate-500 dark:text-purple-200/80 mt-0.5">N Kiri dulu, lalu N Kanan</div>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { setCetakTarget('sepasang'); setActiveTab('sepasang'); }}
-                        className={`col-span-2 p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                        className={`col-span-2 p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'sepasang'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
                         <div className="font-bold flex items-center justify-between">
@@ -821,11 +983,11 @@ export default function StikerMakanV2Page() {
                             <Maximize2 className="w-3.5 h-3.5 text-blue-600" />
                             <span>Sepasang Berjejer (Format 140 × 50 mm)</span>
                           </div>
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-blue-200 border border-slate-200 dark:border-slate-800">
                             Printer Lebar 14cm
                           </span>
                         </div>
-                        <div className="text-[10px] text-slate-500 mt-0.5">
+                        <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">
                           Kedua label dicetak bersebelahan dalam satu lembar stiker memanjang.
                         </div>
                       </button>
@@ -842,7 +1004,7 @@ export default function StikerMakanV2Page() {
                         <button
                           type="button"
                           onClick={() => setJumlahCetak((prev) => Math.max(1, prev - 1))}
-                          className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                          className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center cursor-pointer transition-colors active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                           aria-label="Kurangi jumlah cetak"
                         >
                           -
@@ -854,12 +1016,12 @@ export default function StikerMakanV2Page() {
                           max="1000"
                           value={jumlahCetak}
                           onChange={(e) => setJumlahCetak(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                          className="w-full text-center py-1.5 px-2 text-xs font-bold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                          className="w-full text-center py-2 px-2 text-xs font-bold font-mono tabular-nums rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                         />
                         <button
                           type="button"
                           onClick={() => setJumlahCetak((prev) => prev + 1)}
-                          className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                          className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center cursor-pointer transition-colors active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                           aria-label="Tambah jumlah cetak"
                         >
                           +
@@ -873,7 +1035,7 @@ export default function StikerMakanV2Page() {
                             key={num}
                             type="button"
                             onClick={() => setJumlahCetak((prev) => prev + num)}
-                            className="text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
+                            className="text-[10px] font-semibold font-mono tabular-nums px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 cursor-pointer transition-all active:scale-[0.95]"
                           >
                             +{num}
                           </button>
@@ -885,14 +1047,14 @@ export default function StikerMakanV2Page() {
                       <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         Mode Warna Cetak:
                       </label>
-                      <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
+                      <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200/60 dark:border-slate-800">
                         <button
                           type="button"
                           onClick={() => setColorMode('bw')}
-                          className={`py-2 px-2 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1 ${
+                          className={`py-2 px-2 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                             isBW
-                              ? 'bg-slate-900 text-white shadow-xs dark:bg-black dark:text-white'
-                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                              ? 'bg-slate-900 text-white shadow-xs dark:bg-slate-800 dark:text-white dark:ring-1 dark:ring-slate-700'
+                              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                           }`}
                         >
                           <span>Hitam Putih (B&amp;W)</span>
@@ -900,25 +1062,25 @@ export default function StikerMakanV2Page() {
                         <button
                           type="button"
                           onClick={() => setColorMode('color')}
-                          className={`py-2 px-2 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1 ${
+                          className={`py-2 px-2 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                             !isBW
                               ? 'bg-blue-600 text-white shadow-xs'
-                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                           }`}
                         >
                           <span>Warna Resmi</span>
                         </button>
                       </div>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
-                        {isBW ? '✓ Sangat direkomendasikan untuk printer thermal 203 DPI' : '🎨 Untuk printer inkjet / stiker chromo berwarna'}
+                      <p className="text-[10px] text-slate-500 dark:text-blue-200/70 mt-1">
+                        {isBW ? 'Direkomendasikan untuk printer thermal 203 DPI' : 'Untuk printer inkjet / stiker chromo berwarna'}
                       </p>
                     </div>
                   </div>
 
                   {/* Crop Marks Toggle */}
-                  <div className="flex items-center justify-between py-2 px-3 mb-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">
-                    <label htmlFor="cropMarksToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
-                      <Scissors className="w-3.5 h-3.5 text-slate-500" />
+                  <div className="flex items-center justify-between py-2 px-3 mb-2 rounded-xl bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 text-xs">
+                    <label htmlFor="cropMarksToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer select-none">
+                      <Scissors className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                       <span>Garis Bantu Potong / Batas (Crop Marks)</span>
                     </label>
                     <input
@@ -931,13 +1093,13 @@ export default function StikerMakanV2Page() {
                   </div>
 
                   {/* Ornamen Pangan Toggle (Default Nonaktif/Diabaikan) */}
-                  <div className="flex items-center justify-between py-2 px-3 mb-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">
+                  <div className="flex items-center justify-between py-2 px-3 mb-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 text-xs">
                     <div>
-                      <label htmlFor="showOrnamentToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
-                        <Sparkles className="w-3.5 h-3.5 text-slate-500" />
+                      <label htmlFor="showOrnamentToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer select-none">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
                         <span>Strip Ornamen Sayur &amp; Pangan</span>
                       </label>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 m-0">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-300 m-0">
                         Menampilkan strip ornamen asli dengan kontras hitam pekat (tidak pudar jadi abu-abu di mode B&amp;W).
                       </p>
                     </div>
@@ -951,18 +1113,18 @@ export default function StikerMakanV2Page() {
                   </div>
 
                   {/* Ringkasan Output Kertas Roll */}
-                  <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 mb-4 flex items-center justify-between text-xs">
+                  <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 mb-4 flex items-center justify-between text-xs">
                     <div>
                       <div className="text-slate-600 dark:text-slate-300">
-                        Total Output: <strong className="font-black text-blue-600 dark:text-blue-400 text-sm">{printPages.length} label</strong>
-                        <span className="text-[11px] text-slate-500 ml-1">(@ 70 × 50 mm)</span>
+                        Total Output: <strong className="font-black text-blue-600 dark:text-blue-400 text-sm font-mono tabular-nums">{printPages.length} label</strong>
+                        <span className="text-[11px] text-slate-500 dark:text-blue-200/80 ml-1 font-mono">(@ 70 × 50 mm)</span>
                       </div>
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5 font-mono tabular-nums">
                         Estimasi panjang roll kertas: <strong>~{estimasiPanjangMeter} meter</strong>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
                         <Check className="w-3 h-3" /> Siap Roll Thermal
                       </span>
                     </div>
@@ -973,7 +1135,7 @@ export default function StikerMakanV2Page() {
                     <button
                       type="button"
                       onClick={handleCleanThermalPrint}
-                      className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                     >
                       <Printer className="w-4 h-4" />
                       <span>Cetak Thermal Presisi</span>
@@ -981,10 +1143,26 @@ export default function StikerMakanV2Page() {
                     <button
                       type="button"
                       onClick={handlePrint}
-                      className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 text-white dark:text-slate-200 border border-transparent dark:border-slate-700 font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                     >
                       <FileText className="w-4 h-4" />
                       <span>Cetak Dialog Browser</span>
+                    </button>
+                  </div>
+
+                  {/* Status Penyimpanan Lokal */}
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-300">
+                    <span className="flex items-center gap-1.5">
+                      <HardDrive className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                      <span>{hasSavedData ? `Tersimpan di browser (${storageSizeBytes > 0 ? `${(storageSizeBytes / 1024).toFixed(1)} KB` : ''})` : 'Belum tersimpan di browser'}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleSaveToLocalStorage}
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-semibold cursor-pointer flex items-center gap-1 active:scale-[0.98]"
+                    >
+                      <Save className="w-3 h-3" />
+                      <span>Simpan Sekarang</span>
                     </button>
                   </div>
                 </div>
@@ -1006,14 +1184,14 @@ export default function StikerMakanV2Page() {
                         <label htmlFor="namaSppgInput" className="font-semibold text-slate-700 dark:text-slate-300">
                           Nama Satuan Pelayanan (SPPG):
                         </label>
-                        <span className="text-[10px] text-slate-400">Tekan Enter untuk baris baru</span>
+                        <span className="text-[10px] text-slate-500 dark:text-blue-200/75">Tekan Enter untuk baris baru</span>
                       </div>
                       <textarea
                         id="namaSppgInput"
                         rows={2}
                         value={cfg.namaSppg}
                         onChange={(e) => updateCfg({ namaSppg: e.target.value })}
-                        className="w-full py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold uppercase text-xs leading-relaxed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                        className="w-full py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-bold uppercase text-xs leading-relaxed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                         placeholder={'Contoh:\nSPPG JAKARTA PUSAT 1\natau baris kedua untuk detail wilayah'}
                       />
                     </div>
@@ -1027,7 +1205,7 @@ export default function StikerMakanV2Page() {
                         rows={2}
                         value={cfg.alamatSppg}
                         onChange={(e) => updateCfg({ alamatSppg: e.target.value })}
-                        className="w-full py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs leading-relaxed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                        className="w-full py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs leading-relaxed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                         placeholder="Alamat jalan, kelurahan, kecamatan, kota/kabupaten..."
                       />
                     </div>
@@ -1037,7 +1215,7 @@ export default function StikerMakanV2Page() {
                       <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                         Logo SPPG / Badan Gizi Nasional:
                       </label>
-                      <div className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/80">
                         <div className="w-10 h-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white flex items-center justify-center p-1 shrink-0 overflow-hidden shadow-2xs">
                           <img
                             src={cfg.logoUrl}
@@ -1051,7 +1229,7 @@ export default function StikerMakanV2Page() {
                             <button
                               type="button"
                               onClick={() => fileInputRef.current?.click()}
-                              className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-[11px] font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                              className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-[11px] font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-2xs"
                             >
                               <Upload className="w-3 h-3 text-blue-600" />
                               <span>Unggah Logo Baru</span>
@@ -1064,7 +1242,7 @@ export default function StikerMakanV2Page() {
                                   updateCfg({ logoUrl: '/img/logo-bgn.png' })
                                   triggerToast('Logo dikembalikan ke Logo BGN Resmi')
                                 }}
-                                className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-[10px] font-semibold text-slate-600 dark:text-slate-400 cursor-pointer transition-colors"
+                                className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-[10px] font-semibold text-slate-600 dark:text-slate-200 cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                               >
                                 Reset ke Logo BGN
                               </button>
@@ -1077,7 +1255,7 @@ export default function StikerMakanV2Page() {
                             onChange={handleLogoUpload}
                             className="hidden"
                           />
-                          <p className="text-[10px] text-slate-400 dark:text-slate-500 m-0 mt-1 truncate">
+                          <p className="text-[10px] text-slate-500 dark:text-blue-200/70 m-0 mt-1 truncate">
                             {cfg.logoUrl.startsWith('data:') ? 'Menggunakan logo khusus lokal' : cfg.logoUrl}
                           </p>
                         </div>
@@ -1102,33 +1280,33 @@ export default function StikerMakanV2Page() {
                           <button
                             type="button"
                             onClick={() => updateCfg({ waktuMode: 'direct' })}
-                            className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all ${
+                            className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                               cfg.waktuMode === 'direct'
-                                ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                                : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                                ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                                : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                             }`}
                           >
                             <div className="font-bold flex items-center gap-1.5">
                               <Clock className="w-3.5 h-3.5 text-blue-600" />
                               <span>Jam Tercetak</span>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">Cetak jam langsung di stiker</div>
+                            <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">Cetak jam langsung di stiker</div>
                           </button>
 
                           <button
                             type="button"
                             onClick={() => updateCfg({ waktuMode: 'blank' })}
-                            className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all ${
+                            className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                               cfg.waktuMode === 'blank'
-                                ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                                : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                                ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                                : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                             }`}
                           >
                             <div className="font-bold flex items-center gap-1.5">
-                              <Tag className="w-3.5 h-3.5 text-slate-500" />
+                              <Tag className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
                               <span>Kolom Kosong</span>
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">Untuk stempel / tulis spidol</div>
+                            <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">Untuk stempel / tulis spidol</div>
                           </button>
                         </div>
                       </fieldset>
@@ -1144,7 +1322,7 @@ export default function StikerMakanV2Page() {
                               type="text"
                               value={cfg.jamKonsumsi}
                               onChange={(e) => updateCfg({ jamKonsumsi: e.target.value })}
-                              className="w-full py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-black text-sm tracking-wider focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                              className="w-full py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-black text-sm tracking-wider focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="Contoh: 11:00 WIB"
                             />
 
@@ -1155,10 +1333,10 @@ export default function StikerMakanV2Page() {
                                   key={jp}
                                   type="button"
                                   onClick={() => updateCfg({ jamKonsumsi: jp })}
-                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold font-mono tabular-nums border cursor-pointer transition-all active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                                     cfg.jamKonsumsi === jp
                                       ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                                      : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                      : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
                                   }`}
                                 >
                                   {jp}
@@ -1182,7 +1360,7 @@ export default function StikerMakanV2Page() {
                           </div>
 
                           {cfg.showTanggal && (
-                            <div className="space-y-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 animate-in fade-in duration-150">
+                            <div className="space-y-2.5 p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 animate-in fade-in duration-150">
                               <div>
                                 <label htmlFor="tanggalKonsumsiInput" className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
                                   Pilih Tanggal:
@@ -1193,19 +1371,19 @@ export default function StikerMakanV2Page() {
                                     type="date"
                                     value={/^\d{4}-\d{2}-\d{2}$/.test(cfg.tanggalKonsumsi || '') ? cfg.tanggalKonsumsi : ''}
                                     onChange={(e) => updateCfg({ tanggalKonsumsi: e.target.value })}
-                                    className="flex-1 py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                                    className="flex-1 py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                                   />
                                   <button
                                     type="button"
                                     onClick={() => updateCfg({ tanggalKonsumsi: getTodayISO() })}
-                                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer whitespace-nowrap"
+                                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                                   >
                                     Hari Ini
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => updateCfg({ tanggalKonsumsi: getTomorrowISO() })}
-                                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer whitespace-nowrap"
+                                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer whitespace-nowrap active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                                   >
                                     Besok
                                   </button>
@@ -1223,10 +1401,10 @@ export default function StikerMakanV2Page() {
                                       type="button"
                                       title={tf.label}
                                       onClick={() => updateCfg({ tanggalFormat: tf.id })}
-                                      className={`px-2 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                                      className={`px-2 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                                         (cfg.tanggalFormat || 'long') === tf.id
                                           ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                          : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
                                       }`}
                                     >
                                       {formatTanggalID(cfg.tanggalKonsumsi || getTodayISO(), tf.id)}
@@ -1256,28 +1434,28 @@ export default function StikerMakanV2Page() {
 
                   <div className="space-y-4 text-xs">
                     {/* Proporsi Lebar Kolom Label Kanan (Lebar Larangan vs Kontak & QR) */}
-                    <div className="p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                    <div className="p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
                       <div className="flex items-center justify-between mb-1.5">
                         <label htmlFor="slider-widthKolomLarangan" className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                           <Sliders className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                           <span>Proporsi Lebar Kolom Label Kanan:</span>
                         </label>
                         <div className="flex items-center gap-1.5 text-[10px]">
-                          <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold tabular-nums">
+                          <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 font-bold tabular-nums">
                             Larangan: {cfg.widthKolomLarangan || 27} mm
                           </span>
-                          <span className="text-slate-400">vs</span>
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold tabular-nums">
+                          <span className="text-slate-400 dark:text-blue-300/80">vs</span>
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 font-bold tabular-nums">
                             Kontak &amp; QR: {(63 - (cfg.widthKolomLarangan || 27)).toFixed(0)} mm
                           </span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                      <p className="text-[10px] text-slate-500 dark:text-blue-200/80 mb-2">
                         Lebar kolom larangan (kiri) dapat dipersempit agar kotak pengaduan dan QR Code di sisi kanan memiliki ruang horizontal lebih lebar dan tidak terpotong.
                       </p>
 
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] text-slate-400 shrink-0 font-semibold">22 mm (Ramping)</span>
+                        <span className="text-[10px] text-slate-500 dark:text-blue-200/80 shrink-0 font-semibold">22 mm (Ramping)</span>
                         <input
                           id="slider-widthKolomLarangan"
                           type="range"
@@ -1289,7 +1467,7 @@ export default function StikerMakanV2Page() {
                           className="flex-1 accent-blue-600 cursor-pointer"
                           aria-label="Lebar Kolom Larangan (mm)"
                         />
-                        <span className="text-[10px] text-slate-400 shrink-0 font-semibold">36.5 mm (Standar Lama)</span>
+                        <span className="text-[10px] text-slate-500 dark:text-blue-200/80 shrink-0 font-semibold">36.5 mm (Standar Lama)</span>
                       </div>
 
                       {/* Preset Cepat Lebar Kolom */}
@@ -1304,10 +1482,10 @@ export default function StikerMakanV2Page() {
                             key={item.val}
                             type="button"
                             onClick={() => updateCfg({ widthKolomLarangan: item.val })}
-                            className={`px-2 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                            className={`px-2 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                               (cfg.widthKolomLarangan || 27) === item.val
                                 ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
                             }`}
                           >
                             {item.label}
@@ -1322,7 +1500,7 @@ export default function StikerMakanV2Page() {
                         <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300 m-0">
                           Daftar Saluran Pengaduan BGN:
                         </h4>
-                        <span className="text-[10px] text-slate-400">Pilih mode ringkas agar tidak kepanjangan</span>
+                        <span className="text-[10px] text-slate-500 dark:text-blue-200/75">Pilih mode ringkas agar tidak kepanjangan</span>
                       </div>
 
                       {/* Tombol Cepat Pilihan Mode Kontak */}
@@ -1341,7 +1519,7 @@ export default function StikerMakanV2Page() {
                             })
                             triggerToast('Mode Ringkas aktif (157, WA, Web)')
                           }}
-                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold border border-blue-500 bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 cursor-pointer shadow-2xs"
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold border border-blue-500 bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 cursor-pointer shadow-2xs transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                         >
                           Ringkas: 157, WA &amp; Web (Rekomendasi)
                         </button>
@@ -1359,7 +1537,7 @@ export default function StikerMakanV2Page() {
                             })
                             triggerToast('Mode Standar aktif (+ Email)')
                           }}
-                          className="px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                         >
                           Standar (+ Email)
                         </button>
@@ -1377,7 +1555,7 @@ export default function StikerMakanV2Page() {
                             })
                             triggerToast('Mode Lengkap aktif (+ Medsos)')
                           }}
-                          className="px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                         >
                           Lengkap (+ Medsos)
                         </button>
@@ -1386,7 +1564,7 @@ export default function StikerMakanV2Page() {
                       <div className="space-y-2.5">
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label htmlFor="callCenterInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="callCenterInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               Call Center BGN:
                             </label>
                             <input
@@ -1394,12 +1572,12 @@ export default function StikerMakanV2Page() {
                               type="tel"
                               value={cfg.pengaduanCallCenter}
                               onChange={(e) => updateCfg({ pengaduanCallCenter: e.target.value })}
-                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="157"
                             />
                           </div>
                           <div>
-                            <label htmlFor="waInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="waInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               WhatsApp Hotline:
                             </label>
                             <input
@@ -1407,7 +1585,7 @@ export default function StikerMakanV2Page() {
                               type="tel"
                               value={cfg.pengaduanWa}
                               onChange={(e) => updateCfg({ pengaduanWa: e.target.value })}
-                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="0811-1020-0157"
                             />
                           </div>
@@ -1415,7 +1593,7 @@ export default function StikerMakanV2Page() {
 
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label htmlFor="webInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="webInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               Website Resmi:
                             </label>
                             <input
@@ -1423,12 +1601,12 @@ export default function StikerMakanV2Page() {
                               type="text"
                               value={cfg.pengaduanWeb}
                               onChange={(e) => updateCfg({ pengaduanWeb: e.target.value })}
-                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="bgn.go.id"
                             />
                           </div>
                           <div>
-                            <label htmlFor="emailInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="emailInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               Email Pengaduan:
                             </label>
                             <input
@@ -1436,7 +1614,7 @@ export default function StikerMakanV2Page() {
                               type="email"
                               value={cfg.pengaduanEmail}
                               onChange={(e) => updateCfg({ pengaduanEmail: e.target.value })}
-                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="pengaduan@bgn.go.id"
                             />
                           </div>
@@ -1444,7 +1622,7 @@ export default function StikerMakanV2Page() {
 
                         <div className="grid grid-cols-3 gap-2 pt-0.5">
                           <div>
-                            <label htmlFor="igInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="igInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               Instagram:
                             </label>
                             <input
@@ -1452,12 +1630,12 @@ export default function StikerMakanV2Page() {
                               type="text"
                               value={cfg.pengaduanIg}
                               onChange={(e) => updateCfg({ pengaduanIg: e.target.value })}
-                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-[11px] font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="@badangizinasional.ri"
                             />
                           </div>
                           <div>
-                            <label htmlFor="fbInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="fbInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               Facebook:
                             </label>
                             <input
@@ -1465,12 +1643,12 @@ export default function StikerMakanV2Page() {
                               type="text"
                               value={cfg.pengaduanFb}
                               onChange={(e) => updateCfg({ pengaduanFb: e.target.value })}
-                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-[11px] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="Badan Gizi Nasional RI"
                             />
                           </div>
                           <div>
-                            <label htmlFor="tiktokInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                            <label htmlFor="tiktokInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-200 mb-0.5">
                               TikTok:
                             </label>
                             <input
@@ -1478,7 +1656,7 @@ export default function StikerMakanV2Page() {
                               type="text"
                               value={cfg.pengaduanTiktok}
                               onChange={(e) => updateCfg({ pengaduanTiktok: e.target.value })}
-                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-[11px] font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                               placeholder="@badangizinasional.ri"
                             />
                           </div>
@@ -1501,7 +1679,7 @@ export default function StikerMakanV2Page() {
                             })
                             updateCfg(reset)
                           }}
-                          className="text-[10px] font-semibold text-slate-500 hover:text-blue-600 cursor-pointer"
+                          className="text-[10px] font-semibold text-slate-500 hover:text-blue-600 dark:text-blue-300 dark:hover:text-blue-200 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded px-1 transition-all"
                         >
                           Reset font kontak
                         </button>
@@ -1510,7 +1688,7 @@ export default function StikerMakanV2Page() {
                       <div className="space-y-2">
                         {PENGADUAN_FONT_FIELDS.map((pf) => (
                           <div key={pf.key} className="flex items-center gap-2">
-                            <label htmlFor={`slider-${pf.key}`} className="w-[75px] shrink-0 text-[10px] font-semibold text-slate-600 dark:text-slate-400 truncate">
+                            <label htmlFor={`slider-${pf.key}`} className="w-[75px] shrink-0 text-[10px] font-semibold text-slate-600 dark:text-slate-200 truncate">
                               {pf.label}
                             </label>
                             <input
@@ -1539,19 +1717,19 @@ export default function StikerMakanV2Page() {
                           <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           <span>QR Code Menu &amp; Analisis Gizi</span>
                         </h4>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                           Di Bawah Kontak
                         </span>
                       </div>
 
                       {/* Toggle Tampilkan QR Code */}
-                      <div className="flex items-center justify-between p-3 mb-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">
+                      <div className="flex items-center justify-between p-3 mb-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 text-xs">
                         <div>
                           <label htmlFor="showQrMenuToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
                             <QrCode className="w-3.5 h-3.5 text-emerald-600" />
                             <span>Tampilkan QR Code Menu &amp; Gizi</span>
                           </label>
-                          <p className="text-[10px] text-slate-400 dark:text-slate-500 m-0">
+                          <p className="text-[10px] text-slate-500 dark:text-slate-300 m-0">
                             Menempatkan kotak QR Code di bawah kotak pengaduan pada Label Kanan.
                           </p>
                         </div>
@@ -1565,7 +1743,7 @@ export default function StikerMakanV2Page() {
                       </div>
 
                       {(cfg.showQrMenu ?? true) && (
-                        <div className="space-y-3 p-3.5 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 animate-in fade-in duration-150">
+                        <div className="space-y-3 p-3.5 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 animate-in fade-in duration-150">
                           {/* Input Tautan / URL */}
                           <div>
                             <div className="flex items-center justify-between mb-1">
@@ -1573,14 +1751,14 @@ export default function StikerMakanV2Page() {
                                 <Link2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                 <span>Tautan / Link Menu &amp; Gizi:</span>
                               </label>
-                              <span className="text-[10px] text-slate-400">Generate otomatis</span>
+                              <span className="text-[10px] text-slate-500 dark:text-emerald-300/80">Generate otomatis</span>
                             </div>
                             <input
                               id="qrMenuUrlInput"
                               type="url"
                               value={cfg.qrMenuUrl || ''}
                               onChange={(e) => updateCfg({ qrMenuUrl: e.target.value })}
-                              className="w-full py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
+                              className="w-full py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-mono text-xs focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none transition-all"
                               placeholder="https://bgn.go.id atau tautan menu SPPG"
                             />
 
@@ -1596,10 +1774,10 @@ export default function StikerMakanV2Page() {
                                   key={preset.label}
                                   type="button"
                                   onClick={() => updateCfg({ qrMenuUrl: preset.url })}
-                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none ${
                                     cfg.qrMenuUrl === preset.url
                                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                                      : 'border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 bg-white dark:bg-slate-800'
+                                      : 'border-emerald-200 dark:border-emerald-900/60 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 bg-white dark:bg-emerald-900/30'
                                   }`}
                                 >
                                   {preset.label}
@@ -1611,7 +1789,7 @@ export default function StikerMakanV2Page() {
                           {/* Judul & Ukuran Font QR */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                              <label htmlFor="qrMenuTextInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                              <label htmlFor="qrMenuTextInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-1">
                                 Judul di Atas QR:
                               </label>
                               <input
@@ -1619,13 +1797,13 @@ export default function StikerMakanV2Page() {
                                 type="text"
                                 value={cfg.qrMenuText || ''}
                                 onChange={(e) => updateCfg({ qrMenuText: e.target.value })}
-                                className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold uppercase"
+                                className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold uppercase focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none transition-all"
                                 placeholder="MENU & ANALISIS GIZI"
                               />
                             </div>
                             <div className="flex flex-col justify-end">
                               <div className="flex items-center justify-between text-[11px] mb-1">
-                                <label htmlFor="slider-fsQrJudul" className="font-semibold text-slate-600 dark:text-slate-400">
+                                <label htmlFor="slider-fsQrJudul" className="font-semibold text-slate-600 dark:text-slate-200">
                                   Ukuran Font Judul QR:
                                 </label>
                                 <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums text-[10px]">
@@ -1647,7 +1825,7 @@ export default function StikerMakanV2Page() {
                           </div>
 
                           {/* Petunjuk Pemindaian */}
-                          <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-emerald-200/80 dark:border-emerald-800/40 text-[10px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
+                          <div className="p-2 rounded-lg bg-white/80 dark:bg-emerald-900/40 border border-emerald-200/80 dark:border-emerald-900/40 text-[10px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
                             <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                             <span>
                               Format simpel &amp; presisi: Teks <strong>MENU &amp; ANALISIS GIZI</strong> di atas, dan QR Code di bawahnya.
@@ -1669,11 +1847,11 @@ export default function StikerMakanV2Page() {
                       <span>Font &amp; Tipografi Semua Tulisan</span>
                     </h3>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                  <p className="text-[11px] text-slate-500 dark:text-blue-200/80 mb-2">
                     Berlaku serentak untuk seluruh elemen teks pada Label Kiri &amp; Label Kanan.
                   </p>
 
-                  <div className="flex items-start gap-2 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] text-emerald-800 dark:text-emerald-300 mb-3">
+                  <div className="flex items-start gap-2 p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-[11px] text-emerald-800 dark:text-emerald-300 mb-3">
                     <Info className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
                     <span>
                       <strong>Rekomendasi Thermal:</strong> Gunakan font sans-serif bersudut tegas seperti <strong>Verdana</strong> atau <strong>Tahoma</strong> agar tulisan di ukuran 4–8pt tetap tajam dan tidak kabur pada printer thermal 203 DPI.
@@ -1689,25 +1867,25 @@ export default function StikerMakanV2Page() {
                           key={f.label}
                           type="button"
                           onClick={() => updateCfg({ fontFamily: f.value })}
-                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                             active
-                              ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                              : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                              ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                              : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                           }`}
                         >
                           <div className="font-bold flex items-center justify-between" style={{ fontFamily: f.value }}>
                             <span>Ag {f.label}</span>
                             {f.badge && (
-                              <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
+                              <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                                 {f.badge}
                               </span>
                             )}
                           </div>
-                          <div className="text-[10px] text-slate-500 truncate mt-0.5" style={{ fontFamily: f.value }}>
+                          <div className="text-[10px] text-slate-500 dark:text-blue-200/80 truncate mt-0.5" style={{ fontFamily: f.value }}>
                             HARUS DIKONSUMSI 123
                           </div>
                           {f.desc && (
-                            <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">
+                            <div className="text-[9px] text-slate-500 dark:text-slate-300 mt-0.5">
                               {f.desc}
                             </div>
                           )}
@@ -1732,7 +1910,7 @@ export default function StikerMakanV2Page() {
                           updateCfg(reset)
                           triggerToast('Ukuran font berhasil direset ke standar default')
                         }}
-                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1"
+                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all cursor-pointer flex items-center gap-1 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                       >
                         <RotateCcw className="w-3 h-3" />
                         <span>Reset Ukuran</span>
@@ -1743,7 +1921,7 @@ export default function StikerMakanV2Page() {
                       {FONT_SIZE_FIELDS.map((f) => (
                         <div key={f.key}>
                           <div className="flex items-center justify-between text-[11px] mb-0.5">
-                            <label htmlFor={`slider-font-${f.key}`} className="font-semibold text-slate-600 dark:text-slate-400">
+                            <label htmlFor={`slider-font-${f.key}`} className="font-semibold text-slate-600 dark:text-slate-200">
                               {f.label}
                             </label>
                             <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
@@ -1781,12 +1959,41 @@ export default function StikerMakanV2Page() {
 
             </form>
 
+            {/* Quick jump to preview on mobile */}
+            <div className="lg:hidden mt-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileView('preview')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+                className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all cursor-pointer"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Lihat Hasil Pratinjau Langsung →</span>
+              </button>
+            </div>
           </section>
 
-          {/* ─── PANEL PREVIEW KANAN (INTERACTIVE PREVIEW & SIMULATION) ─── */}
-          <section className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-[68px] lg:self-start">
+          {/* ─── PANEL PREVIEW KANAN (ARCHITECTURAL INSPECTION STUDIO) ─── */}
+          <section className={`lg:col-span-7 flex-col gap-4 lg:sticky lg:top-[74px] lg:self-start ${mobileView === 'preview' ? 'flex' : 'hidden lg:flex'}`}>
             
-            {/* Tab Navigasi Preview */}
+            {/* Quick jump back to editor on mobile */}
+            <div className="lg:hidden mb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileView('editor')
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+                className="w-full py-2.5 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer"
+              >
+                <Sliders className="w-4 h-4" />
+                <span>← Kembali ke Pengaturan</span>
+              </button>
+            </div>
+
+            {/* Tab Navigasi Preview & Zoom Controls */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-2.5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-2">
               <nav role="tablist" aria-label="Tampilan Format Preview" className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
                 <button
@@ -1794,10 +2001,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={activeTab === 'kiri'}
                   onClick={() => setActiveTab('kiri')}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     activeTab === 'kiri'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   Label Kiri (7×5 cm)
@@ -1807,10 +2014,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={activeTab === 'kanan'}
                   onClick={() => setActiveTab('kanan')}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     activeTab === 'kanan'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   Label Kanan (7×5 cm)
@@ -1820,10 +2027,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={activeTab === 'sepasang'}
                   onClick={() => setActiveTab('sepasang')}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                     activeTab === 'sepasang'
                       ? 'bg-blue-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   Sepasang (14×5 cm)
@@ -1833,10 +2040,10 @@ export default function StikerMakanV2Page() {
                   role="tab"
                   aria-selected={activeTab === 'ompreng'}
                   onClick={() => setActiveTab('ompreng')}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none ${
                     activeTab === 'ompreng'
                       ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
                   <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -1844,81 +2051,100 @@ export default function StikerMakanV2Page() {
                 </button>
               </nav>
 
-              {/* Zoom Controls & Viewport Modes */}
+              {/* Zoom Controls & Quick Presets */}
               <div className="flex items-center gap-1 text-xs">
-                <span className="text-slate-400 dark:text-slate-500 font-semibold mr-0.5">Zoom:</span>
+                <span className="text-slate-500 dark:text-blue-200/90 font-semibold mr-0.5 text-[11px]">Zoom:</span>
                 <button
                   type="button"
-                  onClick={() => setZoomScale((prev) => Math.max(0.7, prev - 0.1))}
-                  className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
+                  onClick={() => setZoomScale((prev) => Math.max(0.7, Math.round((prev - 0.1) * 10) / 10))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 font-bold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center cursor-pointer active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                   aria-label="Perkecil zoom"
                 >
                   <ZoomOut className="w-3.5 h-3.5" />
                 </button>
-                <span className="w-10 text-center font-bold text-[11px] tabular-nums">
+                <span className="w-10 text-center font-bold text-[11px] font-mono tabular-nums text-slate-700 dark:text-slate-200">
                   {Math.round(zoomScale * 100)}%
                 </span>
                 <button
                   type="button"
-                  onClick={() => setZoomScale((prev) => Math.min(2.5, prev + 0.1))}
-                  className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
+                  onClick={() => setZoomScale((prev) => Math.min(2.5, Math.round((prev + 0.1) * 10) / 10))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 font-bold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center cursor-pointer active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
                   aria-label="Perbesar zoom"
                 >
                   <ZoomIn className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setZoomScale(1.0)}
-                  title="Skala Nyata 100% (70x50 mm)"
-                  className={`px-2 py-1 rounded-lg border text-[10px] font-semibold ml-1 cursor-pointer transition-colors ${
-                    zoomScale === 1.0
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  1:1
-                </button>
+                <div className="flex items-center gap-1 ml-1">
+                  <button
+                    type="button"
+                    onClick={() => setZoomScale(1.0)}
+                    title="Skala Nyata 100% (70x50 mm)"
+                    className={`px-2 py-1 rounded-lg border text-[10px] font-mono font-semibold cursor-pointer transition-all active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
+                      zoomScale === 1.0
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
+                    }`}
+                  >
+                    100%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZoomScale(1.25)}
+                    title="Skala Nyaman 125%"
+                    className={`px-2 py-1 rounded-lg border text-[10px] font-mono font-semibold cursor-pointer transition-all active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
+                      zoomScale === 1.25
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
+                    }`}
+                  >
+                    125%
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Preview Canvas Container */}
+            {/* Preview Canvas Container (Architectural Light-Table) */}
             <div
-              className={`rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-start min-h-[460px] max-h-[72vh] overflow-auto overscroll-contain relative transition-colors ${
+              className={`rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-start min-h-[460px] max-h-[74vh] overflow-auto overscroll-contain relative transition-colors ${
                 previewBg === 'grid'
-                  ? 'bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] bg-slate-50 dark:bg-slate-900/60'
+                  ? 'bg-[radial-gradient(#94a3b8_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(59,130,246,0.18)_1.2px,transparent_1.2px)] [background-size:16px_16px] bg-slate-50 dark:bg-slate-950'
                   : previewBg === 'roll'
-                  ? 'bg-gradient-to-b from-amber-100/40 via-amber-50/20 to-amber-100/40 dark:from-slate-900 dark:to-slate-900'
-                  : 'bg-white dark:bg-slate-900'
+                  ? 'bg-gradient-to-b from-slate-200/50 via-slate-100/30 to-slate-200/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950'
+                  : 'bg-white dark:bg-slate-950'
               }`}
             >
               
-              {/* Toolbar Atas Preview: Dimensi & Mode Latar Belakang */}
+              {/* Toolbar Atas Preview: Caliper Info & Mode Latar Belakang */}
               <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-4">
                 {activeTab !== 'ompreng' ? (
-                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 select-none">
-                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      ↔ Lebar: <strong className="text-slate-800 dark:text-slate-200">{activeTab === 'sepasang' ? '14,0 cm' : '7,0 cm'}</strong> (70 mm)
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-blue-200/80 select-none">
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-mono text-[11px]">
+                      <span>↔ Lebar:</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{activeTab === 'sepasang' ? '14,0 cm' : '7,0 cm'}</strong>
+                      <span className="text-slate-400 dark:text-blue-300/80">({activeTab === 'sepasang' ? '140 mm' : '70 mm'})</span>
                     </span>
-                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                      ↕ Tinggi: <strong className="text-slate-800 dark:text-slate-200">5,0 cm</strong> (50 mm)
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-mono text-[11px]">
+                      <span>↕ Tinggi:</span>
+                      <strong className="text-slate-800 dark:text-slate-200">5,0 cm</strong>
+                      <span className="text-slate-400 dark:text-blue-300/80">(50 mm)</span>
                     </span>
                   </div>
                 ) : (
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                    🍱 Simulasi Tutup Ompreng Segel Sesuai Gambar 2 Lampiran SE BGN
+                  <div className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <UtensilsCrossed className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Simulasi Tutup Ompreng Segel Sesuai Gambar 2 Lampiran SE BGN</span>
                   </div>
                 )}
 
                 {/* Background Switcher */}
-                <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
-                  <span>Latar:</span>
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 dark:text-blue-200/80">
+                  <span className="mr-0.5">Latar:</span>
                   <button
                     type="button"
                     onClick={() => setPreviewBg('white')}
-                    className={`px-2 py-0.5 rounded border cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-medium cursor-pointer transition-all active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                       previewBg === 'white'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-slate-200 dark:border-slate-700'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
                     }`}
                   >
                     Polos
@@ -1926,105 +2152,142 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     onClick={() => setPreviewBg('grid')}
-                    className={`px-2 py-0.5 rounded border cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-medium cursor-pointer transition-all active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                       previewBg === 'grid'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-slate-200 dark:border-slate-700'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
                     }`}
                   >
-                    Grid
+                    Grid Presisi
                   </button>
                   <button
                     type="button"
                     onClick={() => setPreviewBg('roll')}
-                    className={`px-2 py-0.5 rounded border cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-lg border text-[11px] font-medium cursor-pointer transition-all active:scale-[0.95] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                       previewBg === 'roll'
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-slate-200 dark:border-slate-700'
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                        : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
                     }`}
                   >
-                    Kertas Roll
+                    Roll Kertas
                   </button>
                 </div>
               </div>
 
-              {/* Tampilan Visual Sesuai Tab Aktif */}
+              {/* Architectural Canvas / Light Table Display */}
               <div
-                style={{
-                  zoom: zoomScale,
-                }}
-                className="py-4 my-auto flex items-center justify-center transition-transform"
+                className="w-full flex items-center justify-center py-4 my-auto overflow-x-auto overflow-y-visible"
+                style={{ minHeight: '320px' }}
               >
-                {activeTab === 'kiri' && (
-                  <div className="shadow-2xl rounded-sm border border-slate-300 bg-white">
-                    <LabelKiri
-                      id="preview-node-kiri"
-                      cfg={cfg}
-                      isBW={isBW}
-                      showCropMarks={showCropMarks}
-                    />
-                  </div>
-                )}
+                <div
+                  style={{
+                    transform: `scale(${zoomScale})`,
+                    transformOrigin: 'top center',
+                    transition: 'transform 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                    marginBottom: `${Math.max(0, (zoomScale - 1) * 220)}px`,
+                  }}
+                  className="flex flex-col items-center"
+                >
+                  {/* Caliper Horizontal (Lebar) */}
+                  {activeTab !== 'ompreng' && (
+                    <div className="w-full flex items-center justify-between text-[10px] font-mono font-semibold text-slate-500 dark:text-cyan-300 mb-2 select-none px-1">
+                      <div className="flex items-center gap-1.5 w-full">
+                        <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
+                        <div className="h-[1px] flex-1 bg-slate-300 dark:bg-cyan-500/40"></div>
+                        <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-cyan-500/40 text-[9px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
+                          {activeTab === 'sepasang' ? '140.0 mm (Lebar 2 Label)' : '70.0 mm (Lebar Standar)'}
+                        </span>
+                        <div className="h-[1px] flex-1 bg-slate-300 dark:bg-cyan-500/40"></div>
+                        <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
+                      </div>
+                    </div>
+                  )}
 
-                {activeTab === 'kanan' && (
-                  <div className="shadow-2xl rounded-sm border border-slate-300 bg-white">
-                    <LabelKanan
-                      id="preview-node-kanan"
-                      cfg={cfg}
-                      isBW={isBW}
-                      showCropMarks={showCropMarks}
-                    />
-                  </div>
-                )}
+                  {/* Label Surface with tactile elevation and side caliper */}
+                  <div className="relative flex items-center justify-center">
+                    {/* Caliper Vertikal (Tinggi) */}
+                    {activeTab !== 'ompreng' && (
+                      <div className="absolute -left-8 top-0 bottom-0 flex flex-col items-center justify-between text-[9px] font-mono font-semibold text-slate-500 dark:text-cyan-300 select-none py-0.5">
+                        <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
+                        <span className="[writing-mode:vertical-lr] rotate-180 px-0.5 py-1 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-cyan-500/40 text-[8px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
+                          50.0 mm
+                        </span>
+                        <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
+                      </div>
+                    )}
 
-                {activeTab === 'sepasang' && (
-                  <div id="preview-node-sepasang" className="shadow-2xl rounded-sm border border-slate-300 bg-white p-0">
-                    <LabelSepasang
-                      cfg={cfg}
-                      isBW={isBW}
-                      showCropMarks={showCropMarks}
-                      gapMm={2}
-                    />
-                  </div>
-                )}
+                    {activeTab === 'kiri' && (
+                      <div className="shadow-[0_16px_36px_-12px_rgba(15,23,42,0.18)] dark:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6)] rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white">
+                        <LabelKiri
+                          id="preview-node-kiri"
+                          cfg={cfg}
+                          isBW={isBW}
+                          showCropMarks={showCropMarks}
+                        />
+                      </div>
+                    )}
 
-                {activeTab === 'ompreng' && (
-                  <div className="w-full max-w-[560px]">
-                    <OmprengMockup cfg={cfg} isBW={isBW} />
+                    {activeTab === 'kanan' && (
+                      <div className="shadow-[0_16px_36px_-12px_rgba(15,23,42,0.18)] dark:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6)] rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white">
+                        <LabelKanan
+                          id="preview-node-kanan"
+                          cfg={cfg}
+                          isBW={isBW}
+                          showCropMarks={showCropMarks}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'sepasang' && (
+                      <div id="preview-node-sepasang" className="shadow-[0_16px_36px_-12px_rgba(15,23,42,0.18)] dark:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6)] rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white p-0">
+                        <LabelSepasang
+                          cfg={cfg}
+                          isBW={isBW}
+                          showCropMarks={showCropMarks}
+                          gapMm={2}
+                        />
+                      </div>
+                    )}
+
+                    {activeTab === 'ompreng' && (
+                      <div className="w-full max-w-[560px]">
+                        <OmprengMockup cfg={cfg} isBW={isBW} />
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
               {/* Action Toolbar di Bawah Preview */}
-              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 w-full flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-slate-500 font-semibold mr-1">Unduh (300 DPI):</span>
+                  <span className="text-slate-600 dark:text-blue-200/90 font-semibold mr-1 text-[11px]">Unduh (300 DPI):</span>
                   <button
                     type="button"
                     disabled={isExporting}
                     onClick={() => handleDownloadPng('preview-node-kiri', 'stiker-bgn-kiri-70x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                   >
-                    <Download className="w-3 h-3" />
+                    {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
                     <span>PNG Kiri</span>
                   </button>
                   <button
                     type="button"
                     disabled={isExporting}
                     onClick={() => handleDownloadPng('preview-node-kanan', 'stiker-bgn-kanan-70x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                   >
-                    <Download className="w-3 h-3" />
+                    {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
                     <span>PNG Kanan</span>
                   </button>
                   <button
                     type="button"
                     disabled={isExporting}
                     onClick={() => handleDownloadPng('preview-node-sepasang-dl', 'stiker-bgn-sepasang-140x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                   >
-                    <Download className="w-3 h-3" />
-                    <span>PNG Sepasang (14×5)</span>
+                    {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
+                    <span>PNG Sepasang</span>
                   </button>
 
                   <button
@@ -2034,10 +2297,10 @@ export default function StikerMakanV2Page() {
                       const target = activeTab === 'kanan' ? 'preview-node-kanan' : activeTab === 'sepasang' ? 'preview-node-sepasang' : 'preview-node-kiri'
                       handleCopyPng(target)
                     }}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                     title="Salin gambar aktif ke clipboard"
                   >
-                    <Copy className="w-3 h-3" />
+                    {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Copy className="w-3 h-3" />}
                     <span>Salin Gambar</span>
                   </button>
                 </div>
@@ -2046,7 +2309,7 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     onClick={handleCleanThermalPrint}
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md hover:shadow-lg flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-[0_10px_20px_-6px_rgba(37,99,235,0.35)] hover:shadow-[0_14px_24px_-6px_rgba(37,99,235,0.45)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                   >
                     <Printer className="w-4 h-4" />
                     <span>Cetak Sekarang ({printPages.length} Label)</span>
@@ -2056,10 +2319,10 @@ export default function StikerMakanV2Page() {
             </div>
 
             {/* Panduan Cetak Printer Thermal */}
-            <div className="bg-amber-50/90 dark:bg-amber-950/40 rounded-2xl p-4 border border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs">
-              <div className="font-bold flex items-center gap-2 mb-2 text-sm">
+            <div className="bg-amber-50/80 dark:bg-amber-950/30 rounded-2xl p-4 sm:p-5 border border-amber-200/90 dark:border-amber-700/40 text-amber-900 dark:text-amber-200 text-xs shadow-xs">
+              <div className="font-bold flex items-center gap-2 mb-2 text-sm tracking-tight text-amber-950 dark:text-amber-100">
                 <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span>Panduan Teknis Cetak Thermal Label Ompreng (70 × 50 mm):</span>
+                <span>Panduan Teknis Cetak Thermal Label Ompreng (70 × 50 mm)</span>
               </div>
               <ul className="list-disc pl-5 space-y-1.5 text-[11px] leading-relaxed">
                 <li>
@@ -2082,72 +2345,164 @@ export default function StikerMakanV2Page() {
         </div>
       </div>
 
-      {/* ─── MODAL BAGIKAN / BACKUP KONFIGURASI JSON ─── */}
+      {/* ─── MODAL BAGIKAN, CADANGKAN & PENYIMPANAN LOKAL ─── */}
       {showConfigModal && (
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150"
         >
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-[0_25px_50px_-12px_rgba(15,23,42,0.25)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Share2 className="w-4 h-4 text-blue-600" />
-                <h3 className="text-sm font-bold m-0 text-slate-900 dark:text-white">
-                  Bagikan &amp; Cadangkan Konfigurasi
+                <HardDrive className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-sm font-bold m-0 text-slate-900 dark:text-white tracking-tight">
+                  Penyimpanan &amp; Cadangan Konfigurasi
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setShowConfigModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                onClick={() => {
+                  setShowConfigModal(false)
+                  setConfigError(null)
+                }}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+                aria-label="Tutup modal"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-500 dark:text-slate-400 m-0">
-              Salin data konfigurasi label SPPG ini untuk digunakan di komputer/perangkat dapur lain, atau tempelkan JSON konfigurasi untuk memuat data.
-            </p>
+            {/* KARTU 1: PENYIMPANAN LOKAL BROWSER (LOCAL STORAGE) */}
+            <div className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 m-0">
+                    <Save className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Penyimpanan Lokal Browser (Local Storage)</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-300 m-0 mt-0.5 leading-relaxed">
+                    Menyimpan nama SPPG, alamat, kontak, logo, dan preferensi cetak langsung di browser Anda secara offline tanpa server.
+                  </p>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 border ${
+                  hasSavedData
+                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-800'
+                }`}>
+                  {hasSavedData ? 'Tersimpan' : 'Belum Ada Data'}
+                </span>
+              </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleExportConfig}
-                className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
-              >
-                <Copy className="w-3.5 h-3.5" />
-                <span>Salin Konfigurasi Aktif (JSON)</span>
-              </button>
-            </div>
+              {/* Status Info */}
+              <div className="grid grid-cols-2 gap-2 text-[11px] p-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 font-mono">
+                <div>
+                  <span className="text-slate-500 dark:text-blue-200/80 block text-[10px]">Terakhir Disimpan:</span>
+                  <strong className="text-slate-700 dark:text-slate-200 tabular-nums">
+                    {lastSavedTime || (hasSavedData ? 'Tersimpan (Sesi ini)' : '—')}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 dark:text-blue-200/80 block text-[10px]">Ukuran Tersimpan:</span>
+                  <strong className="text-slate-700 dark:text-slate-200 tabular-nums">
+                    {storageSizeBytes > 0 ? `${(storageSizeBytes / 1024).toFixed(1)} KB` : '0 KB'}
+                  </strong>
+                </div>
+              </div>
 
-            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-              <label htmlFor="importJsonTextarea" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                Tempel Konfigurasi JSON untuk Mengimpor:
-              </label>
-              <textarea
-                id="importJsonTextarea"
-                rows={4}
-                value={configJsonInput}
-                onChange={(e) => setConfigJsonInput(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[11px] font-mono"
-                placeholder='{"namaSppg": "SPPG JAKARTA PUSAT 1", ...}'
-              />
-              <div className="flex justify-end gap-2 mt-2">
+              {/* Tombol Aksi Local Storage */}
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
                 <button
                   type="button"
-                  onClick={() => setShowConfigModal(false)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                  onClick={handleSaveToLocalStorage}
+                  className="flex-1 py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-xs active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
                 >
-                  Batal
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Simpan Sekarang</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!hasSavedData}
+                  onClick={handleRestoreFromLocalStorage}
+                  className="py-2 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                  title="Pulihkan konfigurasi terakhir yang tersimpan di browser"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Pulihkan</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={!hasSavedData}
+                  onClick={handleClearLocalStorage}
+                  className="py-2 px-3 rounded-lg border border-rose-200 dark:border-rose-800/40 bg-white dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 font-semibold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                  title="Hapus data tersimpan dari browser ini"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Hapus</span>
+                </button>
+              </div>
+            </div>
+
+            {/* KARTU 2: CADANGAN JSON EKSTERNAL (EKSPOR / IMPOR) */}
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 m-0">
+                  <Share2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <span>Cadangan JSON (Bagi Antar-Perangkat)</span>
+                </h4>
+                <button
+                  type="button"
+                  onClick={handleExportConfig}
+                  className="py-1 px-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 text-[11px] font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all active:scale-[0.98]"
+                >
+                  <Copy className="w-3 h-3" />
+                  <span>Salin JSON</span>
+                </button>
+              </div>
+
+              <p className="text-[11px] text-slate-500 dark:text-slate-300 m-0 leading-relaxed">
+                Salin data konfigurasi label SPPG ini untuk digunakan di perangkat dapur lain, atau tempelkan JSON konfigurasi untuk memuat data secara instan.
+              </p>
+
+              {configError && (
+                <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 animate-in fade-in duration-100">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                  <span>{configError}</span>
+                </div>
+              )}
+
+              <textarea
+                id="importJsonTextarea"
+                rows={3}
+                value={configJsonInput}
+                onChange={(e) => {
+                  setConfigJsonInput(e.target.value)
+                  if (configError) setConfigError(null)
+                }}
+                className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-[11px] font-mono focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
+                placeholder='Tempel JSON di sini: {"namaSppg": "...", ...}'
+              />
+
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowConfigModal(false)
+                    setConfigError(null)
+                  }}
+                  className="px-3.5 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
+                >
+                  Tutup
                 </button>
                 <button
                   type="button"
                   disabled={!configJsonInput.trim()}
                   onClick={handleApplyImportConfig}
-                  className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer transition-colors shadow-2xs"
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer transition-all shadow-xs active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  Terapkan Konfigurasi
+                  Terapkan JSON
                 </button>
               </div>
             </div>

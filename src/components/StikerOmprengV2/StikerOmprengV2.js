@@ -1,5 +1,6 @@
 import React from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import { UtensilsCrossed } from 'lucide-react'
 
 /**
  * Auto-fit helpers — memastikan tulisan TIDAK terpotong walaupun panjang.
@@ -422,7 +423,7 @@ export function LabelKiri({
               style={{
                 fontSize: `${alamatBase}pt`,
                 fontWeight: '500',
-                color: isBW ? '#333333' : '#475569',
+                color: isBW ? '#000000' : '#1e293b',
                 marginTop: '0.8pt',
                 whiteSpace: 'pre-line',
                 overflow: 'hidden',
@@ -520,7 +521,7 @@ export function LabelKiri({
                     style={{
                       fontSize: `${tanggalBase}pt`,
                       fontWeight: '700',
-                      color: isBW ? '#222222' : '#64748b',
+                      color: isBW ? '#000000' : '#0f172a',
                       marginTop: '1.2mm',
                       letterSpacing: '0.04em',
                       whiteSpace: 'nowrap',
@@ -1074,8 +1075,8 @@ export function OmprengMockup({ cfg = {}, isBW = false }) {
 
   return (
     <div ref={containerRef} className="relative w-full max-w-[760px] mx-auto select-none">
-      <div className="flex items-center gap-1.5 mb-5 px-1">
-        <span className="text-base">🍱</span>
+      <div className="flex items-center gap-2 mb-4 px-1">
+        <UtensilsCrossed className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
         <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
           Gambar 2: Label Segel pada Tutup Ompreng Program Makan Bergizi Gratis
         </span>
@@ -1133,7 +1134,7 @@ export function OmprengMockup({ cfg = {}, isBW = false }) {
               position: 'absolute', top: `${stickerH}px`, left: 0, right: 0,
               height: `${lidThicknessPx}px`,
               background: 'linear-gradient(to bottom, #7898ae 0%, #567a90 100%)',
-              borderTop: '1.5px solid #6b8da2',
+              borderTop: '1.5px solid #4a6f87',
               boxShadow: '0 6px 14px rgba(0,0,0,0.28)',
             }}
           >
