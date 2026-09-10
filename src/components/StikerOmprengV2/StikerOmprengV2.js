@@ -1,4 +1,5 @@
 import React from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 
 /**
  * Auto-fit helpers — memastikan tulisan TIDAK terpotong walaupun panjang.
@@ -593,6 +594,13 @@ export function LabelKanan({
   const borderThickness = cfg.borderThickness || '1.6pt'
   const borderRadius = cfg.borderRadius || '2.8mm'
 
+  // Lebar Kolom Larangan vs Pengaduan & Pengaturan QR Menu
+  const widthKolomLarangan = cfg.widthKolomLarangan || 27
+  const showQrMenu = cfg.showQrMenu ?? true
+  const qrMenuUrl = cfg.qrMenuUrl || 'https://bgn.go.id'
+  const qrMenuText = cfg.qrMenuText || 'MENU & ANALISIS GIZI'
+  const qrMenuSub = cfg.qrMenuSub ?? 'Scan rincian menu & gizi'
+
   // Pengaturan Kotak Pengaduan
   const pengaduan = {
     web: cfg.pengaduanWeb ?? 'bgn.go.id',
@@ -699,10 +707,10 @@ export function LabelKanan({
         ...style,
       }}
     >
-      {/* 1. KOLOM KIRI (~57% lebar): 2 Kotak Bertumpuk */}
+      {/* 1. KOLOM KIRI (Larangan & Segera Konsumsi) - Lebar diperkecil agar Kotak Pengaduan lebih luas */}
       <div
         style={{
-          width: '36.5mm',
+          width: `${widthKolomLarangan}mm`,
           height: '45mm',
           display: 'flex',
           flexDirection: 'column',
@@ -729,7 +737,7 @@ export function LabelKanan({
           }}
         >
           <div style={{ marginBottom: '1mm', flexShrink: 0 }}>
-            <IconDilarangBawaPulang isBW={isBW} sizeMm={cfg.sizeIconLarangan || 11.5} />
+            <IconDilarangBawaPulang isBW={isBW} sizeMm={cfg.sizeIconLarangan || 10.5} />
           </div>
           <div
             ref={laranganRef}
@@ -769,7 +777,7 @@ export function LabelKanan({
           }}
         >
           <div style={{ marginBottom: '1mm', flexShrink: 0 }}>
-            <IconSegeraKonsumsi isBW={isBW} sizeMm={cfg.sizeIconKonsumsi || 11.5} />
+            <IconSegeraKonsumsi isBW={isBW} sizeMm={cfg.sizeIconKonsumsi || 10.5} />
           </div>
           <div
             ref={konsumsiRef}
@@ -792,141 +800,226 @@ export function LabelKanan({
         </div>
       </div>
 
-      {/* 2. KOLOM KANAN (~43% lebar): Kotak Pengaduan */}
+      {/* 2. KOLOM KANAN: Kotak Pengaduan + QR Code Menu & Analisis Gizi */}
       <div
-        ref={pengaduanBoxRef}
         style={{
           flex: 1,
           minWidth: 0,
           height: '45mm',
           maxHeight: '45mm',
-          border: `${borderThickness} solid ${primaryColor}`,
-          borderRadius,
-          padding: '1.8mm 1.6mm',
           display: 'flex',
           flexDirection: 'column',
+          justifyContent: 'space-between',
+          gap: '1.5mm',
           boxSizing: 'border-box',
           overflow: 'hidden',
         }}
       >
-        {/* Header: Kotak Pengaduan */}
+        {/* Kotak Pengaduan */}
         <div
-          style={{
-            textAlign: 'center',
-            fontSize: `${cfg.fsHeaderPengaduan || 7.5}pt`,
-            fontWeight: '900',
-            color: primaryColor,
-            lineHeight: 1.15,
-            paddingBottom: '1.2mm',
-            borderBottom: `0.8pt solid ${isBW ? '#444444' : '#cbd5e1'}`,
-            marginBottom: '1.2mm',
-            flexShrink: 0,
-          }}
-        >
-          Kotak<br />Pengaduan
-        </div>
-
-        {/* List Kontak Resmi BGN — wrap + auto-shrink, tidak pakai ellipsis */}
-        <div
-          ref={pengaduanListRef}
+          ref={pengaduanBoxRef}
           style={{
             flex: 1,
+            minWidth: 0,
             minHeight: 0,
+            border: `${borderThickness} solid ${primaryColor}`,
+            borderRadius,
+            padding: showQrMenu ? '1.2mm 1.6mm' : '1.8mm 1.6mm',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-start',
-            gap: '0.9mm',
-            fontSize: `${isiBase}pt`,
-            lineHeight: 1.15,
-            color: isBW ? '#000000' : '#1e293b',
+            boxSizing: 'border-box',
             overflow: 'hidden',
-            minWidth: 0,
           }}
         >
-          {/* Website */}
-          {pengaduan.web && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.Web color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.web} data-pfs={fsWeb} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWeb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.web}
-              </span>
-            </div>
-          )}
+          {/* Header: Kotak Pengaduan */}
+          {/* Header: Kotak Pengaduan */}
+          <div
+            style={{
+              textAlign: 'center',
+              fontSize: `${showQrMenu ? (cfg.fsHeaderPengaduan || 6.2) : (cfg.fsHeaderPengaduan || 7.5)}pt`,
+              fontWeight: '900',
+              color: primaryColor,
+              lineHeight: 1.1,
+              paddingBottom: showQrMenu ? '0.6mm' : '1.2mm',
+              borderBottom: `0.8pt solid ${isBW ? '#444444' : '#cbd5e1'}`,
+              marginBottom: showQrMenu ? '0.8mm' : '1.2mm',
+              flexShrink: 0,
+              textTransform: 'uppercase',
+              letterSpacing: '0.03em',
+            }}
+          >
+            Kotak Pengaduan
+          </div>
 
-          {/* Email */}
-          {pengaduan.email && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.Mail color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.email} data-pfs={fsEmail} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsEmail}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.email}
-              </span>
-            </div>
-          )}
+          {/* List Kontak Resmi BGN — wrap + auto-shrink, ringkas & tidak kepanjangan */}
+          <div
+            ref={pengaduanListRef}
+            style={{
+              flex: 1,
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              gap: showQrMenu ? '0.7mm' : '0.9mm',
+              fontSize: `${isiBase}pt`,
+              lineHeight: 1.15,
+              color: isBW ? '#000000' : '#1e293b',
+              overflow: 'hidden',
+              minWidth: 0,
+            }}
+          >
+            {/* Call Center 157 */}
+            {pengaduan.callCenter && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.Phone color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.callCenter} data-pfs={fsCall} style={{ fontWeight: '800', flex: 1, minWidth: 0, fontSize: `${fsCall}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.callCenter}
+                </span>
+              </div>
+            )}
 
-          {/* Call Center 157 */}
-          {pengaduan.callCenter && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.Phone color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.callCenter} data-pfs={fsCall} style={{ fontWeight: '800', flex: 1, minWidth: 0, fontSize: `${fsCall}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.callCenter}
-              </span>
-            </div>
-          )}
+            {/* WhatsApp */}
+            {pengaduan.wa && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.WhatsApp color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.wa} data-pfs={fsWa} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWa}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.wa}
+                </span>
+              </div>
+            )}
 
-          {/* WhatsApp */}
-          {pengaduan.wa && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.WhatsApp color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.wa} data-pfs={fsWa} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWa}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.wa}
-              </span>
-            </div>
-          )}
+            {/* Website */}
+            {pengaduan.web && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.Web color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.web} data-pfs={fsWeb} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWeb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.web}
+                </span>
+              </div>
+            )}
 
-          {/* Instagram */}
-          {pengaduan.ig && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.Instagram color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.ig} data-pfs={fsIg} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsIg}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.ig}
-              </span>
-            </div>
-          )}
+            {/* Email */}
+            {pengaduan.email && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.Mail color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.email} data-pfs={fsEmail} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsEmail}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.email}
+                </span>
+              </div>
+            )}
 
-          {/* Facebook */}
-          {pengaduan.fb && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.Facebook color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.fb} data-pfs={fsFb} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsFb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.fb}
-              </span>
-            </div>
-          )}
+            {/* Instagram */}
+            {pengaduan.ig && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.Instagram color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.ig} data-pfs={fsIg} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsIg}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.ig}
+                </span>
+              </div>
+            )}
 
-          {/* TikTok */}
-          {pengaduan.tiktok && (
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
-              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                <SocialIcons.TikTok color={iconColor} size={10} />
-              </span>
-              <span title={pengaduan.tiktok} data-pfs={fsTiktok} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsTiktok}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                {pengaduan.tiktok}
-              </span>
-            </div>
-          )}
+            {/* Facebook */}
+            {pengaduan.fb && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.Facebook color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.fb} data-pfs={fsFb} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsFb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.fb}
+                </span>
+              </div>
+            )}
+
+            {/* TikTok */}
+            {pengaduan.tiktok && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
+                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                  <SocialIcons.TikTok color={iconColor} size={9.5} />
+                </span>
+                <span title={pengaduan.tiktok} data-pfs={fsTiktok} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsTiktok}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+                  {pengaduan.tiktok}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Kotak QR Code MENU & ANALISIS GIZI (Vertikal: Judul di Atas, QR Code di Bawah) */}
+        {showQrMenu && (
+          <div
+            style={{
+              height: '21mm',
+              minHeight: '21mm',
+              maxHeight: '21mm',
+              border: `${borderThickness} solid ${primaryColor}`,
+              borderRadius,
+              padding: '1mm 1.2mm',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxSizing: 'border-box',
+              overflow: 'hidden',
+              backgroundColor: '#ffffff',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                fontSize: `${cfg.fsQrJudul || 5.6}pt`,
+                fontWeight: '900',
+                color: primaryColor,
+                letterSpacing: '0.02em',
+                textAlign: 'center',
+                textTransform: 'uppercase',
+                lineHeight: 1.15,
+                marginBottom: '0.8mm',
+                width: '100%',
+                whiteSpace: 'normal',
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+              }}
+            >
+              {qrMenuText || 'MENU & ANALISIS GIZI'}
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                flex: 1,
+                minHeight: 0,
+              }}
+            >
+              <QRCodeSVG
+                value={qrMenuUrl || 'https://bgn.go.id'}
+                size={56}
+                level="M"
+                fgColor={isBW ? '#000000' : primaryColor}
+                bgColor="#ffffff"
+                style={{
+                  width: '14.5mm',
+                  height: '14.5mm',
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  display: 'block',
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

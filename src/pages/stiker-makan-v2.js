@@ -34,6 +34,9 @@ import {
   LayoutGrid,
   X,
   ShieldCheck,
+  QrCode,
+  Link2,
+  Sliders,
 } from 'lucide-react'
 
 // Helper format tanggal Indonesia
@@ -111,14 +114,23 @@ const DEFAULT_CFG = {
   tanggalKonsumsi: getTodayISO(),
   tanggalFormat: 'long', // 'long' | 'full' | 'short' | 'dmy-dash' | 'dmy-slash'
 
-  // Kotak Pengaduan Resmi BGN
-  pengaduanWeb: 'bgn.go.id',
-  pengaduanEmail: 'pengaduan@bgn.go.id',
+  // Kotak Pengaduan Resmi BGN (Default Ringkas agar tidak terlalu panjang)
   pengaduanCallCenter: '157',
   pengaduanWa: '0811-1020-0157',
-  pengaduanIg: '@badangizinasional.ri',
-  pengaduanFb: 'Badan Gizi Nasional RI',
-  pengaduanTiktok: '@badangizinasional.ri',
+  pengaduanWeb: 'bgn.go.id',
+  pengaduanEmail: '', // Dikosongkan default agar kotak pengaduan tidak kepanjangan
+  pengaduanIg: '',    // Dikosongkan default agar kotak pengaduan tidak kepanjangan
+  pengaduanFb: '',
+  pengaduanTiktok: '',
+
+  // Lebar Kolom & QR Code Menu & Gizi (Label Kanan)
+  widthKolomLarangan: 27, // mm
+  showQrMenu: true,
+  qrMenuUrl: 'https://bgn.go.id',
+  qrMenuText: 'MENU & ANALISIS GIZI',
+  qrMenuSub: '',
+  fsQrJudul: 5.6,
+  fsQrSub: 3.8,
 
   // Tipografi & Styling
   primaryColor: '#0b2545',
@@ -136,6 +148,8 @@ const DEFAULT_CFG = {
   fsSegeraKonsumsi: 6.8,
   fsHeaderPengaduan: 7.5,
   fsIsiPengaduan: 5.1,
+  fsQrJudul: 5.2,
+  fsQrSub: 3.8,
 
   // Ukuran font per kontak pengaduan
   fsPengaduanWeb: 5.1,
@@ -184,6 +198,8 @@ const FONT_SIZE_FIELDS = [
   { key: 'fsSegeraKonsumsi', label: 'Teks Segera Konsumsi', min: 4, max: 10, step: 0.1 },
   { key: 'fsHeaderPengaduan', label: 'Judul Kotak Pengaduan', min: 5, max: 12, step: 0.1 },
   { key: 'fsIsiPengaduan', label: 'Isi Kotak Pengaduan (Global)', min: 3, max: 8, step: 0.1 },
+  { key: 'fsQrJudul', label: 'Judul QR Menu & Gizi', min: 3.5, max: 9, step: 0.1 },
+  { key: 'fsQrSub', label: 'Subjudul QR Menu', min: 2.5, max: 7, step: 0.1 },
 ]
 
 // Ukuran font per kontak pengaduan
@@ -195,56 +211,6 @@ const PENGADUAN_FONT_FIELDS = [
   { key: 'fsPengaduanIg', label: 'Instagram' },
   { key: 'fsPengaduanFb', label: 'Facebook' },
   { key: 'fsPengaduanTiktok', label: 'TikTok' },
-]
-
-// Preset Operasional Dapur BGN
-const OPERATIONAL_PRESETS = [
-  {
-    id: 'siang',
-    name: 'Makan Siang',
-    badge: '11:30 WIB',
-    desc: 'Sesi makan siang reguler siswa',
-    apply: {
-      waktuMode: 'direct',
-      jamKonsumsi: '11:30 WIB',
-      showTanggal: true,
-      tanggalFormat: 'long',
-    },
-  },
-  {
-    id: 'pagi',
-    name: 'Sarapan Pagi',
-    badge: '08:30 WIB',
-    desc: 'Sesi makan pagi / awal',
-    apply: {
-      waktuMode: 'direct',
-      jamKonsumsi: '08:30 WIB',
-      showTanggal: true,
-      tanggalFormat: 'long',
-    },
-  },
-  {
-    id: 'sore',
-    name: 'Kudapan Sore',
-    badge: '14:30 WIB',
-    desc: 'Sesi sore atau camilan bergizi',
-    apply: {
-      waktuMode: 'direct',
-      jamKonsumsi: '14:30 WIB',
-      showTanggal: true,
-      tanggalFormat: 'long',
-    },
-  },
-  {
-    id: 'blank',
-    name: 'Stempel Manual',
-    badge: 'Kosong',
-    desc: 'Area jam dibiarkan kosong untuk stempel manual',
-    apply: {
-      waktuMode: 'blank',
-      showTanggal: false,
-    },
-  },
 ]
 
 // Dynamic loader html-to-image
@@ -637,6 +603,21 @@ export default function StikerMakanV2Page() {
 
             <button
               type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.confirm('Kembalikan semua konfigurasi ke standar awal SE BGN 2026?')) {
+                  updateCfg(DEFAULT_CFG)
+                  triggerToast('Konfigurasi dikembalikan ke default')
+                }
+              }}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Reset semua pengaturan ke standar awal"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Default</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setShowConfigModal(true)}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
               title="Salin atau Impor Konfigurasi"
@@ -660,59 +641,6 @@ export default function StikerMakanV2Page() {
       {/* ─── WORKSPACE (NO PRINT) ─── */}
       <div className="no-print-area max-w-7xl mx-auto px-4 sm:px-6 py-6">
         
-        {/* Preset Cepat Banner */}
-        <section className="mb-5 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-2.5">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 m-0">
-                Preset Operasional Dapur Cepat
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm('Kembalikan semua konfigurasi ke standar awal SE BGN 2026?')) {
-                    updateCfg(DEFAULT_CFG)
-                    triggerToast('Konfigurasi dikembalikan ke default')
-                  }
-                }}
-                className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
-              >
-                <RotateCcw className="w-3 h-3" />
-                <span>Reset ke Default BGN</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {OPERATIONAL_PRESETS.map((pst) => (
-              <button
-                key={pst.id}
-                type="button"
-                onClick={() => {
-                  updateCfg(pst.apply)
-                  triggerToast(`Preset "${pst.name}" berhasil diterapkan`)
-                }}
-                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition-all text-left group cursor-pointer"
-              >
-                <div className="flex items-center justify-between gap-1 mb-1">
-                  <span className="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {pst.name}
-                  </span>
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
-                    {pst.badge}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 m-0 leading-tight">
-                  {pst.desc}
-                </p>
-              </button>
-            ))}
-          </div>
-        </section>
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* ─── PANEL KONTROL KIRI (EDITOR SETTINGS) ─── */}
@@ -763,7 +691,7 @@ export default function StikerMakanV2Page() {
                   }`}
                 >
                   <PhoneCall className="w-3.5 h-3.5" />
-                  <span>Pengaduan</span>
+                  <span>Pengaduan &amp; QR</span>
                 </button>
 
                 <button
@@ -1316,118 +1244,250 @@ export default function StikerMakanV2Page() {
               )}
 
               {/* 3. Form Kotak Pengaduan BGN (Label Kanan) */}
+              {/* 3. Form Kotak Pengaduan & QR Code BGN (Label Kanan) */}
               {(editorMode === 'all' || editorTab === 'pengaduan') && (
                 <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs animate-in fade-in duration-150">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
                       <PhoneCall className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span>Saluran Kontak Pengaduan (Label Kanan)</span>
+                      <span>Saluran Kontak &amp; QR Code (Label Kanan)</span>
                     </h3>
                   </div>
 
-                  <div className="space-y-3 text-xs">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label htmlFor="callCenterInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          Call Center BGN:
+                  <div className="space-y-4 text-xs">
+                    {/* Proporsi Lebar Kolom Label Kanan (Lebar Larangan vs Kontak & QR) */}
+                    <div className="p-3.5 rounded-xl bg-slate-50/90 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label htmlFor="slider-widthKolomLarangan" className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <Sliders className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          <span>Proporsi Lebar Kolom Label Kanan:</span>
                         </label>
-                        <input
-                          id="callCenterInput"
-                          type="tel"
-                          value={cfg.pengaduanCallCenter}
-                          onChange={(e) => updateCfg({ pengaduanCallCenter: e.target.value })}
-                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
-                          placeholder="157"
-                        />
+                        <div className="flex items-center gap-1.5 text-[10px]">
+                          <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold tabular-nums">
+                            Larangan: {cfg.widthKolomLarangan || 27} mm
+                          </span>
+                          <span className="text-slate-400">vs</span>
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold tabular-nums">
+                            Kontak &amp; QR: {(63 - (cfg.widthKolomLarangan || 27)).toFixed(0)} mm
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <label htmlFor="waInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          WhatsApp Hotline:
-                        </label>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-2">
+                        Lebar kolom larangan (kiri) dapat dipersempit agar kotak pengaduan dan QR Code di sisi kanan memiliki ruang horizontal lebih lebar dan tidak terpotong.
+                      </p>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] text-slate-400 shrink-0 font-semibold">22 mm (Ramping)</span>
                         <input
-                          id="waInput"
-                          type="tel"
-                          value={cfg.pengaduanWa}
-                          onChange={(e) => updateCfg({ pengaduanWa: e.target.value })}
-                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                          placeholder="0811-1020-0157"
+                          id="slider-widthKolomLarangan"
+                          type="range"
+                          min={22}
+                          max={36.5}
+                          step={0.5}
+                          value={cfg.widthKolomLarangan || 27}
+                          onChange={(e) => updateCfg({ widthKolomLarangan: parseFloat(e.target.value) })}
+                          className="flex-1 accent-blue-600 cursor-pointer"
+                          aria-label="Lebar Kolom Larangan (mm)"
                         />
+                        <span className="text-[10px] text-slate-400 shrink-0 font-semibold">36.5 mm (Standar Lama)</span>
+                      </div>
+
+                      {/* Preset Cepat Lebar Kolom */}
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        {[
+                          { label: 'Standar Baru (27 mm)', val: 27, badge: 'Rekomendasi' },
+                          { label: 'Ekstra Luas (25 mm)', val: 25 },
+                          { label: 'Seimbang (29 mm)', val: 29 },
+                          { label: 'Standar Lama (36.5 mm)', val: 36.5 },
+                        ].map((item) => (
+                          <button
+                            key={item.val}
+                            type="button"
+                            onClick={() => updateCfg({ widthKolomLarangan: item.val })}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                              (cfg.widthKolomLarangan || 27) === item.val
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                            }`}
+                          >
+                            {item.label}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label htmlFor="webInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          Website Resmi:
-                        </label>
-                        <input
-                          id="webInput"
-                          type="text"
-                          value={cfg.pengaduanWeb}
-                          onChange={(e) => updateCfg({ pengaduanWeb: e.target.value })}
-                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                          placeholder="bgn.go.id"
-                        />
+                    {/* Kontak Pengaduan Resmi BGN */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-300 m-0">
+                          Daftar Saluran Pengaduan BGN:
+                        </h4>
+                        <span className="text-[10px] text-slate-400">Pilih mode ringkas agar tidak kepanjangan</span>
                       </div>
-                      <div>
-                        <label htmlFor="emailInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          Email Pengaduan:
-                        </label>
-                        <input
-                          id="emailInput"
-                          type="email"
-                          value={cfg.pengaduanEmail}
-                          onChange={(e) => updateCfg({ pengaduanEmail: e.target.value })}
-                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                          placeholder="pengaduan@bgn.go.id"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-3 gap-2 pt-1">
-                      <div>
-                        <label htmlFor="igInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          Instagram:
-                        </label>
-                        <input
-                          id="igInput"
-                          type="text"
-                          value={cfg.pengaduanIg}
-                          onChange={(e) => updateCfg({ pengaduanIg: e.target.value })}
-                          className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                          placeholder="@badangizinasional.ri"
-                        />
+                      {/* Tombol Cepat Pilihan Mode Kontak */}
+                      <div className="flex flex-wrap gap-1 mb-2.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateCfg({
+                              pengaduanCallCenter: '157',
+                              pengaduanWa: '0811-1020-0157',
+                              pengaduanWeb: 'bgn.go.id',
+                              pengaduanEmail: '',
+                              pengaduanIg: '',
+                              pengaduanFb: '',
+                              pengaduanTiktok: '',
+                            })
+                            triggerToast('Mode Ringkas aktif (157, WA, Web)')
+                          }}
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold border border-blue-500 bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 cursor-pointer shadow-2xs"
+                        >
+                          Ringkas: 157, WA &amp; Web (Rekomendasi)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateCfg({
+                              pengaduanCallCenter: '157',
+                              pengaduanWa: '0811-1020-0157',
+                              pengaduanWeb: 'bgn.go.id',
+                              pengaduanEmail: 'pengaduan@bgn.go.id',
+                              pengaduanIg: '',
+                              pengaduanFb: '',
+                              pengaduanTiktok: '',
+                            })
+                            triggerToast('Mode Standar aktif (+ Email)')
+                          }}
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
+                        >
+                          Standar (+ Email)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateCfg({
+                              pengaduanCallCenter: '157',
+                              pengaduanWa: '0811-1020-0157',
+                              pengaduanWeb: 'bgn.go.id',
+                              pengaduanEmail: 'pengaduan@bgn.go.id',
+                              pengaduanIg: '@badangizinasional.ri',
+                              pengaduanFb: 'Badan Gizi Nasional RI',
+                              pengaduanTiktok: '@badangizinasional.ri',
+                            })
+                            triggerToast('Mode Lengkap aktif (+ Medsos)')
+                          }}
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
+                        >
+                          Lengkap (+ Medsos)
+                        </button>
                       </div>
-                      <div>
-                        <label htmlFor="fbInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          Facebook:
-                        </label>
-                        <input
-                          id="fbInput"
-                          type="text"
-                          value={cfg.pengaduanFb}
-                          onChange={(e) => updateCfg({ pengaduanFb: e.target.value })}
-                          className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                          placeholder="Badan Gizi Nasional RI"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="tiktokInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                          TikTok:
-                        </label>
-                        <input
-                          id="tiktokInput"
-                          type="text"
-                          value={cfg.pengaduanTiktok}
-                          onChange={(e) => updateCfg({ pengaduanTiktok: e.target.value })}
-                          className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                          placeholder="@badangizinasional.ri"
-                        />
+
+                      <div className="space-y-2.5">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label htmlFor="callCenterInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              Call Center BGN:
+                            </label>
+                            <input
+                              id="callCenterInput"
+                              type="tel"
+                              value={cfg.pengaduanCallCenter}
+                              onChange={(e) => updateCfg({ pengaduanCallCenter: e.target.value })}
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                              placeholder="157"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="waInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              WhatsApp Hotline:
+                            </label>
+                            <input
+                              id="waInput"
+                              type="tel"
+                              value={cfg.pengaduanWa}
+                              onChange={(e) => updateCfg({ pengaduanWa: e.target.value })}
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                              placeholder="0811-1020-0157"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label htmlFor="webInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              Website Resmi:
+                            </label>
+                            <input
+                              id="webInput"
+                              type="text"
+                              value={cfg.pengaduanWeb}
+                              onChange={(e) => updateCfg({ pengaduanWeb: e.target.value })}
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                              placeholder="bgn.go.id"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="emailInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              Email Pengaduan:
+                            </label>
+                            <input
+                              id="emailInput"
+                              type="email"
+                              value={cfg.pengaduanEmail}
+                              onChange={(e) => updateCfg({ pengaduanEmail: e.target.value })}
+                              className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                              placeholder="pengaduan@bgn.go.id"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 pt-0.5">
+                          <div>
+                            <label htmlFor="igInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              Instagram:
+                            </label>
+                            <input
+                              id="igInput"
+                              type="text"
+                              value={cfg.pengaduanIg}
+                              onChange={(e) => updateCfg({ pengaduanIg: e.target.value })}
+                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                              placeholder="@badangizinasional.ri"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="fbInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              Facebook:
+                            </label>
+                            <input
+                              id="fbInput"
+                              type="text"
+                              value={cfg.pengaduanFb}
+                              onChange={(e) => updateCfg({ pengaduanFb: e.target.value })}
+                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                              placeholder="Badan Gizi Nasional RI"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="tiktokInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                              TikTok:
+                            </label>
+                            <input
+                              id="tiktokInput"
+                              type="text"
+                              value={cfg.pengaduanTiktok}
+                              onChange={(e) => updateCfg({ pengaduanTiktok: e.target.value })}
+                              className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                              placeholder="@badangizinasional.ri"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
                     {/* Fine-Tuning Ukuran Font Tiap Kontak */}
-                    <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800">
+                    <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
                       <div className="flex items-center justify-between mb-2">
                         <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
                           Fine-Tuning Ukuran Font Kontak:
@@ -1470,6 +1530,131 @@ export default function StikerMakanV2Page() {
                           </div>
                         ))}
                       </div>
+                    </div>
+
+                    {/* ─── FITUR QR CODE MENU & ANALISIS GIZI ─── */}
+                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
+                          <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          <span>QR Code Menu &amp; Analisis Gizi</span>
+                        </h4>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                          Di Bawah Kontak
+                        </span>
+                      </div>
+
+                      {/* Toggle Tampilkan QR Code */}
+                      <div className="flex items-center justify-between p-3 mb-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">
+                        <div>
+                          <label htmlFor="showQrMenuToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
+                            <QrCode className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Tampilkan QR Code Menu &amp; Gizi</span>
+                          </label>
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500 m-0">
+                            Menempatkan kotak QR Code di bawah kotak pengaduan pada Label Kanan.
+                          </p>
+                        </div>
+                        <input
+                          id="showQrMenuToggle"
+                          type="checkbox"
+                          checked={cfg.showQrMenu ?? true}
+                          onChange={(e) => updateCfg({ showQrMenu: e.target.checked })}
+                          className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                        />
+                      </div>
+
+                      {(cfg.showQrMenu ?? true) && (
+                        <div className="space-y-3 p-3.5 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/60 animate-in fade-in duration-150">
+                          {/* Input Tautan / URL */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label htmlFor="qrMenuUrlInput" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                <Link2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                <span>Tautan / Link Menu &amp; Gizi:</span>
+                              </label>
+                              <span className="text-[10px] text-slate-400">Generate otomatis</span>
+                            </div>
+                            <input
+                              id="qrMenuUrlInput"
+                              type="url"
+                              value={cfg.qrMenuUrl || ''}
+                              onChange={(e) => updateCfg({ qrMenuUrl: e.target.value })}
+                              className="w-full py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-mono text-xs focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none"
+                              placeholder="https://bgn.go.id atau tautan menu SPPG"
+                            />
+
+                            {/* Tombol Preset URL Cepat */}
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {[
+                                { label: 'bgn.go.id', url: 'https://bgn.go.id' },
+                                { label: '/menu-hari-ini', url: 'https://bgn.go.id/menu' },
+                                { label: '/analisis-gizi', url: 'https://bgn.go.id/analisis-gizi' },
+                                { label: 'Web SPPG', url: cfg.pengaduanWeb ? (cfg.pengaduanWeb.startsWith('http') ? cfg.pengaduanWeb : `https://${cfg.pengaduanWeb}`) : 'https://bgn.go.id' },
+                              ].map((preset) => (
+                                <button
+                                  key={preset.label}
+                                  type="button"
+                                  onClick={() => updateCfg({ qrMenuUrl: preset.url })}
+                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                                    cfg.qrMenuUrl === preset.url
+                                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                                      : 'border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 bg-white dark:bg-slate-800'
+                                  }`}
+                                >
+                                  {preset.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Judul & Ukuran Font QR */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label htmlFor="qrMenuTextInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                                Judul di Atas QR:
+                              </label>
+                              <input
+                                id="qrMenuTextInput"
+                                type="text"
+                                value={cfg.qrMenuText || ''}
+                                onChange={(e) => updateCfg({ qrMenuText: e.target.value })}
+                                className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold uppercase"
+                                placeholder="MENU & ANALISIS GIZI"
+                              />
+                            </div>
+                            <div className="flex flex-col justify-end">
+                              <div className="flex items-center justify-between text-[11px] mb-1">
+                                <label htmlFor="slider-fsQrJudul" className="font-semibold text-slate-600 dark:text-slate-400">
+                                  Ukuran Font Judul QR:
+                                </label>
+                                <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums text-[10px]">
+                                  {Number(cfg.fsQrJudul || 5.6).toFixed(1)} pt
+                                </span>
+                              </div>
+                              <input
+                                id="slider-fsQrJudul"
+                                type="range"
+                                min={3.5}
+                                max={8}
+                                step={0.1}
+                                value={cfg.fsQrJudul || 5.6}
+                                onChange={(e) => updateCfg({ fsQrJudul: parseFloat(e.target.value) })}
+                                className="w-full accent-emerald-600 cursor-pointer"
+                                aria-label="Ukuran font Judul QR"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Petunjuk Pemindaian */}
+                          <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-800/80 border border-emerald-200/80 dark:border-emerald-800/40 text-[10px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
+                            <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>
+                              Format simpel &amp; presisi: Teks <strong>MENU &amp; ANALISIS GIZI</strong> di atas, dan QR Code di bawahnya.
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
