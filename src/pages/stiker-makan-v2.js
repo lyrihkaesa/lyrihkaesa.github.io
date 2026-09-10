@@ -87,7 +87,7 @@ const DEFAULT_CFG = {
 
   // Tipografi & Styling
   primaryColor: '#0b2545',
-  fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: "Verdana, Geneva, 'DejaVu Sans', sans-serif",
   borderThickness: '1.6pt',
   borderRadius: '2.8mm',
 
@@ -101,6 +101,14 @@ const DEFAULT_CFG = {
   fsSegeraKonsumsi: 6.8,
   fsHeaderPengaduan: 7.5,
   fsIsiPengaduan: 5.1,
+  // Ukuran font per kontak pengaduan (satu-satu)
+  fsPengaduanWeb: 5.1,
+  fsPengaduanEmail: 5.1,
+  fsPengaduanCallCenter: 5.1,
+  fsPengaduanWa: 5.1,
+  fsPengaduanIg: 5.1,
+  fsPengaduanFb: 5.1,
+  fsPengaduanTiktok: 5.1,
 }
 
 // Preset Jam Konsumsi Cepat
@@ -118,15 +126,17 @@ const JAM_PRESETS = [
 ]
 
 // Pilihan Font untuk Semua Tulisan Label
+// Kurasi khusus printer thermal (203 dpi, hitam-putih):
+// - Sans-serif dengan x-height besar & bukaan huruf lebar → terbaca di ukuran 3–8pt
+// - Hindari serif tipis (Times), monospace tipis (Courier), dan font dekoratif (Comic Sans)
+//   karena garis tipisnya hilang / pecah saat dicetak thermal.
 const FONT_OPTIONS = [
-  { label: 'Sistem', value: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
-  { label: 'Arial', value: "Arial, Helvetica, sans-serif" },
-  { label: 'Verdana', value: "Verdana, Geneva, sans-serif" },
-  { label: 'Trebuchet', value: "'Trebuchet MS', Verdana, sans-serif" },
-  { label: 'Georgia', value: "Georgia, 'Times New Roman', serif" },
-  { label: 'Times', value: "'Times New Roman', Times, serif" },
-  { label: 'Courier', value: "'Courier New', Courier, monospace" },
-  { label: 'Comic Sans', value: "'Comic Sans MS', 'Comic Sans', cursive" },
+  { label: 'Verdana', value: "Verdana, Geneva, 'DejaVu Sans', sans-serif", desc: 'Paling jelas di ukuran kecil', badge: '⭐ Rekomendasi' },
+  { label: 'Tahoma', value: "Tahoma, Verdana, Geneva, sans-serif", desc: 'Jelas & hemat tempat' },
+  { label: 'Arial', value: "Arial, Helvetica, sans-serif", desc: 'Standar struk thermal' },
+  { label: 'Segoe UI', value: "'Segoe UI', Tahoma, Verdana, sans-serif", desc: 'Modern bawaan Windows' },
+  { label: 'Trebuchet', value: "'Trebuchet MS', Verdana, sans-serif", desc: 'Ramping & terbuka' },
+  { label: 'Sistem', value: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", desc: 'Bawaan perangkat' },
 ]
 
 // Pengatur Ukuran Font (pt) — key harus sama dengan DEFAULT_CFG
@@ -139,7 +149,18 @@ const FONT_SIZE_FIELDS = [
   { key: 'fsLarangan', label: 'Teks Larangan', min: 4, max: 10, step: 0.1 },
   { key: 'fsSegeraKonsumsi', label: 'Teks Segera Konsumsi', min: 4, max: 10, step: 0.1 },
   { key: 'fsHeaderPengaduan', label: 'Judul Kotak Pengaduan', min: 5, max: 12, step: 0.1 },
-  { key: 'fsIsiPengaduan', label: 'Isi Kotak Pengaduan', min: 3, max: 8, step: 0.1 },
+  { key: 'fsIsiPengaduan', label: 'Isi Kotak Pengaduan (semua sekaligus)', min: 3, max: 8, step: 0.1 },
+]
+
+// Ukuran font per kontak pengaduan — satu-satu (key sama dengan DEFAULT_CFG)
+const PENGADUAN_FONT_FIELDS = [
+  { key: 'fsPengaduanWeb', label: 'Website' },
+  { key: 'fsPengaduanEmail', label: 'Email' },
+  { key: 'fsPengaduanCallCenter', label: 'Call Center' },
+  { key: 'fsPengaduanWa', label: 'WhatsApp' },
+  { key: 'fsPengaduanIg', label: 'Instagram' },
+  { key: 'fsPengaduanFb', label: 'Facebook' },
+  { key: 'fsPengaduanTiktok', label: 'TikTok' },
 ]
 
 // Dynamic loader html-to-image
@@ -900,6 +921,35 @@ export default function StikerMakanV2Page() {
                     />
                   </div>
                 </div>
+
+                {/* Ukuran font per kontak — satu-satu */}
+                <div className="pt-2 mt-1 border-t border-slate-200 dark:border-slate-700/60">
+                  <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Ukuran font per kontak:
+                  </span>
+                  <div className="space-y-1.5">
+                    {PENGADUAN_FONT_FIELDS.map((pf) => (
+                      <div key={pf.key} className="flex items-center gap-2">
+                        <label className="w-[70px] shrink-0 text-[10px] font-semibold text-slate-600 dark:text-slate-400 truncate">
+                          {pf.label}
+                        </label>
+                        <input
+                          type="range"
+                          min={2.8}
+                          max={8}
+                          step={0.1}
+                          value={cfg[pf.key] ?? cfg.fsIsiPengaduan}
+                          onChange={(e) => updateCfg({ [pf.key]: parseFloat(e.target.value) })}
+                          className="flex-1 accent-blue-600 cursor-pointer"
+                          aria-label={`Ukuran font ${pf.label}`}
+                        />
+                        <span className="w-[42px] shrink-0 text-right text-[10px] font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+                          {Number(cfg[pf.key] ?? cfg.fsIsiPengaduan).toFixed(1)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -908,8 +958,11 @@ export default function StikerMakanV2Page() {
               <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-2">
                 <span>🔤</span> Font Semua Tulisan
               </h2>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-1">
                 Berlaku untuk seluruh teks di Label Kiri &amp; Kanan.
+              </p>
+              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-lg px-2.5 py-1.5 mb-3">
+                💡 Tips thermal: <strong>Verdana / Tahoma</strong> paling jelas di ukuran kecil. Hindari font serif tipis — garis halusnya hilang saat dicetak.
               </p>
 
               <div className="grid grid-cols-2 gap-2 text-xs">
@@ -926,12 +979,22 @@ export default function StikerMakanV2Page() {
                           : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                       }`}
                     >
-                      <div className="font-bold" style={{ fontFamily: f.value }}>
-                        Ag {f.label}
+                      <div className="font-bold flex items-center gap-1.5" style={{ fontFamily: f.value }}>
+                        <span>Ag {f.label}</span>
+                        {f.badge && (
+                          <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
+                            {f.badge}
+                          </span>
+                        )}
                       </div>
                       <div className="text-[10px] text-slate-500 truncate" style={{ fontFamily: f.value }}>
                         HARUS DIKONSUMSI 123
                       </div>
+                      {f.desc && (
+                        <div className="text-[10px] text-slate-400 dark:text-slate-500">
+                          {f.desc}
+                        </div>
+                      )}
                     </button>
                   )
                 })}
@@ -974,7 +1037,19 @@ export default function StikerMakanV2Page() {
                         max={f.max}
                         step={f.step}
                         value={cfg[f.key]}
-                        onChange={(e) => updateCfg({ [f.key]: parseFloat(e.target.value) })}
+                        onChange={(e) => {
+                          const v = parseFloat(e.target.value)
+                          // Slider global "semua sekaligus" ikut mengubah tiap kontak satu-satu
+                          if (f.key === 'fsIsiPengaduan') {
+                            const all = { fsIsiPengaduan: v }
+                            PENGADUAN_FONT_FIELDS.forEach((p) => {
+                              all[p.key] = v
+                            })
+                            updateCfg(all)
+                          } else {
+                            updateCfg({ [f.key]: v })
+                          }
+                        }}
                         className="w-full accent-blue-600 cursor-pointer"
                         aria-label={f.label}
                       />

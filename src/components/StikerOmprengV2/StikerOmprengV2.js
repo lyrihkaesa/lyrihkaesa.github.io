@@ -604,6 +604,14 @@ export function LabelKanan({
   const iconColor = isBW ? '#000000' : '#1e293b'
 
   const isiBase = cfg.fsIsiPengaduan || 5.1
+  // Ukuran font per kontak (satu-satu, fallback ke ukuran global)
+  const fsWeb = cfg.fsPengaduanWeb ?? isiBase
+  const fsEmail = cfg.fsPengaduanEmail ?? isiBase
+  const fsCall = cfg.fsPengaduanCallCenter ?? isiBase
+  const fsWa = cfg.fsPengaduanWa ?? isiBase
+  const fsIg = cfg.fsPengaduanIg ?? isiBase
+  const fsFb = cfg.fsPengaduanFb ?? isiBase
+  const fsTiktok = cfg.fsPengaduanTiktok ?? isiBase
   const laranganBase = cfg.fsLarangan || 6.8
   const konsumsiBase = cfg.fsSegeraKonsumsi || 6.8
   const pengaduanBoxRef = React.useRef(null)
@@ -613,23 +621,32 @@ export function LabelKanan({
 
   const pengaduanKey = [pengaduan.web, pengaduan.email, pengaduan.callCenter, pengaduan.wa, pengaduan.ig, pengaduan.fb, pengaduan.tiktok].join('|')
 
-  // Auto-fit: daftar pengaduan wrap + mengecil sampai muat (tidak terpotong / tanpa ellipsis)
+  // Auto-fit: tiap baris wrap + font per-kontak mengecil proporsional sampai muat
   React.useEffect(() => {
     const box = pengaduanBoxRef.current
     const list = pengaduanListRef.current
     if (!box || !list || typeof window === 'undefined') return
-    list.style.fontSize = `${isiBase}pt`
+    const spans = Array.from(list.querySelectorAll('[data-pfs]'))
+    const bases = spans.map((el) => parseFloat(el.getAttribute('data-pfs')) || isiBase)
+    spans.forEach((el, i) => {
+      el.style.fontSize = `${bases[i]}pt`
+    })
     for (let i = 0; i < 40; i++) {
       const overH = box.scrollHeight - box.clientHeight > 1
       const overW = box.scrollWidth - box.clientWidth > 1
       const listOverW = list.scrollWidth - list.clientWidth > 1
       if (!overH && !overW && !listOverW) break
-      const cur = parseFloat(list.style.fontSize) || isiBase
-      if (cur <= 3) break
-      const next = Math.max(3, Math.round((cur - 0.2) * 10) / 10)
-      list.style.fontSize = `${next}pt`
+      let shrunk = false
+      spans.forEach((el, j) => {
+        const cur = parseFloat(el.style.fontSize) || bases[j]
+        if (cur > 2.8) {
+          el.style.fontSize = `${Math.max(2.8, Math.round((cur - 0.2) * 10) / 10)}pt`
+          shrunk = true
+        }
+      })
+      if (!shrunk) break
     }
-  }, [pengaduanKey, isiBase])
+  }, [pengaduanKey, isiBase, fsWeb, fsEmail, fsCall, fsWa, fsIg, fsFb, fsTiktok])
 
   // Auto-fit: teks larangan (statis, tapi aman bila fs diperbesar user)
   React.useEffect(() => {
@@ -829,7 +846,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.Web color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.web} style={{ fontWeight: '600', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.web} data-pfs={fsWeb} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWeb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.web}
               </span>
             </div>
@@ -841,7 +858,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.Mail color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.email} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.email} data-pfs={fsEmail} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsEmail}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.email}
               </span>
             </div>
@@ -853,7 +870,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.Phone color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.callCenter} style={{ fontWeight: '800', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.callCenter} data-pfs={fsCall} style={{ fontWeight: '800', flex: 1, minWidth: 0, fontSize: `${fsCall}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.callCenter}
               </span>
             </div>
@@ -865,7 +882,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.WhatsApp color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.wa} style={{ fontWeight: '600', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.wa} data-pfs={fsWa} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWa}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.wa}
               </span>
             </div>
@@ -877,7 +894,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.Instagram color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.ig} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.ig} data-pfs={fsIg} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsIg}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.ig}
               </span>
             </div>
@@ -889,7 +906,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.Facebook color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.fb} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.fb} data-pfs={fsFb} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsFb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.fb}
               </span>
             </div>
@@ -901,7 +918,7 @@ export function LabelKanan({
               <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
                 <SocialIcons.TikTok color={iconColor} size={10} />
               </span>
-              <span title={pengaduan.tiktok} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
+              <span title={pengaduan.tiktok} data-pfs={fsTiktok} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsTiktok}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.tiktok}
               </span>
             </div>
