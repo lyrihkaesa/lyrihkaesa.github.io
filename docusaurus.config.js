@@ -646,3 +646,4 @@ const config = {
 }
 
 export default config
+// Reload trigger for stiker-makan and stiker-makan-v2

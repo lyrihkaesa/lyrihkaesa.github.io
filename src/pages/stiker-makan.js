@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import Link from '@docusaurus/Link'
 import StikerLabel, { GIZI_CATEGORIES } from '../components/StikerLabel'
 
 // Helper format tanggal Indonesia
@@ -880,6 +881,12 @@ export default function StikerMakanPage() {
               <span className='text-[11px] font-medium text-[#787774] dark:text-[#888888]'>
                 SPPG Badan Gizi Nasional
               </span>
+              <Link
+                to='/stiker-makan-v2'
+                className='inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-100 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800'
+              >
+                <span>🆕 Format Ompreng 7×5 cm (SE 2026) →</span>
+              </Link>
             </div>
             <h1 className='mt-1 text-xl font-bold tracking-tight text-[#111111] sm:text-2xl dark:text-white'>
               Editor Desain Label Stiker Makan
