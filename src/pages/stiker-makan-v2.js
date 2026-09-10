@@ -6,6 +6,35 @@ import {
   LabelSepasang,
   OmprengMockup,
 } from '../components/StikerOmprengV2/StikerOmprengV2'
+import {
+  Printer,
+  FileText,
+  Building2,
+  Clock,
+  PhoneCall,
+  Type,
+  UtensilsCrossed,
+  Sparkles,
+  Tag,
+  RotateCw,
+  Layers,
+  Download,
+  Maximize2,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  Check,
+  Calendar,
+  Share2,
+  Upload,
+  CheckCircle2,
+  Scissors,
+  Info,
+  Copy,
+  LayoutGrid,
+  X,
+  ShieldCheck,
+} from 'lucide-react'
 
 // Helper format tanggal Indonesia
 const MONTH_NAMES_ID = [
@@ -17,7 +46,7 @@ const MONTH_SHORT_ID = [
   'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
 ]
 const DAY_NAMES_ID = [
-  'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jumat", 'Sabtu'
+  'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'
 ]
 
 const pad2 = (n) => String(n).padStart(2, '0')
@@ -27,8 +56,13 @@ const getTodayISO = () => {
   return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`
 }
 
-// Konversi YYYY-MM-DD ke berbagai format tampilan Indonesia.
-// Nilai lama (teks bebas) dikembalikan apa adanya agar tidak hilang.
+const getTomorrowISO = () => {
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  return `${tomorrow.getFullYear()}-${pad2(tomorrow.getMonth() + 1)}-${pad2(tomorrow.getDate())}`
+}
+
+// Konversi YYYY-MM-DD ke berbagai format tampilan Indonesia
 const formatTanggalID = (iso, fmt) => {
   if (!iso) return ''
   const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/)
@@ -53,13 +87,13 @@ const formatTanggalID = (iso, fmt) => {
   }
 }
 
-// Pilihan format tampilan tanggal (contoh dihitung live dari tanggal terpilih)
+// Pilihan format tampilan tanggal
 const TANGGAL_FORMATS = [
-  { id: 'long', label: 'Panjang' },
-  { id: 'full', label: 'Hari + Panjang' },
-  { id: 'short', label: 'Pendek' },
-  { id: 'dmy-dash', label: 'Strip' },
-  { id: 'dmy-slash', label: 'Garis miring' },
+  { id: 'long', label: 'Panjang (10 September 2026)' },
+  { id: 'full', label: 'Hari + Panjang (Kamis, 10 September 2026)' },
+  { id: 'short', label: 'Pendek (10 Sep 2026)' },
+  { id: 'dmy-dash', label: 'Strip (10-09-2026)' },
+  { id: 'dmy-slash', label: 'Garis Miring (10/09/2026)' },
 ]
 
 // Konfigurasi Default Sesuai Surat Edaran BGN 2026
@@ -70,10 +104,11 @@ const DEFAULT_CFG = {
   logoUrl: '/img/logo-bgn.png',
 
   // Batas Waktu Konsumsi
+  showOrnament: true, // Ornamen selalu ditampilkan dengan kontras hitam pekat (tidak difilter abu-abu)
   waktuMode: 'direct', // 'direct' (jam tercetak) atau 'blank' (kosong untuk stempel/spidol)
   jamKonsumsi: '11:00 WIB',
   showTanggal: false,
-  tanggalKonsumsi: getTodayISO(), // YYYY-MM-DD (untuk input type="date")
+  tanggalKonsumsi: getTodayISO(),
   tanggalFormat: 'long', // 'long' | 'full' | 'short' | 'dmy-dash' | 'dmy-slash'
 
   // Kotak Pengaduan Resmi BGN
@@ -101,7 +136,8 @@ const DEFAULT_CFG = {
   fsSegeraKonsumsi: 6.8,
   fsHeaderPengaduan: 7.5,
   fsIsiPengaduan: 5.1,
-  // Ukuran font per kontak pengaduan (satu-satu)
+
+  // Ukuran font per kontak pengaduan
   fsPengaduanWeb: 5.1,
   fsPengaduanEmail: 5.1,
   fsPengaduanCallCenter: 5.1,
@@ -114,6 +150,7 @@ const DEFAULT_CFG = {
 // Preset Jam Konsumsi Cepat
 const JAM_PRESETS = [
   '08:00 WIB',
+  '08:30 WIB',
   '09:00 WIB',
   '09:30 WIB',
   '10:00 WIB',
@@ -123,36 +160,33 @@ const JAM_PRESETS = [
   '12:00 WIB',
   '12:30 WIB',
   '13:00 WIB',
+  '14:30 WIB',
 ]
 
-// Pilihan Font untuk Semua Tulisan Label
-// Kurasi khusus printer thermal (203 dpi, hitam-putih):
-// - Sans-serif dengan x-height besar & bukaan huruf lebar → terbaca di ukuran 3–8pt
-// - Hindari serif tipis (Times), monospace tipis (Courier), dan font dekoratif (Comic Sans)
-//   karena garis tipisnya hilang / pecah saat dicetak thermal.
+// Pilihan Font untuk Printer Thermal
 const FONT_OPTIONS = [
-  { label: 'Verdana', value: "Verdana, Geneva, 'DejaVu Sans', sans-serif", desc: 'Paling jelas di ukuran kecil', badge: '⭐ Rekomendasi' },
-  { label: 'Tahoma', value: "Tahoma, Verdana, Geneva, sans-serif", desc: 'Jelas & hemat tempat' },
-  { label: 'Arial', value: "Arial, Helvetica, sans-serif", desc: 'Standar struk thermal' },
-  { label: 'Segoe UI', value: "'Segoe UI', Tahoma, Verdana, sans-serif", desc: 'Modern bawaan Windows' },
-  { label: 'Trebuchet', value: "'Trebuchet MS', Verdana, sans-serif", desc: 'Ramping & terbuka' },
-  { label: 'Sistem', value: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", desc: 'Bawaan perangkat' },
+  { label: 'Verdana', value: "Verdana, Geneva, 'DejaVu Sans', sans-serif", desc: 'Optimal untuk teks kecil (203/300 DPI)', badge: 'Rekomendasi BGN' },
+  { label: 'Tahoma', value: "Tahoma, Verdana, Geneva, sans-serif", desc: 'Karakter rapat, hemat lebar ruang' },
+  { label: 'Arial', value: "Arial, Helvetica, sans-serif", desc: 'Standar struk & pos thermal' },
+  { label: 'Segoe UI', value: "'Segoe UI', Tahoma, Verdana, sans-serif", desc: 'Modern & ramping' },
+  { label: 'Trebuchet MS', value: "'Trebuchet MS', Verdana, sans-serif", desc: 'Bukaan huruf terbuka' },
+  { label: 'Sistem (UI)', value: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", desc: 'Font bawaan perangkat operasi' },
 ]
 
-// Pengatur Ukuran Font (pt) — key harus sama dengan DEFAULT_CFG
+// Pengatur Ukuran Font (pt)
 const FONT_SIZE_FIELDS = [
   { key: 'fsNamaSppg', label: 'Nama SPPG', min: 4, max: 14, step: 0.1 },
   { key: 'fsAlamatSppg', label: 'Alamat SPPG', min: 3, max: 8, step: 0.1 },
   { key: 'fsBatasAman', label: 'Judul "Harus Dikonsumsi"', min: 5, max: 14, step: 0.1 },
   { key: 'fsJam', label: 'Jam Konsumsi', min: 8, max: 30, step: 0.5 },
   { key: 'fsTanggal', label: 'Tanggal', min: 4, max: 10, step: 0.1 },
-  { key: 'fsLarangan', label: 'Teks Larangan', min: 4, max: 10, step: 0.1 },
+  { key: 'fsLarangan', label: 'Teks Larangan Bawa Pulang', min: 4, max: 10, step: 0.1 },
   { key: 'fsSegeraKonsumsi', label: 'Teks Segera Konsumsi', min: 4, max: 10, step: 0.1 },
   { key: 'fsHeaderPengaduan', label: 'Judul Kotak Pengaduan', min: 5, max: 12, step: 0.1 },
-  { key: 'fsIsiPengaduan', label: 'Isi Kotak Pengaduan (semua sekaligus)', min: 3, max: 8, step: 0.1 },
+  { key: 'fsIsiPengaduan', label: 'Isi Kotak Pengaduan (Global)', min: 3, max: 8, step: 0.1 },
 ]
 
-// Ukuran font per kontak pengaduan — satu-satu (key sama dengan DEFAULT_CFG)
+// Ukuran font per kontak pengaduan
 const PENGADUAN_FONT_FIELDS = [
   { key: 'fsPengaduanWeb', label: 'Website' },
   { key: 'fsPengaduanEmail', label: 'Email' },
@@ -161,6 +195,56 @@ const PENGADUAN_FONT_FIELDS = [
   { key: 'fsPengaduanIg', label: 'Instagram' },
   { key: 'fsPengaduanFb', label: 'Facebook' },
   { key: 'fsPengaduanTiktok', label: 'TikTok' },
+]
+
+// Preset Operasional Dapur BGN
+const OPERATIONAL_PRESETS = [
+  {
+    id: 'siang',
+    name: 'Makan Siang',
+    badge: '11:30 WIB',
+    desc: 'Sesi makan siang reguler siswa',
+    apply: {
+      waktuMode: 'direct',
+      jamKonsumsi: '11:30 WIB',
+      showTanggal: true,
+      tanggalFormat: 'long',
+    },
+  },
+  {
+    id: 'pagi',
+    name: 'Sarapan Pagi',
+    badge: '08:30 WIB',
+    desc: 'Sesi makan pagi / awal',
+    apply: {
+      waktuMode: 'direct',
+      jamKonsumsi: '08:30 WIB',
+      showTanggal: true,
+      tanggalFormat: 'long',
+    },
+  },
+  {
+    id: 'sore',
+    name: 'Kudapan Sore',
+    badge: '14:30 WIB',
+    desc: 'Sesi sore atau camilan bergizi',
+    apply: {
+      waktuMode: 'direct',
+      jamKonsumsi: '14:30 WIB',
+      showTanggal: true,
+      tanggalFormat: 'long',
+    },
+  },
+  {
+    id: 'blank',
+    name: 'Stempel Manual',
+    badge: 'Kosong',
+    desc: 'Area jam dibiarkan kosong untuk stempel manual',
+    apply: {
+      waktuMode: 'blank',
+      showTanggal: false,
+    },
+  },
 ]
 
 // Dynamic loader html-to-image
@@ -172,7 +256,7 @@ const loadHtmlToImage = () => {
     const script = document.createElement('script')
     script.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js'
     script.onload = () => resolve(window.htmlToImage)
-    script.onerror = (err) => reject(new Error('Gagal memuat html-to-image: ' + err))
+    script.onerror = (err) => reject(new Error('Gagal memuat library html-to-image: ' + err))
     document.body.appendChild(script)
   })
 }
@@ -181,13 +265,28 @@ const STORAGE_KEY = 'stiker_ompreng_v2_config'
 
 export default function StikerMakanV2Page() {
   const [cfg, setCfg] = useState(DEFAULT_CFG)
-  const [colorMode, setColorMode] = useState('bw') // Default 'bw' untuk printer thermal!
+  const [colorMode, setColorMode] = useState('bw') // 'bw' (thermal) atau 'color'
   const [cetakTarget, setCetakTarget] = useState('alternating') // 'kiri', 'kanan', 'alternating', 'both_batch', 'sepasang'
   const [jumlahCetak, setJumlahCetak] = useState(1)
   const [activeTab, setActiveTab] = useState('kiri') // 'kiri', 'kanan', 'sepasang', 'ompreng'
-  const [zoomScale, setZoomScale] = useState(1.3)
+  const [editorTab, setEditorTab] = useState('cetak') // 'cetak', 'identitas', 'pengaduan', 'tipografi'
+  const [editorMode, setEditorMode] = useState('tabs') // 'tabs' atau 'all'
+  const [previewBg, setPreviewBg] = useState('white') // 'white', 'grid', 'roll'
+  const [zoomScale, setZoomScale] = useState(1.25)
   const [showCropMarks, setShowCropMarks] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [toastMessage, setToastMessage] = useState(null)
+  const [showConfigModal, setShowConfigModal] = useState(false)
+  const [configJsonInput, setConfigJsonInput] = useState('')
+  const fileInputRef = useRef(null)
+
+  // Show auto-dismiss toast
+  const triggerToast = (msg) => {
+    setToastMessage(msg)
+    setTimeout(() => {
+      setToastMessage(null)
+    }, 3500)
+  }
 
   // Load Saved Config from LocalStorage
   useEffect(() => {
@@ -196,8 +295,6 @@ export default function StikerMakanV2Page() {
         const saved = localStorage.getItem(STORAGE_KEY)
         if (saved) {
           const parsed = JSON.parse(saved)
-          // Migrasi: nilai tanggal lama berupa teks bebas ("10 September 2026")
-          // tidak cocok untuk input date → ganti ke tanggal hari ini (ISO).
           if (parsed.tanggalKonsumsi && !/^\d{4}-\d{2}-\d{2}$/.test(parsed.tanggalKonsumsi)) {
             parsed.tanggalKonsumsi = getTodayISO()
           }
@@ -222,6 +319,26 @@ export default function StikerMakanV2Page() {
     })
   }
 
+  // Handle Logo File Upload (Base64)
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      triggerToast('Mohon pilih file gambar (PNG, JPG, SVG, WebP)')
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      triggerToast('Ukuran gambar maksimal 2 MB agar performa cetak optimal')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      updateCfg({ logoUrl: ev.target.result })
+      triggerToast('Logo SPPG berhasil diperbarui!')
+    }
+    reader.readAsDataURL(file)
+  }
+
   const isBW = colorMode === 'bw'
 
   // Hitung Daftar Halaman Cetak Thermal
@@ -238,13 +355,11 @@ export default function StikerMakanV2Page() {
         pages.push({ type: 'kanan', id: `print-kanan-${i}` })
       }
     } else if (cetakTarget === 'alternating') {
-      // 1 Kiri, 1 Kanan, bergantian sebanyak count pasang
       for (let i = 0; i < count; i++) {
         pages.push({ type: 'kiri', id: `print-alt-kiri-${i}` })
         pages.push({ type: 'kanan', id: `print-alt-kanan-${i}` })
       }
     } else if (cetakTarget === 'both_batch') {
-      // Semua Kiri dulu sebanyak count, lalu semua Kanan sebanyak count
       for (let i = 0; i < count; i++) {
         pages.push({ type: 'kiri', id: `print-batch-kiri-${i}` })
       }
@@ -252,7 +367,6 @@ export default function StikerMakanV2Page() {
         pages.push({ type: 'kanan', id: `print-batch-kanan-${i}` })
       }
     } else if (cetakTarget === 'sepasang') {
-      // Format 140x50mm sepasang berjejer
       for (let i = 0; i < count; i++) {
         pages.push({ type: 'sepasang', id: `print-sepasang-${i}` })
       }
@@ -272,29 +386,29 @@ export default function StikerMakanV2Page() {
   const handleCleanThermalPrint = () => {
     if (typeof window === 'undefined') return
 
-    const printWindow = window.open('', '_blank', 'width=450,height=400')
-    if (!printWindow) {
-      window.print()
-      return
-    }
-
     const printRoot = document.getElementById('thermal-print-root')
     if (!printRoot) {
       window.print()
       return
     }
 
-    const innerHtml = printRoot.innerHTML
     const isPair = cetakTarget === 'sepasang'
     const pageWidthMm = isPair ? 140 : 70
     const pageHeightMm = 50
+    const innerHtml = printRoot.innerHTML
+
+    const printWindow = window.open('', '_blank', 'width=560,height=480')
+    if (!printWindow) {
+      window.print()
+      return
+    }
 
     const fullHtml = `
       <!DOCTYPE html>
-      <html>
+      <html lang="id">
         <head>
           <meta charset="utf-8">
-          <title>Cetak Stiker Thermal BGN (70x50 mm)</title>
+          <title>Cetak Stiker Thermal BGN (${pageWidthMm}×${pageHeightMm} mm)</title>
           <style>
             @page {
               size: ${pageWidthMm}mm ${pageHeightMm}mm;
@@ -311,7 +425,7 @@ export default function StikerMakanV2Page() {
               width: ${pageWidthMm}mm !important;
               background: #ffffff !important;
               color: #000000 !important;
-              font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              font-family: ${cfg.fontFamily || "Verdana, Geneva, 'DejaVu Sans', sans-serif"};
             }
             .thermal-label-page {
               width: ${pageWidthMm}mm !important;
@@ -350,9 +464,9 @@ export default function StikerMakanV2Page() {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
       const node = document.getElementById(targetId)
-      if (!node) throw new Error('Elemen tidak ditemukan')
+      if (!node) throw new Error('Elemen tidak ditemukan pada canvas')
 
-      // Pixel ratio 4x menghasilkan resolusi tajam ~827x591 px (standar 300 DPI untuk 70x50mm)
+      // Pixel ratio 4 menghasilkan resolusi ~827x591 px (standar 300 DPI untuk 70x50mm)
       const dataUrl = await htmlToImage.toPng(node, {
         pixelRatio: 4,
         quality: 1,
@@ -363,6 +477,7 @@ export default function StikerMakanV2Page() {
       link.download = `${filename}.png`
       link.href = dataUrl
       link.click()
+      triggerToast(`Berhasil mengunduh ${filename}.png (300 DPI)`)
     } catch (err) {
       alert('Gagal mengunduh gambar: ' + err.message)
     } finally {
@@ -370,12 +485,68 @@ export default function StikerMakanV2Page() {
     }
   }
 
+  // Handle Copy Image ke Clipboard
+  const handleCopyPng = async (targetId) => {
+    try {
+      setIsExporting(true)
+      const htmlToImage = await loadHtmlToImage()
+      const node = document.getElementById(targetId)
+      if (!node) throw new Error('Elemen tidak ditemukan pada canvas')
+
+      const blob = await htmlToImage.toBlob(node, {
+        pixelRatio: 3,
+        backgroundColor: '#ffffff',
+      })
+
+      if (!navigator.clipboard || !window.ClipboardItem) {
+        throw new Error('Clipboard API gambar tidak didukung di browser ini.')
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ])
+      triggerToast('Gambar stiker berhasil disalin ke clipboard! Siap di-paste ke WA/Word.')
+    } catch (err) {
+      triggerToast('Gagal menyalin: ' + err.message)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  // Handle Export Config to Clipboard
+  const handleExportConfig = () => {
+    try {
+      const jsonStr = JSON.stringify(cfg, null, 2)
+      navigator.clipboard.writeText(jsonStr)
+      triggerToast('Konfigurasi berhasil disalin ke clipboard dalam format JSON!')
+    } catch (e) {
+      triggerToast('Gagal menyalin konfigurasi: ' + e.message)
+    }
+  }
+
+  // Handle Import Config
+  const handleApplyImportConfig = () => {
+    try {
+      const parsed = JSON.parse(configJsonInput)
+      updateCfg(parsed)
+      setShowConfigModal(false)
+      setConfigJsonInput('')
+      triggerToast('Konfigurasi berhasil diimpor dan diterapkan!')
+    } catch (e) {
+      alert('Format JSON tidak valid: ' + e.message)
+    }
+  }
+
   const printPages = generatePrintLabels()
   const isPairMode = cetakTarget === 'sepasang'
+  const estimasiPanjangMeter = ((printPages.length * 52) / 1000).toFixed(1)
 
   return (
-    <main className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-100 dark:selection:bg-blue-950">
-      {/* ─── PRINT CSS STYLES (PRESISI THERMAL 70 × 50 mm) ─── */}
+    <main
+      className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-200 dark:selection:bg-blue-900"
+      style={{ accentColor: '#2563eb' }}
+    >
+      {/* ─── PRINT CSS STYLES (PRESISI THERMAL 70 × 50 mm & 140 × 50 mm) ─── */}
       <style>{`
         @page {
           size: ${isPairMode ? '140mm 50mm' : '70mm 50mm'};
@@ -421,24 +592,36 @@ export default function StikerMakanV2Page() {
         }
       `}</style>
 
+      {/* ─── TOAST NOTIFICATION (ACCESSIBLE STATUS) ─── */}
+      {toastMessage && (
+        <aside
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl shadow-2xl border border-slate-700 dark:border-slate-200 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 duration-200"
+        >
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" />
+          <span>{toastMessage}</span>
+        </aside>
+      )}
+
       {/* ─── HEADER / NAVIGATION BAR (NO PRINT) ─── */}
-      <header className="no-print-area border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-40 shadow-xs">
+      <header className="no-print-area border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-blue-600 dark:bg-blue-500 text-white flex items-center justify-center font-black text-base shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-black text-sm shadow-sm ring-1 ring-white/20">
               7×5
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-lg font-bold tracking-tight m-0 text-slate-900 dark:text-white">
-                  Stiker Makan V2 (Label Ompreng 7×5 cm)
+                  Stiker Makan V2 — Standar BGN 2026
                 </h1>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                  SE BGN 2026
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                  <ShieldCheck className="w-3 h-3" /> SE BGN 2026
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 m-0">
-                Sesuai Lampiran Surat Edaran Badan Gizi Nasional • Khusus Printer Thermal 70×50 mm
+                Generator Label Thermal Roll 70 × 50 mm • Khusus Dapur SPPG &amp; Kotak Pengaduan
               </p>
             </div>
           </div>
@@ -446,15 +629,29 @@ export default function StikerMakanV2Page() {
           <div className="flex items-center gap-2">
             <Link
               to="/stiker-makan"
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5"
             >
-              ← Ke Versi 1 (Menu & Gizi)
+              <span>←</span>
+              <span>Versi 1 (Menu &amp; Gizi)</span>
             </Link>
+
             <button
-              onClick={handleCleanThermalPrint}
-              className="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+              type="button"
+              onClick={() => setShowConfigModal(true)}
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Salin atau Impor Konfigurasi"
             >
-              <span>🖨️</span> Cetak Thermal (70×50 mm)
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Bagikan / Backup</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCleanThermalPrint}
+              className="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Cetak Thermal ({printPages.length})</span>
             </button>
           </div>
         </div>
@@ -462,613 +659,955 @@ export default function StikerMakanV2Page() {
 
       {/* ─── WORKSPACE (NO PRINT) ─── */}
       <div className="no-print-area max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        
+        {/* Preset Cepat Banner */}
+        <section className="mb-5 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-2.5">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 m-0">
+                Preset Operasional Dapur Cepat
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('Kembalikan semua konfigurasi ke standar awal SE BGN 2026?')) {
+                    updateCfg(DEFAULT_CFG)
+                    triggerToast('Konfigurasi dikembalikan ke default')
+                  }
+                }}
+                className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset ke Default BGN</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {OPERATIONAL_PRESETS.map((pst) => (
+              <button
+                key={pst.id}
+                type="button"
+                onClick={() => {
+                  updateCfg(pst.apply)
+                  triggerToast(`Preset "${pst.name}" berhasil diterapkan`)
+                }}
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-blue-50/50 dark:hover:bg-blue-950/30 transition-all text-left group cursor-pointer"
+              >
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {pst.name}
+                  </span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                    {pst.badge}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 m-0 leading-tight">
+                  {pst.desc}
+                </p>
+              </button>
+            ))}
+          </div>
+        </section>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* ─── PANEL KONTROL KIRI (EDITOR SETTINGS) ─── */}
-          <div className="lg:col-span-5 flex flex-col gap-5">
+          <section className="lg:col-span-5 flex flex-col gap-4">
             
-            {/* 1. Pengaturan Thermal & Cetak Cepat */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
-                  <span>🖨️</span> Opsi Cetak Printer Thermal
-                </h2>
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
-                  Ukuran: 70 × 50 mm
-                </span>
-              </div>
-
-              {/* Pilihan Target Cetak */}
-              <div className="mb-4">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Label yang Dicetak:
-                </label>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => { setCetakTarget('kiri'); setActiveTab('kiri'); }}
-                    className={`py-2 px-3 rounded-lg border font-semibold text-left transition-all cursor-pointer ${
-                      cetakTarget === 'kiri'
-                        ? 'bg-blue-50 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="font-bold">🏷️ Label Kiri Saja</div>
-                    <div className="text-[10px] text-slate-500">SPPG & Batas Waktu</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => { setCetakTarget('kanan'); setActiveTab('kanan'); }}
-                    className={`py-2 px-3 rounded-lg border font-semibold text-left transition-all cursor-pointer ${
-                      cetakTarget === 'kanan'
-                        ? 'bg-blue-50 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="font-bold">🏷️ Label Kanan Saja</div>
-                    <div className="text-[10px] text-slate-500">Larangan & Pengaduan</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => { setCetakTarget('alternating'); setActiveTab('sepasang'); }}
-                    className={`py-2 px-3 rounded-lg border font-semibold text-left transition-all cursor-pointer ${
-                      cetakTarget === 'alternating'
-                        ? 'bg-blue-50 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="font-bold">🔄 Bergantian (Kiri & Kanan)</div>
-                    <div className="text-[10px] text-slate-500">1 Kiri lalu 1 Kanan urut</div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => { setCetakTarget('both_batch'); setActiveTab('sepasang'); }}
-                    className={`py-2 px-3 rounded-lg border font-semibold text-left transition-all cursor-pointer ${
-                      cetakTarget === 'both_batch'
-                        ? 'bg-blue-50 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                    }`}
-                  >
-                    <div className="font-bold">📦 Batch Kiri Lalu Kanan</div>
-                    <div className="text-[10px] text-slate-500">N Kiri, lalu N Kanan</div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Jumlah Label & Mode Warna */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    {cetakTarget === 'alternating' || cetakTarget === 'both_batch' ? 'Jumlah Pasang:' : 'Jumlah Stiker:'}
-                  </label>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setJumlahCetak((prev) => Math.max(1, prev - 1))}
-                      className="w-8 h-8 rounded border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      max="500"
-                      value={jumlahCetak}
-                      onChange={(e) => setJumlahCetak(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                      className="w-full text-center py-1.5 px-2 text-xs font-bold rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setJumlahCetak((prev) => prev + 1)}
-                      className="w-8 h-8 rounded border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Warna Cetak:
-                  </label>
-                  <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-                    <button
-                      type="button"
-                      onClick={() => setColorMode('bw')}
-                      className={`py-1.5 text-[11px] font-bold rounded cursor-pointer transition-all ${
-                        isBW
-                          ? 'bg-black text-white shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      🖤 B&W (Thermal)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setColorMode('color')}
-                      className={`py-1.5 text-[11px] font-bold rounded cursor-pointer transition-all ${
-                        !isBW
-                          ? 'bg-blue-600 text-white shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      🎨 Warna Resmi
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Total Output Info & Tombol Aksi */}
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 mb-4 flex items-center justify-between text-xs">
-                <div>
-                  <span className="text-slate-500 dark:text-slate-400">Total lembar stiker: </span>
-                  <span className="font-black text-blue-600 dark:text-blue-400 text-sm">
-                    {printPages.length} label
-                  </span>
-                  <span className="text-slate-400 dark:text-slate-500 text-[10px] ml-1">
-                    (@ 70 × 50 mm)
-                  </span>
-                </div>
-                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                  ✓ Siap Roll Thermal
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
+            {/* Navigasi Kategori Editor (Tabs / All) */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-2 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between gap-2">
+              <nav role="tablist" aria-label="Kategori Pengaturan Label" className="flex items-center gap-1 flex-1 overflow-x-auto text-xs font-semibold">
                 <button
                   type="button"
-                  onClick={handleCleanThermalPrint}
-                  className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  role="tab"
+                  aria-selected={editorTab === 'cetak'}
+                  onClick={() => setEditorTab('cetak')}
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                    editorTab === 'cetak' && editorMode === 'tabs'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
                 >
-                  <span>🖨️</span> Cetak Thermal
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Cetak &amp; Roll</span>
                 </button>
+
                 <button
                   type="button"
-                  onClick={handlePrint}
-                  className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  role="tab"
+                  aria-selected={editorTab === 'identitas'}
+                  onClick={() => setEditorTab('identitas')}
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                    editorTab === 'identitas' && editorMode === 'tabs'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
                 >
-                  <span>📄</span> Cetak Browser
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>SPPG &amp; Waktu</span>
                 </button>
-              </div>
+
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={editorTab === 'pengaduan'}
+                  onClick={() => setEditorTab('pengaduan')}
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                    editorTab === 'pengaduan' && editorMode === 'tabs'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <PhoneCall className="w-3.5 h-3.5" />
+                  <span>Pengaduan</span>
+                </button>
+
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={editorTab === 'tipografi'}
+                  onClick={() => setEditorTab('tipografi')}
+                  className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+                    editorTab === 'tipografi' && editorMode === 'tabs'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <Type className="w-3.5 h-3.5" />
+                  <span>Tipografi</span>
+                </button>
+              </nav>
+
+              <button
+                type="button"
+                onClick={() => setEditorMode((prev) => (prev === 'tabs' ? 'all' : 'tabs'))}
+                title={editorMode === 'tabs' ? 'Buka Semua Bagian' : 'Sederhanakan dengan Tab'}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white text-[11px] font-semibold flex items-center gap-1 cursor-pointer shrink-0"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{editorMode === 'tabs' ? 'Lihat Semua' : 'Mode Tab'}</span>
+              </button>
             </div>
 
-            {/* 2. Form Identitas SPPG & Logo */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-                <span>🏢</span> Identitas SPPG & Dapur
-              </h2>
-
-              <div className="space-y-3 text-xs">
-                <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Nama SPPG: <span className="font-normal text-slate-400">(bisa Enter untuk baris baru)</span>
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={cfg.namaSppg}
-                    onChange={(e) => updateCfg({ namaSppg: e.target.value })}
-                    className="w-full py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold uppercase text-xs leading-relaxed"
-                    placeholder={'Contoh:\nSPPG JAKARTA PUSAT 1\natau Enter untuk 2 baris'}
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Alamat Lengkap SPPG:
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={cfg.alamatSppg}
-                    onChange={(e) => updateCfg({ alamatSppg: e.target.value })}
-                    className="w-full py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    placeholder="Alamat jalan, kelurahan, kecamatan, kota..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Logo Badan Gizi Nasional:
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={cfg.logoUrl}
-                      alt="Preview Logo"
-                      className="w-8 h-8 object-contain rounded border p-0.5 bg-white"
-                    />
-                    <input
-                      type="text"
-                      value={cfg.logoUrl}
-                      onChange={(e) => updateCfg({ logoUrl: e.target.value })}
-                      className="flex-1 py-1 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                      placeholder="/img/logo-bgn.png"
-                    />
+            {/* FORM CONTAINER */}
+            <form onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-5">
+              
+              {/* 1. Pengaturan Thermal & Cetak Cepat */}
+              {(editorMode === 'all' || editorTab === 'cetak') && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
+                      <Printer className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Opsi Cetak Printer Thermal</span>
+                    </h3>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
+                      Ukuran: 70 × 50 mm
+                    </span>
                   </div>
-                </div>
-              </div>
-            </div>
 
-            {/* 3. Form Batas Waktu Konsumsi (Label Kiri) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-                <span>⏰</span> Batas Waktu Konsumsi (Label Kiri)
-              </h2>
+                  {/* Pilihan Target Cetak */}
+                  <fieldset className="mb-4 border-0 p-0 m-0">
+                    <legend className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                      Pilih Label yang Hendak Dicetak:
+                    </legend>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => { setCetakTarget('kiri'); setActiveTab('kiri'); }}
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                          cetakTarget === 'kiri'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <div className="font-bold flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Label Kiri Saja</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">SPPG &amp; Batas Waktu (70×50)</div>
+                      </button>
 
-              <div className="space-y-3 text-xs">
-                {/* Mode Waktu: Cetak Langsung vs Kosong untuk Stempel */}
-                <div>
-                  <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Mode Kolom Waktu:
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => updateCfg({ waktuMode: 'direct' })}
-                      className={`py-2 px-3 rounded-lg border text-left font-semibold cursor-pointer ${
-                        cfg.waktuMode === 'direct'
-                          ? 'bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-700 dark:text-blue-300'
-                          : 'border-slate-200 dark:border-slate-800'
-                      }`}
-                    >
-                      <div className="font-bold">⏱️ Jam Tercetak</div>
-                      <div className="text-[10px] text-slate-500">Cetak jam langsung di label</div>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => { setCetakTarget('kanan'); setActiveTab('kanan'); }}
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                          cetakTarget === 'kanan'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <div className="font-bold flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Label Kanan Saja</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">Larangan &amp; Pengaduan (70×50)</div>
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => updateCfg({ waktuMode: 'blank' })}
-                      className={`py-2 px-3 rounded-lg border text-left font-semibold cursor-pointer ${
-                        cfg.waktuMode === 'blank'
-                          ? 'bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-700 dark:text-blue-300'
-                          : 'border-slate-200 dark:border-slate-800'
-                      }`}
-                    >
-                      <div className="font-bold">⬜ Kolom Kosong</div>
-                      <div className="text-[10px] text-slate-500">Untuk stempel / tulis spidol</div>
-                    </button>
-                  </div>
-                </div>
+                      <button
+                        type="button"
+                        onClick={() => { setCetakTarget('alternating'); setActiveTab('sepasang'); }}
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                          cetakTarget === 'alternating'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <div className="font-bold flex items-center gap-1.5">
+                          <RotateCw className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Bergantian (Urut)</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">1 Kiri, lalu 1 Kanan urut</div>
+                      </button>
 
-                {cfg.waktuMode === 'direct' && (
-                  <>
+                      <button
+                        type="button"
+                        onClick={() => { setCetakTarget('both_batch'); setActiveTab('sepasang'); }}
+                        className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                          cetakTarget === 'both_batch'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <div className="font-bold flex items-center gap-1.5">
+                          <Layers className="w-3.5 h-3.5 text-purple-600" />
+                          <span>Batch Terpisah</span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">N Kiri dulu, lalu N Kanan</div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => { setCetakTarget('sepasang'); setActiveTab('sepasang'); }}
+                        className={`col-span-2 p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer ${
+                          cetakTarget === 'sepasang'
+                            ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                            : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                        }`}
+                      >
+                        <div className="font-bold flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <Maximize2 className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Sepasang Berjejer (Format 140 × 50 mm)</span>
+                          </div>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+                            Printer Lebar 14cm
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 mt-0.5">
+                          Kedua label dicetak bersebelahan dalam satu lembar stiker memanjang.
+                        </div>
+                      </button>
+                    </div>
+                  </fieldset>
+
+                  {/* Jumlah Label & Mode Warna */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <div>
-                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Jam Batas Konsumsi:
+                      <label htmlFor="jumlahCetakInput" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        {cetakTarget === 'alternating' || cetakTarget === 'both_batch' ? 'Jumlah Pasang (Ompreng):' : 'Jumlah Stiker:'}
                       </label>
-                      <input
-                        type="text"
-                        value={cfg.jamKonsumsi}
-                        onChange={(e) => updateCfg({ jamKonsumsi: e.target.value })}
-                        className="w-full py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-black text-sm"
-                        placeholder="Contoh: 11:00 WIB"
-                      />
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setJumlahCetak((prev) => Math.max(1, prev - 1))}
+                          className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                          aria-label="Kurangi jumlah cetak"
+                        >
+                          -
+                        </button>
+                        <input
+                          id="jumlahCetakInput"
+                          type="number"
+                          min="1"
+                          max="1000"
+                          value={jumlahCetak}
+                          onChange={(e) => setJumlahCetak(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                          className="w-full text-center py-1.5 px-2 text-xs font-bold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setJumlahCetak((prev) => prev + 1)}
+                          className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                          aria-label="Tambah jumlah cetak"
+                        >
+                          +
+                        </button>
+                      </div>
 
-                      {/* Tombol Cepat Pilihan Jam */}
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {JAM_PRESETS.map((jp) => (
+                      {/* Tombol Cepat Batch */}
+                      <div className="flex items-center gap-1 mt-1.5">
+                        {[10, 50, 100].map((num) => (
                           <button
-                            key={jp}
+                            key={num}
                             type="button"
-                            onClick={() => updateCfg({ jamKonsumsi: jp })}
-                            className={`px-2 py-0.5 rounded text-[10px] font-semibold border cursor-pointer ${
-                              cfg.jamKonsumsi === jp
-                                ? 'bg-blue-600 text-white border-blue-600'
-                                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
-                            }`}
+                            onClick={() => setJumlahCetak((prev) => prev + num)}
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
                           >
-                            {jp}
+                            +{num}
                           </button>
                         ))}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-1">
-                      <input
-                        type="checkbox"
-                        id="showTanggal"
-                        checked={cfg.showTanggal}
-                        onChange={(e) => updateCfg({ showTanggal: e.target.checked })}
-                        className="rounded"
-                      />
-                      <label htmlFor="showTanggal" className="font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-                        Cantumkan Tanggal di Bawah Jam
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Mode Warna Cetak:
                       </label>
+                      <div className="grid grid-cols-2 gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => setColorMode('bw')}
+                          className={`py-2 px-2 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1 ${
+                            isBW
+                              ? 'bg-slate-900 text-white shadow-xs dark:bg-black dark:text-white'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          <span>Hitam Putih (B&amp;W)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setColorMode('color')}
+                          className={`py-2 px-2 text-[11px] font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1 ${
+                            !isBW
+                              ? 'bg-blue-600 text-white shadow-xs'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                          }`}
+                        >
+                          <span>Warna Resmi</span>
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
+                        {isBW ? '✓ Sangat direkomendasikan untuk printer thermal 203 DPI' : '🎨 Untuk printer inkjet / stiker chromo berwarna'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Crop Marks Toggle */}
+                  <div className="flex items-center justify-between py-2 px-3 mb-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">
+                    <label htmlFor="cropMarksToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
+                      <Scissors className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Garis Bantu Potong / Batas (Crop Marks)</span>
+                    </label>
+                    <input
+                      id="cropMarksToggle"
+                      type="checkbox"
+                      checked={showCropMarks}
+                      onChange={(e) => setShowCropMarks(e.target.checked)}
+                      className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                    />
+                  </div>
+
+                  {/* Ornamen Pangan Toggle (Default Nonaktif/Diabaikan) */}
+                  <div className="flex items-center justify-between py-2 px-3 mb-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-xs">
+                    <div>
+                      <label htmlFor="showOrnamentToggle" className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 cursor-pointer">
+                        <Sparkles className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Strip Ornamen Sayur &amp; Pangan</span>
+                      </label>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 m-0">
+                        Menampilkan strip ornamen asli dengan kontras hitam pekat (tidak pudar jadi abu-abu di mode B&amp;W).
+                      </p>
+                    </div>
+                    <input
+                      id="showOrnamentToggle"
+                      type="checkbox"
+                      checked={cfg.showOrnament ?? true}
+                      onChange={(e) => updateCfg({ showOrnament: e.target.checked })}
+                      className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                    />
+                  </div>
+
+                  {/* Ringkasan Output Kertas Roll */}
+                  <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 mb-4 flex items-center justify-between text-xs">
+                    <div>
+                      <div className="text-slate-600 dark:text-slate-300">
+                        Total Output: <strong className="font-black text-blue-600 dark:text-blue-400 text-sm">{printPages.length} label</strong>
+                        <span className="text-[11px] text-slate-500 ml-1">(@ 70 × 50 mm)</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        Estimasi panjang roll kertas: <strong>~{estimasiPanjangMeter} meter</strong>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                        <Check className="w-3 h-3" /> Siap Roll Thermal
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Tombol Aksi Cetak */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={handleCleanThermalPrint}
+                      className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>Cetak Thermal Presisi</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="w-full py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span>Cetak Dialog Browser</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. Form Identitas SPPG & Logo */}
+              {(editorMode === 'all' || editorTab === 'identitas') && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Identitas SPPG &amp; Dapur BGN</span>
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label htmlFor="namaSppgInput" className="font-semibold text-slate-700 dark:text-slate-300">
+                          Nama Satuan Pelayanan (SPPG):
+                        </label>
+                        <span className="text-[10px] text-slate-400">Tekan Enter untuk baris baru</span>
+                      </div>
+                      <textarea
+                        id="namaSppgInput"
+                        rows={2}
+                        value={cfg.namaSppg}
+                        onChange={(e) => updateCfg({ namaSppg: e.target.value })}
+                        className="w-full py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold uppercase text-xs leading-relaxed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                        placeholder={'Contoh:\nSPPG JAKARTA PUSAT 1\natau baris kedua untuk detail wilayah'}
+                      />
                     </div>
 
-                    {cfg.showTanggal && (
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Tanggal:
-                          </label>
+                    <div>
+                      <label htmlFor="alamatSppgInput" className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Alamat Lengkap SPPG / Dapur:
+                      </label>
+                      <textarea
+                        id="alamatSppgInput"
+                        rows={2}
+                        value={cfg.alamatSppg}
+                        onChange={(e) => updateCfg({ alamatSppg: e.target.value })}
+                        className="w-full py-1.5 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs leading-relaxed focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                        placeholder="Alamat jalan, kelurahan, kecamatan, kota/kabupaten..."
+                      />
+                    </div>
+
+                    {/* Logo SPPG / BGN dengan File Picker */}
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                        Logo SPPG / Badan Gizi Nasional:
+                      </label>
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40">
+                        <div className="w-10 h-10 rounded-lg border border-slate-300 dark:border-slate-700 bg-white flex items-center justify-center p-1 shrink-0 overflow-hidden shadow-2xs">
+                          <img
+                            src={cfg.logoUrl}
+                            alt="Preview Logo"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <input
-                              type="date"
-                              value={/^\d{4}-\d{2}-\d{2}$/.test(cfg.tanggalKonsumsi || '') ? cfg.tanggalKonsumsi : ''}
-                              onChange={(e) => updateCfg({ tanggalKonsumsi: e.target.value })}
-                              className="flex-1 py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                            />
                             <button
                               type="button"
-                              onClick={() => updateCfg({ tanggalKonsumsi: getTodayISO() })}
-                              className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer whitespace-nowrap"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-[11px] font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
                             >
-                              Hari ini
+                              <Upload className="w-3 h-3 text-blue-600" />
+                              <span>Unggah Logo Baru</span>
                             </button>
-                          </div>
-                        </div>
 
-                        <div>
-                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Format tampilan:
-                          </label>
-                          <div className="flex flex-wrap gap-1">
-                            {TANGGAL_FORMATS.map((tf) => (
+                            {cfg.logoUrl !== '/img/logo-bgn.png' && (
                               <button
-                                key={tf.id}
                                 type="button"
-                                title={tf.label}
-                                onClick={() => updateCfg({ tanggalFormat: tf.id })}
-                                className={`px-2 py-1 rounded text-[11px] font-semibold border cursor-pointer ${
-                                  (cfg.tanggalFormat || 'long') === tf.id
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                }`}
+                                onClick={() => {
+                                  updateCfg({ logoUrl: '/img/logo-bgn.png' })
+                                  triggerToast('Logo dikembalikan ke Logo BGN Resmi')
+                                }}
+                                className="px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-[10px] font-semibold text-slate-600 dark:text-slate-400 cursor-pointer transition-colors"
                               >
-                                {formatTanggalID(cfg.tanggalKonsumsi || getTodayISO(), tf.id)}
+                                Reset ke Logo BGN
                               </button>
-                            ))}
+                            )}
                           </div>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                            className="hidden"
+                          />
+                          <p className="text-[10px] text-slate-400 dark:text-slate-500 m-0 mt-1 truncate">
+                            {cfg.logoUrl.startsWith('data:') ? 'Menggunakan logo khusus lokal' : cfg.logoUrl}
+                          </p>
                         </div>
                       </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
+                    </div>
+                  </div>
 
-            {/* 4. Form Kotak Pengaduan BGN (Label Kanan) */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
-                <span>📞</span> Saluran Kontak Pengaduan (Label Kanan)
-              </h2>
+                  {/* Sub-Section: Batas Waktu Konsumsi (Label Kiri) */}
+                  <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Batas Waktu Konsumsi (Label Kiri)</span>
+                    </h4>
 
-              <div className="space-y-2 text-xs">
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      Call Center:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanCallCenter}
-                      onChange={(e) => updateCfg({ pengaduanCallCenter: e.target.value })}
-                      className="w-full py-1 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      WhatsApp Hotline:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanWa}
-                      onChange={(e) => updateCfg({ pengaduanWa: e.target.value })}
-                      className="w-full py-1 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    />
-                  </div>
-                </div>
+                    <div className="space-y-3 text-xs">
+                      {/* Mode Waktu: Jam Tercetak vs Kolom Kosong */}
+                      <fieldset className="border-0 p-0 m-0">
+                        <legend className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                          Mode Tampilan Waktu:
+                        </legend>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ waktuMode: 'direct' })}
+                            className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all ${
+                              cfg.waktuMode === 'direct'
+                                ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                                : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <div className="font-bold flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-blue-600" />
+                              <span>Jam Tercetak</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 mt-0.5">Cetak jam langsung di stiker</div>
+                          </button>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      Website BGN:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanWeb}
-                      onChange={(e) => updateCfg({ pengaduanWeb: e.target.value })}
-                      className="w-full py-1 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      Email Pengaduan:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanEmail}
-                      onChange={(e) => updateCfg({ pengaduanEmail: e.target.value })}
-                      className="w-full py-1 px-2.5 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                    />
-                  </div>
-                </div>
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ waktuMode: 'blank' })}
+                            className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all ${
+                              cfg.waktuMode === 'blank'
+                                ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                                : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <div className="font-bold flex items-center gap-1.5">
+                              <Tag className="w-3.5 h-3.5 text-slate-500" />
+                              <span>Kolom Kosong</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 mt-0.5">Untuk stempel / tulis spidol</div>
+                          </button>
+                        </div>
+                      </fieldset>
 
-                <div className="grid grid-cols-3 gap-2 pt-1">
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      Instagram:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanIg}
-                      onChange={(e) => updateCfg({ pengaduanIg: e.target.value })}
-                      className="w-full py-1 px-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      Facebook:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanFb}
-                      onChange={(e) => updateCfg({ pengaduanFb: e.target.value })}
-                      className="w-full py-1 px-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
-                      TikTok:
-                    </label>
-                    <input
-                      type="text"
-                      value={cfg.pengaduanTiktok}
-                      onChange={(e) => updateCfg({ pengaduanTiktok: e.target.value })}
-                      className="w-full py-1 px-2 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
-                    />
-                  </div>
-                </div>
+                      {cfg.waktuMode === 'direct' && (
+                        <div className="space-y-3 pt-1">
+                          <div>
+                            <label htmlFor="jamKonsumsiInput" className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                              Teks Jam Konsumsi:
+                            </label>
+                            <input
+                              id="jamKonsumsiInput"
+                              type="text"
+                              value={cfg.jamKonsumsi}
+                              onChange={(e) => updateCfg({ jamKonsumsi: e.target.value })}
+                              className="w-full py-2 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-black text-sm tracking-wider focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                              placeholder="Contoh: 11:00 WIB"
+                            />
 
-                {/* Ukuran font per kontak — satu-satu */}
-                <div className="pt-2 mt-1 border-t border-slate-200 dark:border-slate-700/60">
-                  <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Ukuran font per kontak:
-                  </span>
-                  <div className="space-y-1.5">
-                    {PENGADUAN_FONT_FIELDS.map((pf) => (
-                      <div key={pf.key} className="flex items-center gap-2">
-                        <label className="w-[70px] shrink-0 text-[10px] font-semibold text-slate-600 dark:text-slate-400 truncate">
-                          {pf.label}
-                        </label>
-                        <input
-                          type="range"
-                          min={2.8}
-                          max={8}
-                          step={0.1}
-                          value={cfg[pf.key] ?? cfg.fsIsiPengaduan}
-                          onChange={(e) => updateCfg({ [pf.key]: parseFloat(e.target.value) })}
-                          className="flex-1 accent-blue-600 cursor-pointer"
-                          aria-label={`Ukuran font ${pf.label}`}
-                        />
-                        <span className="w-[42px] shrink-0 text-right text-[10px] font-bold text-blue-600 dark:text-blue-400 tabular-nums">
-                          {Number(cfg[pf.key] ?? cfg.fsIsiPengaduan).toFixed(1)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+                            {/* Tombol Cepat Pilihan Jam */}
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {JAM_PRESETS.map((jp) => (
+                                <button
+                                  key={jp}
+                                  type="button"
+                                  onClick={() => updateCfg({ jamKonsumsi: jp })}
+                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                                    cfg.jamKonsumsi === jp
+                                      ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                                      : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                  }`}
+                                >
+                                  {jp}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
 
-            {/* 5. Tipografi & Font Semua Tulisan */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-2">
-                <span>🔤</span> Font Semua Tulisan
-              </h2>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-1">
-                Berlaku untuk seluruh teks di Label Kiri &amp; Kanan.
-              </p>
-              <p className="text-[11px] text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-lg px-2.5 py-1.5 mb-3">
-                💡 Tips thermal: <strong>Verdana / Tahoma</strong> paling jelas di ukuran kecil. Hindari font serif tipis — garis halusnya hilang saat dicetak.
-              </p>
+                          {/* Toggle Cantumkan Tanggal */}
+                          <div className="flex items-center gap-2 pt-1">
+                            <input
+                              type="checkbox"
+                              id="showTanggalCheckbox"
+                              checked={cfg.showTanggal}
+                              onChange={(e) => updateCfg({ showTanggal: e.target.checked })}
+                              className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                            />
+                            <label htmlFor="showTanggalCheckbox" className="font-semibold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                              Cantumkan Tanggal di Bawah Jam
+                            </label>
+                          </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {FONT_OPTIONS.map((f) => {
-                  const active = cfg.fontFamily === f.value
-                  return (
-                    <button
-                      key={f.label}
-                      type="button"
-                      onClick={() => updateCfg({ fontFamily: f.value })}
-                      className={`py-2 px-3 rounded-lg border text-left transition-all cursor-pointer ${
-                        active
-                          ? 'bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
-                          : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <div className="font-bold flex items-center gap-1.5" style={{ fontFamily: f.value }}>
-                        <span>Ag {f.label}</span>
-                        {f.badge && (
-                          <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
-                            {f.badge}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[10px] text-slate-500 truncate" style={{ fontFamily: f.value }}>
-                        HARUS DIKONSUMSI 123
-                      </div>
-                      {f.desc && (
-                        <div className="text-[10px] text-slate-400 dark:text-slate-500">
-                          {f.desc}
+                          {cfg.showTanggal && (
+                            <div className="space-y-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 animate-in fade-in duration-150">
+                              <div>
+                                <label htmlFor="tanggalKonsumsiInput" className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                  Pilih Tanggal:
+                                </label>
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    id="tanggalKonsumsiInput"
+                                    type="date"
+                                    value={/^\d{4}-\d{2}-\d{2}$/.test(cfg.tanggalKonsumsi || '') ? cfg.tanggalKonsumsi : ''}
+                                    onChange={(e) => updateCfg({ tanggalKonsumsi: e.target.value })}
+                                    className="flex-1 py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => updateCfg({ tanggalKonsumsi: getTodayISO() })}
+                                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer whitespace-nowrap"
+                                  >
+                                    Hari Ini
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => updateCfg({ tanggalKonsumsi: getTomorrowISO() })}
+                                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer whitespace-nowrap"
+                                  >
+                                    Besok
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                  Format Tampilan Tanggal:
+                                </label>
+                                <div className="flex flex-wrap gap-1">
+                                  {TANGGAL_FORMATS.map((tf) => (
+                                    <button
+                                      key={tf.id}
+                                      type="button"
+                                      title={tf.label}
+                                      onClick={() => updateCfg({ tanggalFormat: tf.id })}
+                                      className={`px-2 py-1 rounded-lg text-[10px] font-semibold border cursor-pointer transition-colors ${
+                                        (cfg.tanggalFormat || 'long') === tf.id
+                                          ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                                          : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                      }`}
+                                    >
+                                      {formatTanggalID(cfg.tanggalKonsumsi || getTodayISO(), tf.id)}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </button>
-                  )
-                })}
-              </div>
-
-              {/* Ukuran Font per Bagian */}
-              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Ukuran Font (pt)
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const reset = {}
-                      FONT_SIZE_FIELDS.forEach((f) => {
-                        reset[f.key] = DEFAULT_CFG[f.key]
-                      })
-                      updateCfg(reset)
-                    }}
-                    className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    ↺ Reset ukuran
-                  </button>
-                </div>
-                <div className="space-y-2.5">
-                  {FONT_SIZE_FIELDS.map((f) => (
-                    <div key={f.key}>
-                      <div className="flex items-center justify-between text-[11px] mb-0.5">
-                        <label className="font-semibold text-slate-600 dark:text-slate-400">
-                          {f.label}
-                        </label>
-                        <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
-                          {Number(cfg[f.key]).toFixed(1)} pt
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        min={f.min}
-                        max={f.max}
-                        step={f.step}
-                        value={cfg[f.key]}
-                        onChange={(e) => {
-                          const v = parseFloat(e.target.value)
-                          // Slider global "semua sekaligus" ikut mengubah tiap kontak satu-satu
-                          if (f.key === 'fsIsiPengaduan') {
-                            const all = { fsIsiPengaduan: v }
-                            PENGADUAN_FONT_FIELDS.forEach((p) => {
-                              all[p.key] = v
-                            })
-                            updateCfg(all)
-                          } else {
-                            updateCfg({ [f.key]: v })
-                          }
-                        }}
-                        className="w-full accent-blue-600 cursor-pointer"
-                        aria-label={f.label}
-                      />
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            </div>
+              )}
 
-          </div>
+              {/* 3. Form Kotak Pengaduan BGN (Label Kanan) */}
+              {(editorMode === 'all' || editorTab === 'pengaduan') && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
+                      <PhoneCall className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Saluran Kontak Pengaduan (Label Kanan)</span>
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3 text-xs">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label htmlFor="callCenterInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          Call Center BGN:
+                        </label>
+                        <input
+                          id="callCenterInput"
+                          type="tel"
+                          value={cfg.pengaduanCallCenter}
+                          onChange={(e) => updateCfg({ pengaduanCallCenter: e.target.value })}
+                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold"
+                          placeholder="157"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="waInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          WhatsApp Hotline:
+                        </label>
+                        <input
+                          id="waInput"
+                          type="tel"
+                          value={cfg.pengaduanWa}
+                          onChange={(e) => updateCfg({ pengaduanWa: e.target.value })}
+                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                          placeholder="0811-1020-0157"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label htmlFor="webInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          Website Resmi:
+                        </label>
+                        <input
+                          id="webInput"
+                          type="text"
+                          value={cfg.pengaduanWeb}
+                          onChange={(e) => updateCfg({ pengaduanWeb: e.target.value })}
+                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                          placeholder="bgn.go.id"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="emailInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          Email Pengaduan:
+                        </label>
+                        <input
+                          id="emailInput"
+                          type="email"
+                          value={cfg.pengaduanEmail}
+                          onChange={(e) => updateCfg({ pengaduanEmail: e.target.value })}
+                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                          placeholder="pengaduan@bgn.go.id"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 pt-1">
+                      <div>
+                        <label htmlFor="igInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          Instagram:
+                        </label>
+                        <input
+                          id="igInput"
+                          type="text"
+                          value={cfg.pengaduanIg}
+                          onChange={(e) => updateCfg({ pengaduanIg: e.target.value })}
+                          className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                          placeholder="@badangizinasional.ri"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="fbInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          Facebook:
+                        </label>
+                        <input
+                          id="fbInput"
+                          type="text"
+                          value={cfg.pengaduanFb}
+                          onChange={(e) => updateCfg({ pengaduanFb: e.target.value })}
+                          className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                          placeholder="Badan Gizi Nasional RI"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="tiktokInput" className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">
+                          TikTok:
+                        </label>
+                        <input
+                          id="tiktokInput"
+                          type="text"
+                          value={cfg.pengaduanTiktok}
+                          onChange={(e) => updateCfg({ pengaduanTiktok: e.target.value })}
+                          className="w-full py-1 px-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px]"
+                          placeholder="@badangizinasional.ri"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Fine-Tuning Ukuran Font Tiap Kontak */}
+                    <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                          Fine-Tuning Ukuran Font Kontak:
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const reset = {}
+                            PENGADUAN_FONT_FIELDS.forEach((pf) => {
+                              reset[pf.key] = DEFAULT_CFG.fsIsiPengaduan
+                            })
+                            updateCfg(reset)
+                          }}
+                          className="text-[10px] font-semibold text-slate-500 hover:text-blue-600 cursor-pointer"
+                        >
+                          Reset font kontak
+                        </button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {PENGADUAN_FONT_FIELDS.map((pf) => (
+                          <div key={pf.key} className="flex items-center gap-2">
+                            <label htmlFor={`slider-${pf.key}`} className="w-[75px] shrink-0 text-[10px] font-semibold text-slate-600 dark:text-slate-400 truncate">
+                              {pf.label}
+                            </label>
+                            <input
+                              id={`slider-${pf.key}`}
+                              type="range"
+                              min={2.8}
+                              max={8}
+                              step={0.1}
+                              value={cfg[pf.key] ?? cfg.fsIsiPengaduan}
+                              onChange={(e) => updateCfg({ [pf.key]: parseFloat(e.target.value) })}
+                              className="flex-1 accent-blue-600 cursor-pointer"
+                              aria-label={`Ukuran font ${pf.label}`}
+                            />
+                            <span className="w-[42px] shrink-0 text-right text-[10px] font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+                              {Number(cfg[pf.key] ?? cfg.fsIsiPengaduan).toFixed(1)} pt
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Form Tipografi & Font Semua Tulisan */}
+              {(editorMode === 'all' || editorTab === 'tipografi') && (
+                <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0 flex items-center gap-2">
+                      <Type className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <span>Font &amp; Tipografi Semua Tulisan</span>
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                    Berlaku serentak untuk seluruh elemen teks pada Label Kiri &amp; Label Kanan.
+                  </p>
+
+                  <div className="flex items-start gap-2 p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-[11px] text-emerald-800 dark:text-emerald-300 mb-3">
+                    <Info className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
+                    <span>
+                      <strong>Rekomendasi Thermal:</strong> Gunakan font sans-serif bersudut tegas seperti <strong>Verdana</strong> atau <strong>Tahoma</strong> agar tulisan di ukuran 4–8pt tetap tajam dan tidak kabur pada printer thermal 203 DPI.
+                    </span>
+                  </div>
+
+                  {/* Pilihan Font Kurasi */}
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+                    {FONT_OPTIONS.map((f) => {
+                      const active = cfg.fontFamily === f.value
+                      return (
+                        <button
+                          key={f.label}
+                          type="button"
+                          onClick={() => updateCfg({ fontFamily: f.value })}
+                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                            active
+                              ? 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                              : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                          }`}
+                        >
+                          <div className="font-bold flex items-center justify-between" style={{ fontFamily: f.value }}>
+                            <span>Ag {f.label}</span>
+                            {f.badge && (
+                              <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
+                                {f.badge}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-slate-500 truncate mt-0.5" style={{ fontFamily: f.value }}>
+                            HARUS DIKONSUMSI 123
+                          </div>
+                          {f.desc && (
+                            <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">
+                              {f.desc}
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Ukuran Font per Bagian */}
+                  <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        Ukuran Font Detail (pt)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const reset = {}
+                          FONT_SIZE_FIELDS.forEach((f) => {
+                            reset[f.key] = DEFAULT_CFG[f.key]
+                          })
+                          updateCfg(reset)
+                          triggerToast('Ukuran font berhasil direset ke standar default')
+                        }}
+                        className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Reset Ukuran</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {FONT_SIZE_FIELDS.map((f) => (
+                        <div key={f.key}>
+                          <div className="flex items-center justify-between text-[11px] mb-0.5">
+                            <label htmlFor={`slider-font-${f.key}`} className="font-semibold text-slate-600 dark:text-slate-400">
+                              {f.label}
+                            </label>
+                            <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+                              {Number(cfg[f.key]).toFixed(1)} pt
+                            </span>
+                          </div>
+                          <input
+                            id={`slider-font-${f.key}`}
+                            type="range"
+                            min={f.min}
+                            max={f.max}
+                            step={f.step}
+                            value={cfg[f.key]}
+                            onChange={(e) => {
+                              const v = parseFloat(e.target.value)
+                              if (f.key === 'fsIsiPengaduan') {
+                                const all = { fsIsiPengaduan: v }
+                                PENGADUAN_FONT_FIELDS.forEach((p) => {
+                                  all[p.key] = v
+                                })
+                                updateCfg(all)
+                              } else {
+                                updateCfg({ [f.key]: v })
+                              }
+                            }}
+                            className="w-full accent-blue-600 cursor-pointer"
+                            aria-label={f.label}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </form>
+
+          </section>
 
           {/* ─── PANEL PREVIEW KANAN (INTERACTIVE PREVIEW & SIMULATION) ─── */}
-          <div className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-[70px] lg:self-start">
+          <section className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-[68px] lg:self-start">
             
             {/* Tab Navigasi Preview */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-2.5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
+              <nav role="tablist" aria-label="Tampilan Format Preview" className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'kiri'}
                   onClick={() => setActiveTab('kiri')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                     activeTab === 'kiri'
@@ -1080,6 +1619,8 @@ export default function StikerMakanV2Page() {
                 </button>
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'kanan'}
                   onClick={() => setActiveTab('kanan')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                     activeTab === 'kanan'
@@ -1091,6 +1632,8 @@ export default function StikerMakanV2Page() {
                 </button>
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'sepasang'}
                   onClick={() => setActiveTab('sepasang')}
                   className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                     activeTab === 'sepasang'
@@ -1098,81 +1641,137 @@ export default function StikerMakanV2Page() {
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  Sepasang Berjejer (14×5 cm)
+                  Sepasang (14×5 cm)
                 </button>
                 <button
                   type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'ompreng'}
                   onClick={() => setActiveTab('ompreng')}
-                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeTab === 'ompreng'
                       ? 'bg-emerald-600 text-white shadow-xs'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  🍱 Simulasi Ompreng (Gambar 2)
+                  <UtensilsCrossed className="w-3.5 h-3.5" />
+                  <span>Simulasi Ompreng</span>
                 </button>
-              </div>
+              </nav>
 
-              {/* Zoom Controls */}
+              {/* Zoom Controls & Viewport Modes */}
               <div className="flex items-center gap-1 text-xs">
-                <span className="text-slate-400 dark:text-slate-500 font-semibold mr-1">Zoom:</span>
+                <span className="text-slate-400 dark:text-slate-500 font-semibold mr-0.5">Zoom:</span>
                 <button
                   type="button"
-                  onClick={() => setZoomScale((prev) => Math.max(0.8, prev - 0.1))}
-                  className="w-7 h-7 rounded border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center"
+                  onClick={() => setZoomScale((prev) => Math.max(0.7, prev - 0.1))}
+                  className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
+                  aria-label="Perkecil zoom"
                 >
-                  -
+                  <ZoomOut className="w-3.5 h-3.5" />
                 </button>
-                <span className="w-10 text-center font-bold text-[11px]">
+                <span className="w-10 text-center font-bold text-[11px] tabular-nums">
                   {Math.round(zoomScale * 100)}%
                 </span>
                 <button
                   type="button"
                   onClick={() => setZoomScale((prev) => Math.min(2.5, prev + 0.1))}
-                  className="w-7 h-7 rounded border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center"
+                  className="w-7 h-7 rounded-lg border border-slate-200 dark:border-slate-800 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer"
+                  aria-label="Perbesar zoom"
                 >
-                  +
+                  <ZoomIn className="w-3.5 h-3.5" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setZoomScale(1.0)}
                   title="Skala Nyata 100% (70x50 mm)"
-                  className="px-2 py-1 rounded border border-slate-200 dark:border-slate-800 text-[10px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 ml-1"
+                  className={`px-2 py-1 rounded-lg border text-[10px] font-semibold ml-1 cursor-pointer transition-colors ${
+                    zoomScale === 1.0
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
                 >
                   1:1
                 </button>
               </div>
             </div>
 
-            {/* Preview Box Container dengan Indikator Ukuran 7,0 cm x 5,0 cm */}
-            {/* Scroll terisolasi: scroll di dalam preview tidak merembet ke halaman */}
+            {/* Preview Canvas Container */}
             <div
-              className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-start min-h-[460px] max-h-[70vh] overflow-auto overscroll-contain relative"
-              style={{ overscrollBehavior: 'contain' }}
+              className={`rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-start min-h-[460px] max-h-[72vh] overflow-auto overscroll-contain relative transition-colors ${
+                previewBg === 'grid'
+                  ? 'bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] bg-slate-50 dark:bg-slate-900/60'
+                  : previewBg === 'roll'
+                  ? 'bg-gradient-to-b from-amber-100/40 via-amber-50/20 to-amber-100/40 dark:from-slate-900 dark:to-slate-900'
+                  : 'bg-white dark:bg-slate-900'
+              }`}
             >
               
-              {/* Indikator Dimensi Resmi di Layar */}
-              {activeTab !== 'ompreng' && (
-                <div className="mb-4 flex items-center justify-center gap-3 text-xs font-bold text-slate-500 dark:text-slate-400 select-none">
-                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                    ↔ Lebar: <strong className="text-slate-800 dark:text-slate-200">{activeTab === 'sepasang' ? '14,0 cm' : '7,0 cm'}</strong> (70 mm)
-                  </span>
-                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                    ↕ Tinggi: <strong className="text-slate-800 dark:text-slate-200">5,0 cm</strong> (50 mm)
-                  </span>
-                </div>
-              )}
+              {/* Toolbar Atas Preview: Dimensi & Mode Latar Belakang */}
+              <div className="w-full flex flex-wrap items-center justify-between gap-2 mb-4">
+                {activeTab !== 'ompreng' ? (
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 select-none">
+                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      ↔ Lebar: <strong className="text-slate-800 dark:text-slate-200">{activeTab === 'sepasang' ? '14,0 cm' : '7,0 cm'}</strong> (70 mm)
+                    </span>
+                    <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      ↕ Tinggi: <strong className="text-slate-800 dark:text-slate-200">5,0 cm</strong> (50 mm)
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                    🍱 Simulasi Tutup Ompreng Segel Sesuai Gambar 2 Lampiran SE BGN
+                  </div>
+                )}
 
-              {/* Tampilan Sesuai Tab Aktif */}
-              {/* Pakai `zoom` (bukan transform scale) agar area scroll mengikuti ukuran visual */}
+                {/* Background Switcher */}
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+                  <span>Latar:</span>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewBg('white')}
+                    className={`px-2 py-0.5 rounded border cursor-pointer ${
+                      previewBg === 'white'
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'border-slate-200 dark:border-slate-700'
+                    }`}
+                  >
+                    Polos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewBg('grid')}
+                    className={`px-2 py-0.5 rounded border cursor-pointer ${
+                      previewBg === 'grid'
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'border-slate-200 dark:border-slate-700'
+                    }`}
+                  >
+                    Grid
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewBg('roll')}
+                    className={`px-2 py-0.5 rounded border cursor-pointer ${
+                      previewBg === 'roll'
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'border-slate-200 dark:border-slate-700'
+                    }`}
+                  >
+                    Kertas Roll
+                  </button>
+                </div>
+              </div>
+
+              {/* Tampilan Visual Sesuai Tab Aktif */}
               <div
                 style={{
                   zoom: zoomScale,
                 }}
-                className="py-4"
+                className="py-4 my-auto flex items-center justify-center transition-transform"
               >
                 {activeTab === 'kiri' && (
-                  <div className="shadow-2xl rounded-sm border border-slate-300">
+                  <div className="shadow-2xl rounded-sm border border-slate-300 bg-white">
                     <LabelKiri
                       id="preview-node-kiri"
                       cfg={cfg}
@@ -1183,7 +1782,7 @@ export default function StikerMakanV2Page() {
                 )}
 
                 {activeTab === 'kanan' && (
-                  <div className="shadow-2xl rounded-sm border border-slate-300">
+                  <div className="shadow-2xl rounded-sm border border-slate-300 bg-white">
                     <LabelKanan
                       id="preview-node-kanan"
                       cfg={cfg}
@@ -1194,9 +1793,8 @@ export default function StikerMakanV2Page() {
                 )}
 
                 {activeTab === 'sepasang' && (
-                  <div className="shadow-2xl rounded-sm border border-slate-300">
+                  <div id="preview-node-sepasang" className="shadow-2xl rounded-sm border border-slate-300 bg-white p-0">
                     <LabelSepasang
-                      id="preview-node-sepasang"
                       cfg={cfg}
                       isBW={isBW}
                       showCropMarks={showCropMarks}
@@ -1214,23 +1812,48 @@ export default function StikerMakanV2Page() {
 
               {/* Action Toolbar di Bawah Preview */}
               <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 w-full flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-slate-500 font-semibold">Unduh Gambar (300 DPI):</span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-slate-500 font-semibold mr-1">Unduh (300 DPI):</span>
                   <button
                     type="button"
                     disabled={isExporting}
                     onClick={() => handleDownloadPng('preview-node-kiri', 'stiker-bgn-kiri-70x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
                   >
-                    📥 PNG Kiri
+                    <Download className="w-3 h-3" />
+                    <span>PNG Kiri</span>
                   </button>
                   <button
                     type="button"
                     disabled={isExporting}
                     onClick={() => handleDownloadPng('preview-node-kanan', 'stiker-bgn-kanan-70x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
                   >
-                    📥 PNG Kanan
+                    <Download className="w-3 h-3" />
+                    <span>PNG Kanan</span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isExporting}
+                    onClick={() => handleDownloadPng('preview-node-sepasang-dl', 'stiker-bgn-sepasang-140x50mm')}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+                  >
+                    <Download className="w-3 h-3" />
+                    <span>PNG Sepasang (14×5)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={isExporting}
+                    onClick={() => {
+                      const target = activeTab === 'kanan' ? 'preview-node-kanan' : activeTab === 'sepasang' ? 'preview-node-sepasang' : 'preview-node-kiri'
+                      handleCopyPng(target)
+                    }}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center gap-1 cursor-pointer"
+                    title="Salin gambar aktif ke clipboard"
+                  >
+                    <Copy className="w-3 h-3" />
+                    <span>Salin Gambar</span>
                   </button>
                 </div>
 
@@ -1238,41 +1861,122 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     onClick={handleCleanThermalPrint}
-                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md hover:shadow-lg flex items-center gap-1.5 transition-all cursor-pointer"
                   >
-                    <span>🖨️</span> Cetak Sekarang ({printPages.length} Label)
+                    <Printer className="w-4 h-4" />
+                    <span>Cetak Sekarang ({printPages.length} Label)</span>
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Panduan Cetak Printer Thermal */}
-            <div className="bg-amber-50/80 dark:bg-amber-950/40 rounded-2xl p-4 border border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs">
-              <div className="font-bold flex items-center gap-1.5 mb-1 text-sm">
-                <span>💡</span> Tips Cetak Printer Thermal Stiker (Ukuran Kertas 70 × 50 mm):
+            <div className="bg-amber-50/90 dark:bg-amber-950/40 rounded-2xl p-4 border border-amber-200 dark:border-amber-800/80 text-amber-900 dark:text-amber-200 text-xs">
+              <div className="font-bold flex items-center gap-2 mb-2 text-sm">
+                <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <span>Panduan Teknis Cetak Thermal Label Ompreng (70 × 50 mm):</span>
               </div>
-              <ul className="list-disc pl-5 space-y-1 text-[11px] leading-relaxed">
+              <ul className="list-disc pl-5 space-y-1.5 text-[11px] leading-relaxed">
                 <li>
-                  Pada jendela dialog cetak printer, pastikan memilih <strong>Paper Size: 70mm × 50mm</strong> (atau 70×50 mm pada driver label printer Anda).
+                  Pada jendela dialog cetak printer, pastikan ukuran kertas diatur ke <strong>Paper Size: 70mm × 50mm</strong> (atau 140mm × 50mm bila memilih mode sepasang).
                 </li>
                 <li>
-                  Atur <strong>Margins: None</strong> (atau 0 mm) dan <strong>Scale: 100%</strong> (Fit to printable area atau Actual Size) agar stiker pas dan tidak bergeser.
+                  Atur <strong>Margins: None (0 mm)</strong> dan <strong>Scale: 100% (Actual Size)</strong> agar stiker pas dan batas tepi tidak terpotong.
                 </li>
                 <li>
-                  Gunakan mode <strong>Hitam Putih (B&W)</strong> untuk hasil paling pekat dan tajam tanpa bintik dither abu-abu.
+                  Gunakan mode <strong>Hitam Putih (B&amp;W)</strong> untuk hasil paling pekat tanpa bintik dither abu-abu.
+                </li>
+                <li>
+                  Jika menggunakan label gulungan (roll), pastikan sensor printer diatur ke <strong>Label Gap / Notch Detection</strong>.
                 </li>
               </ul>
             </div>
 
-          </div>
+          </section>
 
         </div>
       </div>
 
+      {/* ─── MODAL BAGIKAN / BACKUP KONFIGURASI JSON ─── */}
+      {showConfigModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Share2 className="w-4 h-4 text-blue-600" />
+                <h3 className="text-sm font-bold m-0 text-slate-900 dark:text-white">
+                  Bagikan &amp; Cadangkan Konfigurasi
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowConfigModal(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-500 dark:text-slate-400 m-0">
+              Salin data konfigurasi label SPPG ini untuk digunakan di komputer/perangkat dapur lain, atau tempelkan JSON konfigurasi untuk memuat data.
+            </p>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportConfig}
+                className="flex-1 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+              >
+                <Copy className="w-3.5 h-3.5" />
+                <span>Salin Konfigurasi Aktif (JSON)</span>
+              </button>
+            </div>
+
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+              <label htmlFor="importJsonTextarea" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Tempel Konfigurasi JSON untuk Mengimpor:
+              </label>
+              <textarea
+                id="importJsonTextarea"
+                rows={4}
+                value={configJsonInput}
+                onChange={(e) => setConfigJsonInput(e.target.value)}
+                className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[11px] font-mono"
+                placeholder='{"namaSppg": "SPPG JAKARTA PUSAT 1", ...}'
+              />
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowConfigModal(false)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  disabled={!configJsonInput.trim()}
+                  onClick={handleApplyImportConfig}
+                  className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer transition-colors shadow-2xs"
+                >
+                  Terapkan Konfigurasi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── HIDDEN PREVIEW NODES FOR DOWNLOAD (ALWAYS MOUNTED) ─── */}
-      <div style={{ position: 'fixed', left: '-9999px', top: '-9999px' }}>
+      <div style={{ position: 'fixed', left: '-9999px', top: '-9999px' }} aria-hidden="true">
         <LabelKiri id="preview-node-kiri-dl" cfg={cfg} isBW={isBW} />
         <LabelKanan id="preview-node-kanan-dl" cfg={cfg} isBW={isBW} />
+        <div id="preview-node-sepasang-dl" className="bg-white">
+          <LabelSepasang cfg={cfg} isBW={isBW} gapMm={2} />
+        </div>
       </div>
 
       {/* ─── PRINT BROWSER ROOT ELEMENT (@media print) ─── */}

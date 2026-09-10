@@ -116,8 +116,8 @@ export const FoodPatternStrip = ({ isBW = false, widthMm = 11.5, heightMm = 50 }
           objectFit: 'cover',
           objectPosition: 'center',
           display: 'block',
-          filter: isBW ? 'grayscale(100%) contrast(120%)' : 'none',
-          opacity: isBW ? 0.9 : 1,
+          filter: 'none',
+          opacity: 1,
         }}
       />
     </div>
@@ -234,6 +234,7 @@ export function LabelKiri({
   const tanggalKonsumsi = formatTanggalLabel(cfg)
   const tanggalFormat = cfg.tanggalFormat || 'long'
   const showTanggal = cfg.showTanggal ?? false
+  const showOrnament = cfg.showOrnament ?? true
 
   const borderThickness = cfg.borderThickness || '1.6pt'
   const borderRadius = cfg.borderRadius || '2.8mm'
@@ -323,8 +324,10 @@ export function LabelKiri({
         ...style,
       }}
     >
-      {/* 1. SISI KIRI: Strip Ornamen Pangan */}
-      <FoodPatternStrip isBW={isBW} widthMm={11.5} heightMm={50} />
+      {/* 1. SISI KIRI: Strip Ornamen Pangan (Opsional, bawaan diabaikan/nonaktif) */}
+      {showOrnament && (
+        <FoodPatternStrip isBW={isBW} widthMm={11.5} heightMm={50} />
+      )}
 
       {/* 2. SISI KANAN: Konten Utama */}
       <div
@@ -333,7 +336,7 @@ export function LabelKiri({
           minWidth: 0,
           height: '50mm',
           maxHeight: '50mm',
-          padding: '2mm 2.5mm 2.2mm 2.2mm',
+          padding: showOrnament ? '2mm 2.5mm 2.2mm 2.2mm' : '2.2mm 3.5mm 2.2mm 3.5mm',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
