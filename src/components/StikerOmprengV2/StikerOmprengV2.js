@@ -1,6 +1,88 @@
 import React from 'react'
 
 /**
+ * Auto-fit helpers — memastikan tulisan TIDAK terpotong walaupun panjang.
+ * Strategi:
+ * - Teks satu baris (nama SPPG, jam): font mengecil otomatis sampai muat (tanpa ellipsis).
+ * - Teks multi-baris (alamat, kontak): wrap anywhere + font mengecil sampai muat vertikal.
+ */
+function shrinkSingleLineEl(el, basePt, minPt) {
+  if (!el) return basePt
+  let cur = basePt
+  el.style.fontSize = `${cur}pt`
+  for (let i = 0; i < 40; i++) {
+    const overW = el.scrollWidth - el.clientWidth > 1
+    if (!overW) break
+    if (cur <= minPt) break
+    cur = Math.max(minPt, Math.round((cur - 0.4) * 10) / 10)
+    el.style.fontSize = `${cur}pt`
+  }
+  return cur
+}
+
+function fitBoxByShrinkingFonts(boxEl, fontEls, minPts) {
+  if (!boxEl) return
+  for (let i = 0; i < 40; i++) {
+    const overH = boxEl.scrollHeight - boxEl.clientHeight > 1
+    const overW = boxEl.scrollWidth - boxEl.clientWidth > 1
+    if (!overH && !overW) break
+    let shrunk = false
+    for (let j = 0; j < fontEls.length; j++) {
+      const el = fontEls[j]
+      if (!el) continue
+      const cur = parseFloat(el.style.fontSize) || parseFloat(minPts[j]) || 5
+      const min = minPts[j]
+      if (cur > min) {
+        const next = Math.max(min, Math.round((cur - 0.3) * 10) / 10)
+        el.style.fontSize = `${next}pt`
+        shrunk = true
+      }
+    }
+    if (!shrunk) break
+  }
+}
+
+// Format tanggal Indonesia: YYYY-MM-DD → "09 September 2026" / "09-09-2026" / dst.
+// Nilai non-ISO (teks lama) dikembalikan apa adanya.
+const TANGGAL_MONTHS = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+]
+const TANGGAL_MONTHS_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+]
+const TANGGAL_DAYS = [
+  'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jumat", 'Sabtu'
+]
+
+function formatTanggalLabel(cfg = {}) {
+  const raw = cfg.tanggalKonsumsi || ''
+  const fmt = cfg.tanggalFormat || 'long'
+  const m = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return raw
+  const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  if (isNaN(dt.getTime())) return raw
+  const pad2 = (n) => String(n).padStart(2, '0')
+  const dd = pad2(dt.getDate())
+  const mm = pad2(dt.getMonth() + 1)
+  const yyyy = dt.getFullYear()
+  switch (fmt) {
+    case 'dmy-dash':
+      return `${dd}-${mm}-${yyyy}`
+    case 'dmy-slash':
+      return `${dd}/${mm}/${yyyy}`
+    case 'full':
+      return `${TANGGAL_DAYS[dt.getDay()]}, ${dd} ${TANGGAL_MONTHS[dt.getMonth()]} ${yyyy}`
+    case 'short':
+      return `${dd} ${TANGGAL_MONTHS_SHORT[dt.getMonth()]} ${yyyy}`
+    case 'long':
+    default:
+      return `${dt.getDate()} ${TANGGAL_MONTHS[dt.getMonth()]} ${yyyy}`
+  }
+}
+
+/**
  * 🏷️ STIKER OMPRENG V2 (STANDAR SURAT EDARAN BADAN GIZI NASIONAL 2026)
  * Ukuran Resmi: 7,0 cm × 5,0 cm (70 mm × 50 mm)
  */
@@ -15,7 +97,6 @@ export const FoodPatternStrip = ({ isBW = false, widthMm = 11.5, heightMm = 50 }
         overflow: 'hidden',
         position: 'relative',
         backgroundColor: isBW ? '#ffffff' : '#f8fafc',
-        borderRight: `0.8pt solid ${isBW ? '#000000' : '#cbd5e1'}`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -150,11 +231,76 @@ export function LabelKiri({
   // Waktu Konsumsi
   const waktuMode = cfg.waktuMode || 'direct' // 'direct' (tercetak) atau 'blank' (kosong / stempel)
   const jamKonsumsi = cfg.jamKonsumsi || '11:00 WIB'
-  const tanggalKonsumsi = cfg.tanggalKonsumsi || ''
+  const tanggalKonsumsi = formatTanggalLabel(cfg)
+  const tanggalFormat = cfg.tanggalFormat || 'long'
   const showTanggal = cfg.showTanggal ?? false
 
   const borderThickness = cfg.borderThickness || '1.6pt'
   const borderRadius = cfg.borderRadius || '2.8mm'
+
+  const namaBase = cfg.fsNamaSppg || 8.5
+  const alamatBase = cfg.fsAlamatSppg || 4.8
+  const jamBase = cfg.fsJam || 22
+  const tanggalBase = cfg.fsTanggal || 6.8
+
+  const headerBoxRef = React.useRef(null)
+  const namaRef = React.useRef(null)
+  const alamatRef = React.useRef(null)
+  const jamRef = React.useRef(null)
+  const tanggalRef = React.useRef(null)
+  const jamBoxRef = React.useRef(null)
+
+  // Auto-fit: nama (wrap 2-3 baris, mengecil) + alamat (wrap, mengecil) agar muat di header
+  React.useEffect(() => {
+    const box = headerBoxRef.current
+    const namaEl = namaRef.current
+    const alamatEl = alamatRef.current
+    if (!box || !namaEl || !alamatEl || typeof window === 'undefined') return
+    namaEl.style.fontSize = `${namaBase}pt`
+    alamatEl.style.fontSize = `${alamatBase}pt`
+    let nFs = namaBase
+    let aFs = alamatBase
+    for (let i = 0; i < 60; i++) {
+      const overH = box.scrollHeight - box.clientHeight > 1
+      const overWBox = box.scrollWidth - box.clientWidth > 1
+      const overWNama = namaEl.scrollWidth - namaEl.clientWidth > 1
+      const overHNama = namaEl.scrollHeight - namaEl.clientHeight > 1
+      if (!overH && !overWBox && !overWNama && !overHNama) break
+      let shrunk = false
+      // Prioritas: kecilkan nama dulu bila nama sendiri overflow / box kepenuhan
+      if ((overWNama || overHNama || overH) && nFs > 5) {
+        nFs = Math.max(5, Math.round((nFs - 0.4) * 10) / 10)
+        namaEl.style.fontSize = `${nFs}pt`
+        shrunk = true
+      } else if ((overH || overWBox) && aFs > 3) {
+        aFs = Math.max(3, Math.round((aFs - 0.3) * 10) / 10)
+        alamatEl.style.fontSize = `${aFs}pt`
+        shrunk = true
+      } else if (nFs > 4) {
+        nFs = Math.max(4, Math.round((nFs - 0.4) * 10) / 10)
+        namaEl.style.fontSize = `${nFs}pt`
+        shrunk = true
+      } else if (aFs > 2.8) {
+        aFs = Math.max(2.8, Math.round((aFs - 0.2) * 10) / 10)
+        alamatEl.style.fontSize = `${aFs}pt`
+        shrunk = true
+      }
+      if (!shrunk) break
+    }
+  }, [namaSppg, alamatSppg, namaBase, alamatBase])
+
+  // Auto-fit: jam + tanggal mengecil sampai muat di kotak (tidak terpotong)
+  React.useEffect(() => {
+    if (waktuMode !== 'direct' || typeof window === 'undefined') return
+    if (jamRef.current) shrinkSingleLineEl(jamRef.current, jamBase, 8)
+    if (tanggalRef.current) shrinkSingleLineEl(tanggalRef.current, tanggalBase, 4)
+    const box = jamBoxRef.current
+    if (box) {
+      const els = [jamRef.current, tanggalRef.current].filter(Boolean)
+      const mins = [8, 4]
+      fitBoxByShrinkingFonts(box, els, mins)
+    }
+  }, [jamKonsumsi, tanggalKonsumsi, tanggalFormat, showTanggal, jamBase, tanggalBase, waktuMode])
 
   return (
     <div
@@ -184,22 +330,28 @@ export function LabelKiri({
       <div
         style={{
           flex: 1,
+          minWidth: 0,
           height: '50mm',
+          maxHeight: '50mm',
           padding: '2mm 2.5mm 2.2mm 2.2mm',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
+          overflow: 'hidden',
         }}
       >
-        {/* Header SPPG & Logo */}
+        {/* Header SPPG & Logo — tinggi fleksibel agar nama panjang bisa wrap */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             gap: '2mm',
-            height: '11mm',
+            height: 'auto',
+            minHeight: '11mm',
+            maxHeight: '17mm',
+            flexShrink: 0,
             overflow: 'hidden',
           }}
         >
@@ -227,10 +379,15 @@ export function LabelKiri({
             />
           </div>
 
-          {/* Identitas SPPG */}
+          {/* Identitas SPPG — auto-fit, tidak terpotong */}
           <div
+            ref={headerBoxRef}
             style={{
               flex: 1,
+              minWidth: 0,
+              height: 'auto',
+              minHeight: '11mm',
+              maxHeight: '17mm',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -239,30 +396,36 @@ export function LabelKiri({
             }}
           >
             <div
+              ref={namaRef}
               style={{
-                fontSize: `${cfg.fsNamaSppg || 8.5}pt`,
+                fontSize: `${namaBase}pt`,
                 fontWeight: '900',
                 color: primaryColor,
                 letterSpacing: '0.02em',
-                whiteSpace: 'nowrap',
+                whiteSpace: 'pre-line',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
+                maxWidth: '100%',
+                lineHeight: 1.1,
               }}
               title={namaSppg}
             >
               {namaSppg}
             </div>
             <div
+              ref={alamatRef}
               style={{
-                fontSize: `${cfg.fsAlamatSppg || 4.8}pt`,
+                fontSize: `${alamatBase}pt`,
                 fontWeight: '500',
                 color: isBW ? '#333333' : '#475569',
                 marginTop: '0.8pt',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
+                whiteSpace: 'pre-line',
                 overflow: 'hidden',
+                overflowWrap: 'anywhere',
+                wordBreak: 'break-word',
                 lineHeight: 1.2,
+                maxWidth: '100%',
               }}
               title={alamatSppg}
             >
@@ -275,6 +438,7 @@ export function LabelKiri({
         <div
           style={{
             flex: 1,
+            minHeight: 0,
             marginTop: '1.5mm',
             border: `${borderThickness} solid ${primaryColor}`,
             borderRadius,
@@ -308,8 +472,10 @@ export function LabelKiri({
 
           {/* Body Box: Tampilan Waktu (atau Kosong untuk Stempel / Spidol) */}
           <div
+            ref={jamBoxRef}
             style={{
               flex: 1,
+              minHeight: 0,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -317,31 +483,52 @@ export function LabelKiri({
               padding: '1mm',
               backgroundColor: '#ffffff',
               position: 'relative',
+              overflow: 'hidden',
+              width: '100%',
+              boxSizing: 'border-box',
             }}
           >
             {waktuMode === 'direct' ? (
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ textAlign: 'center', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
                 <div
+                  ref={jamRef}
                   style={{
-                    fontSize: `${cfg.fsJam || 22}pt`,
+                    fontSize: `${jamBase}pt`,
                     fontWeight: '900',
                     color: primaryColor,
                     lineHeight: 1,
                     letterSpacing: '0.03em',
                     fontVariantNumeric: 'tabular-nums',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'clip',
+                    textAlign: 'center',
+                    width: '100%',
+                    maxWidth: '100%',
                   }}
+                  title={jamKonsumsi}
                 >
                   {jamKonsumsi}
                 </div>
                 {showTanggal && tanggalKonsumsi && (
                   <div
+                    ref={tanggalRef}
                     style={{
-                      fontSize: `${cfg.fsTanggal || 6.8}pt`,
+                      fontSize: `${tanggalBase}pt`,
                       fontWeight: '700',
                       color: isBW ? '#222222' : '#64748b',
                       marginTop: '1.2mm',
                       letterSpacing: '0.04em',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'clip',
+                      textAlign: 'center',
+                      width: '100%',
+                      maxWidth: '100%',
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
                     }}
+                    title={tanggalKonsumsi}
                   >
                     {tanggalKonsumsi}
                   </div>
@@ -416,6 +603,59 @@ export function LabelKanan({
 
   const iconColor = isBW ? '#000000' : '#1e293b'
 
+  const isiBase = cfg.fsIsiPengaduan || 5.1
+  const laranganBase = cfg.fsLarangan || 6.8
+  const konsumsiBase = cfg.fsSegeraKonsumsi || 6.8
+  const pengaduanBoxRef = React.useRef(null)
+  const pengaduanListRef = React.useRef(null)
+  const laranganRef = React.useRef(null)
+  const konsumsiRef = React.useRef(null)
+
+  const pengaduanKey = [pengaduan.web, pengaduan.email, pengaduan.callCenter, pengaduan.wa, pengaduan.ig, pengaduan.fb, pengaduan.tiktok].join('|')
+
+  // Auto-fit: daftar pengaduan wrap + mengecil sampai muat (tidak terpotong / tanpa ellipsis)
+  React.useEffect(() => {
+    const box = pengaduanBoxRef.current
+    const list = pengaduanListRef.current
+    if (!box || !list || typeof window === 'undefined') return
+    list.style.fontSize = `${isiBase}pt`
+    for (let i = 0; i < 40; i++) {
+      const overH = box.scrollHeight - box.clientHeight > 1
+      const overW = box.scrollWidth - box.clientWidth > 1
+      const listOverW = list.scrollWidth - list.clientWidth > 1
+      if (!overH && !overW && !listOverW) break
+      const cur = parseFloat(list.style.fontSize) || isiBase
+      if (cur <= 3) break
+      const next = Math.max(3, Math.round((cur - 0.2) * 10) / 10)
+      list.style.fontSize = `${next}pt`
+    }
+  }, [pengaduanKey, isiBase])
+
+  // Auto-fit: teks larangan (statis, tapi aman bila fs diperbesar user)
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (laranganRef.current) {
+      const el = laranganRef.current
+      el.style.fontSize = `${laranganBase}pt`
+      for (let i = 0; i < 20; i++) {
+        if (el.scrollHeight - el.clientHeight <= 1 && el.scrollWidth - el.clientWidth <= 1) break
+        const cur = parseFloat(el.style.fontSize) || laranganBase
+        if (cur <= 4) break
+        el.style.fontSize = `${Math.max(4, Math.round((cur - 0.3) * 10) / 10)}pt`
+      }
+    }
+    if (konsumsiRef.current) {
+      const el = konsumsiRef.current
+      el.style.fontSize = `${konsumsiBase}pt`
+      for (let i = 0; i < 20; i++) {
+        if (el.scrollHeight - el.clientHeight <= 1 && el.scrollWidth - el.clientWidth <= 1) break
+        const cur = parseFloat(el.style.fontSize) || konsumsiBase
+        if (cur <= 4) break
+        el.style.fontSize = `${Math.max(4, Math.round((cur - 0.3) * 10) / 10)}pt`
+      }
+    }
+  }, [laranganBase, konsumsiBase])
+
   return (
     <div
       id={id}
@@ -455,6 +695,7 @@ export function LabelKanan({
         <div
           style={{
             flex: 1,
+            minHeight: 0,
             border: `${borderThickness} solid ${primaryColor}`,
             borderRadius,
             padding: '1.2mm 1.5mm',
@@ -464,19 +705,26 @@ export function LabelKanan({
             justifyContent: 'center',
             textAlign: 'center',
             boxSizing: 'border-box',
+            overflow: 'hidden',
           }}
         >
-          <div style={{ marginBottom: '1mm' }}>
+          <div style={{ marginBottom: '1mm', flexShrink: 0 }}>
             <IconDilarangBawaPulang isBW={isBW} sizeMm={cfg.sizeIconLarangan || 11.5} />
           </div>
           <div
+            ref={laranganRef}
             style={{
-              fontSize: `${cfg.fsLarangan || 6.8}pt`,
+              fontSize: `${laranganBase}pt`,
               fontWeight: '900',
               color: primaryColor,
               lineHeight: 1.15,
               textTransform: 'uppercase',
               letterSpacing: '0.02em',
+              whiteSpace: 'normal',
+              overflow: 'hidden',
+              overflowWrap: 'anywhere',
+              wordBreak: 'break-word',
+              maxWidth: '100%',
             }}
           >
             TIDAK BOLEH<br />DIBAWA PULANG.
@@ -487,6 +735,7 @@ export function LabelKanan({
         <div
           style={{
             flex: 1,
+            minHeight: 0,
             border: `${borderThickness} solid ${primaryColor}`,
             borderRadius,
             padding: '1.2mm 1.5mm',
@@ -496,19 +745,26 @@ export function LabelKanan({
             justifyContent: 'center',
             textAlign: 'center',
             boxSizing: 'border-box',
+            overflow: 'hidden',
           }}
         >
-          <div style={{ marginBottom: '1mm' }}>
+          <div style={{ marginBottom: '1mm', flexShrink: 0 }}>
             <IconSegeraKonsumsi isBW={isBW} sizeMm={cfg.sizeIconKonsumsi || 11.5} />
           </div>
           <div
+            ref={konsumsiRef}
             style={{
-              fontSize: `${cfg.fsSegeraKonsumsi || 6.8}pt`,
+              fontSize: `${konsumsiBase}pt`,
               fontWeight: '900',
               color: primaryColor,
               lineHeight: 1.15,
               textTransform: 'uppercase',
               letterSpacing: '0.02em',
+              whiteSpace: 'normal',
+              overflow: 'hidden',
+              overflowWrap: 'anywhere',
+              wordBreak: 'break-word',
+              maxWidth: '100%',
             }}
           >
             SEGERA KONSUMSI<br />SETELAH DITERIMA
@@ -518,15 +774,19 @@ export function LabelKanan({
 
       {/* 2. KOLOM KANAN (~43% lebar): Kotak Pengaduan */}
       <div
+        ref={pengaduanBoxRef}
         style={{
           flex: 1,
+          minWidth: 0,
           height: '45mm',
+          maxHeight: '45mm',
           border: `${borderThickness} solid ${primaryColor}`,
           borderRadius,
           padding: '1.8mm 1.6mm',
           display: 'flex',
           flexDirection: 'column',
           boxSizing: 'border-box',
+          overflow: 'hidden',
         }}
       >
         {/* Header: Kotak Pengaduan */}
@@ -540,28 +800,36 @@ export function LabelKanan({
             paddingBottom: '1.2mm',
             borderBottom: `0.8pt solid ${isBW ? '#444444' : '#cbd5e1'}`,
             marginBottom: '1.2mm',
+            flexShrink: 0,
           }}
         >
           Kotak<br />Pengaduan
         </div>
 
-        {/* List Kontak Resmi BGN */}
+        {/* List Kontak Resmi BGN — wrap + auto-shrink, tidak pakai ellipsis */}
         <div
+          ref={pengaduanListRef}
           style={{
             flex: 1,
+            minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
-            fontSize: `${cfg.fsIsiPengaduan || 5.1}pt`,
-            lineHeight: 1.1,
+            justifyContent: 'flex-start',
+            gap: '0.9mm',
+            fontSize: `${isiBase}pt`,
+            lineHeight: 1.15,
             color: isBW ? '#000000' : '#1e293b',
+            overflow: 'hidden',
+            minWidth: 0,
           }}
         >
           {/* Website */}
           {pengaduan.web && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.Web color={iconColor} size={10} />
-              <span style={{ fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.Web color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.web} style={{ fontWeight: '600', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.web}
               </span>
             </div>
@@ -569,9 +837,11 @@ export function LabelKanan({
 
           {/* Email */}
           {pengaduan.email && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.Mail color={iconColor} size={10} />
-              <span style={{ fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.Mail color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.email} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.email}
               </span>
             </div>
@@ -579,9 +849,11 @@ export function LabelKanan({
 
           {/* Call Center 157 */}
           {pengaduan.callCenter && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.Phone color={iconColor} size={10} />
-              <span style={{ fontWeight: '800' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.Phone color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.callCenter} style={{ fontWeight: '800', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.callCenter}
               </span>
             </div>
@@ -589,9 +861,11 @@ export function LabelKanan({
 
           {/* WhatsApp */}
           {pengaduan.wa && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.WhatsApp color={iconColor} size={10} />
-              <span style={{ fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.WhatsApp color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.wa} style={{ fontWeight: '600', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.wa}
               </span>
             </div>
@@ -599,9 +873,11 @@ export function LabelKanan({
 
           {/* Instagram */}
           {pengaduan.ig && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.Instagram color={iconColor} size={10} />
-              <span style={{ fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.Instagram color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.ig} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.ig}
               </span>
             </div>
@@ -609,9 +885,11 @@ export function LabelKanan({
 
           {/* Facebook */}
           {pengaduan.fb && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.Facebook color={iconColor} size={10} />
-              <span style={{ fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.Facebook color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.fb} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.fb}
               </span>
             </div>
@@ -619,9 +897,11 @@ export function LabelKanan({
 
           {/* TikTok */}
           {pengaduan.tiktok && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm' }}>
-              <SocialIcons.TikTok color={iconColor} size={10} />
-              <span style={{ fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.2mm', minWidth: 0 }}>
+              <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
+                <SocialIcons.TikTok color={iconColor} size={10} />
+              </span>
+              <span title={pengaduan.tiktok} style={{ fontWeight: '500', flex: 1, minWidth: 0, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
                 {pengaduan.tiktok}
               </span>
             </div>

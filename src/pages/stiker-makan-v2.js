@@ -12,14 +12,55 @@ const MONTH_NAMES_ID = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ]
+const MONTH_SHORT_ID = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+]
+const DAY_NAMES_ID = [
+  'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jumat", 'Sabtu'
+]
 
-const getTodayFormatted = () => {
+const pad2 = (n) => String(n).padStart(2, '0')
+
+const getTodayISO = () => {
   const now = new Date()
-  const d = now.getDate()
-  const m = MONTH_NAMES_ID[now.getMonth()]
-  const y = now.getFullYear()
-  return `${d} ${m} ${y}`
+  return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`
 }
+
+// Konversi YYYY-MM-DD ke berbagai format tampilan Indonesia.
+// Nilai lama (teks bebas) dikembalikan apa adanya agar tidak hilang.
+const formatTanggalID = (iso, fmt) => {
+  if (!iso) return ''
+  const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!m) return String(iso)
+  const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+  if (isNaN(dt.getTime())) return String(iso)
+  const dd = pad2(dt.getDate())
+  const mm = pad2(dt.getMonth() + 1)
+  const yyyy = dt.getFullYear()
+  switch (fmt) {
+    case 'dmy-dash':
+      return `${dd}-${mm}-${yyyy}`
+    case 'dmy-slash':
+      return `${dd}/${mm}/${yyyy}`
+    case 'full':
+      return `${DAY_NAMES_ID[dt.getDay()]}, ${dd} ${MONTH_NAMES_ID[dt.getMonth()]} ${yyyy}`
+    case 'short':
+      return `${dd} ${MONTH_SHORT_ID[dt.getMonth()]} ${yyyy}`
+    case 'long':
+    default:
+      return `${dt.getDate()} ${MONTH_NAMES_ID[dt.getMonth()]} ${yyyy}`
+  }
+}
+
+// Pilihan format tampilan tanggal (contoh dihitung live dari tanggal terpilih)
+const TANGGAL_FORMATS = [
+  { id: 'long', label: 'Panjang' },
+  { id: 'full', label: 'Hari + Panjang' },
+  { id: 'short', label: 'Pendek' },
+  { id: 'dmy-dash', label: 'Strip' },
+  { id: 'dmy-slash', label: 'Garis miring' },
+]
 
 // Konfigurasi Default Sesuai Surat Edaran BGN 2026
 const DEFAULT_CFG = {
@@ -32,7 +73,8 @@ const DEFAULT_CFG = {
   waktuMode: 'direct', // 'direct' (jam tercetak) atau 'blank' (kosong untuk stempel/spidol)
   jamKonsumsi: '11:00 WIB',
   showTanggal: false,
-  tanggalKonsumsi: getTodayFormatted(),
+  tanggalKonsumsi: getTodayISO(), // YYYY-MM-DD (untuk input type="date")
+  tanggalFormat: 'long', // 'long' | 'full' | 'short' | 'dmy-dash' | 'dmy-slash'
 
   // Kotak Pengaduan Resmi BGN
   pengaduanWeb: 'bgn.go.id',
@@ -75,6 +117,31 @@ const JAM_PRESETS = [
   '13:00 WIB',
 ]
 
+// Pilihan Font untuk Semua Tulisan Label
+const FONT_OPTIONS = [
+  { label: 'Sistem', value: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" },
+  { label: 'Arial', value: "Arial, Helvetica, sans-serif" },
+  { label: 'Verdana', value: "Verdana, Geneva, sans-serif" },
+  { label: 'Trebuchet', value: "'Trebuchet MS', Verdana, sans-serif" },
+  { label: 'Georgia', value: "Georgia, 'Times New Roman', serif" },
+  { label: 'Times', value: "'Times New Roman', Times, serif" },
+  { label: 'Courier', value: "'Courier New', Courier, monospace" },
+  { label: 'Comic Sans', value: "'Comic Sans MS', 'Comic Sans', cursive" },
+]
+
+// Pengatur Ukuran Font (pt) — key harus sama dengan DEFAULT_CFG
+const FONT_SIZE_FIELDS = [
+  { key: 'fsNamaSppg', label: 'Nama SPPG', min: 4, max: 14, step: 0.1 },
+  { key: 'fsAlamatSppg', label: 'Alamat SPPG', min: 3, max: 8, step: 0.1 },
+  { key: 'fsBatasAman', label: 'Judul "Harus Dikonsumsi"', min: 5, max: 14, step: 0.1 },
+  { key: 'fsJam', label: 'Jam Konsumsi', min: 8, max: 30, step: 0.5 },
+  { key: 'fsTanggal', label: 'Tanggal', min: 4, max: 10, step: 0.1 },
+  { key: 'fsLarangan', label: 'Teks Larangan', min: 4, max: 10, step: 0.1 },
+  { key: 'fsSegeraKonsumsi', label: 'Teks Segera Konsumsi', min: 4, max: 10, step: 0.1 },
+  { key: 'fsHeaderPengaduan', label: 'Judul Kotak Pengaduan', min: 5, max: 12, step: 0.1 },
+  { key: 'fsIsiPengaduan', label: 'Isi Kotak Pengaduan', min: 3, max: 8, step: 0.1 },
+]
+
 // Dynamic loader html-to-image
 const loadHtmlToImage = () => {
   if (typeof window !== 'undefined' && window.htmlToImage) {
@@ -108,6 +175,11 @@ export default function StikerMakanV2Page() {
         const saved = localStorage.getItem(STORAGE_KEY)
         if (saved) {
           const parsed = JSON.parse(saved)
+          // Migrasi: nilai tanggal lama berupa teks bebas ("10 September 2026")
+          // tidak cocok untuk input date → ganti ke tanggal hari ini (ISO).
+          if (parsed.tanggalKonsumsi && !/^\d{4}-\d{2}-\d{2}$/.test(parsed.tanggalKonsumsi)) {
+            parsed.tanggalKonsumsi = getTodayISO()
+          }
           setCfg((prev) => ({ ...prev, ...parsed }))
         }
       } catch (e) {
@@ -551,14 +623,14 @@ export default function StikerMakanV2Page() {
               <div className="space-y-3 text-xs">
                 <div>
                   <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Nama SPPG:
+                    Nama SPPG: <span className="font-normal text-slate-400">(bisa Enter untuk baris baru)</span>
                   </label>
-                  <input
-                    type="text"
+                  <textarea
+                    rows={2}
                     value={cfg.namaSppg}
                     onChange={(e) => updateCfg({ namaSppg: e.target.value })}
-                    className="w-full py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold uppercase"
-                    placeholder="Contoh: SPPG JAKARTA PUSAT 1"
+                    className="w-full py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold uppercase text-xs leading-relaxed"
+                    placeholder={'Contoh:\nSPPG JAKARTA PUSAT 1\natau Enter untuk 2 baris'}
                   />
                 </div>
 
@@ -685,14 +757,50 @@ export default function StikerMakanV2Page() {
                     </div>
 
                     {cfg.showTanggal && (
-                      <div>
-                        <input
-                          type="text"
-                          value={cfg.tanggalKonsumsi}
-                          onChange={(e) => updateCfg({ tanggalKonsumsi: e.target.value })}
-                          className="w-full py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
-                          placeholder="Contoh: 10 September 2026"
-                        />
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Tanggal:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="date"
+                              value={/^\d{4}-\d{2}-\d{2}$/.test(cfg.tanggalKonsumsi || '') ? cfg.tanggalKonsumsi : ''}
+                              onChange={(e) => updateCfg({ tanggalKonsumsi: e.target.value })}
+                              className="flex-1 py-1.5 px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => updateCfg({ tanggalKonsumsi: getTodayISO() })}
+                              className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-[11px] font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer whitespace-nowrap"
+                            >
+                              Hari ini
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                            Format tampilan:
+                          </label>
+                          <div className="flex flex-wrap gap-1">
+                            {TANGGAL_FORMATS.map((tf) => (
+                              <button
+                                key={tf.id}
+                                type="button"
+                                title={tf.label}
+                                onClick={() => updateCfg({ tanggalFormat: tf.id })}
+                                className={`px-2 py-1 rounded text-[11px] font-semibold border cursor-pointer ${
+                                  (cfg.tanggalFormat || 'long') === tf.id
+                                    ? 'bg-blue-600 text-white border-blue-600'
+                                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
+                              >
+                                {formatTanggalID(cfg.tanggalKonsumsi || getTodayISO(), tf.id)}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </>
@@ -795,10 +903,91 @@ export default function StikerMakanV2Page() {
               </div>
             </div>
 
+            {/* 5. Tipografi & Font Semua Tulisan */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-2">
+                <span>🔤</span> Font Semua Tulisan
+              </h2>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-3">
+                Berlaku untuk seluruh teks di Label Kiri &amp; Kanan.
+              </p>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                {FONT_OPTIONS.map((f) => {
+                  const active = cfg.fontFamily === f.value
+                  return (
+                    <button
+                      key={f.label}
+                      type="button"
+                      onClick={() => updateCfg({ fontFamily: f.value })}
+                      className={`py-2 px-3 rounded-lg border text-left transition-all cursor-pointer ${
+                        active
+                          ? 'bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500'
+                          : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <div className="font-bold" style={{ fontFamily: f.value }}>
+                        Ag {f.label}
+                      </div>
+                      <div className="text-[10px] text-slate-500 truncate" style={{ fontFamily: f.value }}>
+                        HARUS DIKONSUMSI 123
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Ukuran Font per Bagian */}
+              <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Ukuran Font (pt)
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const reset = {}
+                      FONT_SIZE_FIELDS.forEach((f) => {
+                        reset[f.key] = DEFAULT_CFG[f.key]
+                      })
+                      updateCfg(reset)
+                    }}
+                    className="text-[11px] font-semibold px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    ↺ Reset ukuran
+                  </button>
+                </div>
+                <div className="space-y-2.5">
+                  {FONT_SIZE_FIELDS.map((f) => (
+                    <div key={f.key}>
+                      <div className="flex items-center justify-between text-[11px] mb-0.5">
+                        <label className="font-semibold text-slate-600 dark:text-slate-400">
+                          {f.label}
+                        </label>
+                        <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+                          {Number(cfg[f.key]).toFixed(1)} pt
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={f.min}
+                        max={f.max}
+                        step={f.step}
+                        value={cfg[f.key]}
+                        onChange={(e) => updateCfg({ [f.key]: parseFloat(e.target.value) })}
+                        className="w-full accent-blue-600 cursor-pointer"
+                        aria-label={f.label}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
 
           {/* ─── PANEL PREVIEW KANAN (INTERACTIVE PREVIEW & SIMULATION) ─── */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
+          <div className="lg:col-span-7 flex flex-col gap-4 lg:sticky lg:top-[70px] lg:self-start">
             
             {/* Tab Navigasi Preview */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-2.5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-2">
@@ -881,7 +1070,11 @@ export default function StikerMakanV2Page() {
             </div>
 
             {/* Preview Box Container dengan Indikator Ukuran 7,0 cm x 5,0 cm */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-center min-h-[460px] overflow-auto relative">
+            {/* Scroll terisolasi: scroll di dalam preview tidak merembet ke halaman */}
+            <div
+              className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-start min-h-[460px] max-h-[70vh] overflow-auto overscroll-contain relative"
+              style={{ overscrollBehavior: 'contain' }}
+            >
               
               {/* Indikator Dimensi Resmi di Layar */}
               {activeTab !== 'ompreng' && (
@@ -896,11 +1089,10 @@ export default function StikerMakanV2Page() {
               )}
 
               {/* Tampilan Sesuai Tab Aktif */}
+              {/* Pakai `zoom` (bukan transform scale) agar area scroll mengikuti ukuran visual */}
               <div
                 style={{
-                  transform: `scale(${zoomScale})`,
-                  transformOrigin: 'center center',
-                  transition: 'transform 0.15s ease-out',
+                  zoom: zoomScale,
                 }}
                 className="py-4"
               >
