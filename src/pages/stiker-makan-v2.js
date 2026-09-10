@@ -221,18 +221,9 @@ const PENGADUAN_FONT_FIELDS = [
   { key: 'fsPengaduanTiktok', label: 'TikTok' },
 ]
 
-// Dynamic loader html-to-image
-const loadHtmlToImage = () => {
-  if (typeof window !== 'undefined' && window.htmlToImage) {
-    return Promise.resolve(window.htmlToImage)
-  }
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js'
-    script.onload = () => resolve(window.htmlToImage)
-    script.onerror = (err) => reject(new Error('Gagal memuat library html-to-image: ' + err))
-    document.body.appendChild(script)
-  })
+// Dynamic loader html-to-image dari package lokal
+const loadHtmlToImage = async () => {
+  return await import('html-to-image')
 }
 
 const STORAGE_KEY = 'stiker_ompreng_v2_config'
@@ -531,43 +522,58 @@ export default function StikerMakanV2Page() {
   }
 
   // Handle Download PNG Resolusi Tinggi (300 DPI)
-  const handleDownloadPng = async (targetId, filename) => {
+  const handleDownloadPng = async (targetIdOrType, filename) => {
     try {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
-      const node = document.getElementById(targetId)
-      if (!node) throw new Error('Elemen tidak ditemukan pada canvas')
+      let node = document.getElementById(targetIdOrType)
+      if (!node) {
+        node = document.getElementById(`export-node-${targetIdOrType}`)
+      }
+      if (!node) throw new Error('Elemen stiker tidak ditemukan')
 
-      // Pixel ratio 4 menghasilkan resolusi ~827x591 px (standar 300 DPI untuk 70x50mm)
+      // Pixel ratio 4 menghasilkan resolusi tajam ~1058x756 px (300 DPI untuk 70x50mm)
       const dataUrl = await htmlToImage.toPng(node, {
         pixelRatio: 4,
         quality: 1,
         backgroundColor: '#ffffff',
+        cacheBust: true,
       })
 
       const link = document.createElement('a')
       link.download = `${filename}.png`
       link.href = dataUrl
+      document.body.appendChild(link)
       link.click()
+      document.body.removeChild(link)
       triggerToast(`Berhasil mengunduh ${filename}.png (300 DPI)`)
     } catch (err) {
-      triggerToast('Gagal mengunduh gambar: ' + err.message)
+      console.error(err)
+      triggerToast('Gagal mengunduh: ' + (err.message || err))
     } finally {
       setIsExporting(false)
     }
   }
 
   // Handle Copy Image ke Clipboard
-  const handleCopyPng = async (targetId) => {
+  const handleCopyPng = async (targetIdOrType) => {
     try {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
-      const node = document.getElementById(targetId)
-      if (!node) throw new Error('Elemen tidak ditemukan pada canvas')
+      let node = targetIdOrType ? document.getElementById(targetIdOrType) : null
+      if (!node && targetIdOrType) {
+        node = document.getElementById(`export-node-${targetIdOrType}`)
+      }
+      if (!node) {
+        const defaultType = activeTab === 'kanan' ? 'kanan' : activeTab === 'kiri' ? 'kiri' : 'sepasang'
+        node = document.getElementById(`export-node-${defaultType}`)
+      }
+      if (!node) throw new Error('Elemen stiker tidak ditemukan')
 
       const blob = await htmlToImage.toBlob(node, {
         pixelRatio: 3,
         backgroundColor: '#ffffff',
+        cacheBust: true,
       })
 
       if (!navigator.clipboard || !window.ClipboardItem) {
@@ -579,7 +585,8 @@ export default function StikerMakanV2Page() {
       ])
       triggerToast('Gambar stiker berhasil disalin ke clipboard (300 DPI)')
     } catch (err) {
-      triggerToast('Gagal menyalin: ' + err.message)
+      console.error(err)
+      triggerToast('Gagal menyalin: ' + (err.message || err))
     } finally {
       setIsExporting(false)
     }
@@ -616,7 +623,7 @@ export default function StikerMakanV2Page() {
 
   return (
     <main
-      className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white relative dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(37,99,235,0.14),rgba(2,6,23,0))]"
+      className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white"
       style={{ accentColor: '#2563eb' }}
     >
       {/* ─── PRINT CSS STYLES (PRESISI THERMAL 70 × 50 mm & 140 × 50 mm) ─── */}
@@ -670,7 +677,7 @@ export default function StikerMakanV2Page() {
         <aside
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900/95 dark:bg-slate-900/95 text-white dark:text-slate-100 rounded-xl shadow-[0_12px_28px_-8px_rgba(15,23,42,0.35)] dark:shadow-[0_12px_28px_-8px_rgba(0,0,0,0.8)] border border-slate-700/80 dark:border-slate-700 text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-slate-900/95 dark:bg-slate-900/95 text-white dark:text-slate-100 rounded-xl shadow-xs border border-slate-700/80 dark:border-slate-700 text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-bottom-3 duration-200"
         >
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
@@ -686,7 +693,7 @@ export default function StikerMakanV2Page() {
       )}
 
       {/* ─── HEADER / NAVIGATION BAR (NO PRINT) ─── */}
-      <header className="no-print-area border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xs dark:shadow-[0_4px_24px_rgba(0,0,0,0.6)]">
+      <header className="no-print-area border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xs dark:shadow-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-md ring-1 ring-white/20 shrink-0 select-none">
@@ -697,14 +704,14 @@ export default function StikerMakanV2Page() {
                 <h1 className="text-base sm:text-lg font-bold tracking-tight m-0 text-slate-900 dark:text-white text-balance">
                   Stiker Makan V2
                 </h1>
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 whitespace-nowrap shadow-2xs">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-slate-700 whitespace-nowrap shadow-2xs">
                   <ShieldCheck className="w-3 h-3" /> Standar BGN 2026
                 </span>
                 <span className="hidden md:inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-cyan-300 border border-slate-200 dark:border-slate-800 whitespace-nowrap font-mono">
                   Thermal Ready · 70 × 50 mm
                 </span>
                 {hasSavedData && (
-                  <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60 whitespace-nowrap font-mono tabular-nums shadow-2xs">
+                  <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-slate-700 whitespace-nowrap font-mono tabular-nums shadow-2xs">
                     <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                     <span>Tersimpan {lastSavedTime ? `(${lastSavedTime})` : ''}</span>
                   </span>
@@ -728,7 +735,7 @@ export default function StikerMakanV2Page() {
             <button
               type="button"
               onClick={handleSaveToLocalStorage}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-400 dark:border-emerald-700/60 bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none shadow-2xs"
+              className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-emerald-400 dark:border-slate-700 bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-slate-700 transition-all flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none shadow-2xs"
               title="Simpan konfigurasi ke Local Storage browser"
             >
               <Save className="w-3.5 h-3.5" />
@@ -894,7 +901,7 @@ export default function StikerMakanV2Page() {
                       <Printer className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       <span>Opsi Cetak Printer Thermal</span>
                     </h3>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 font-mono">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-slate-700 font-mono">
                       Ukuran: 70 × 50 mm
                     </span>
                   </div>
@@ -910,7 +917,7 @@ export default function StikerMakanV2Page() {
                         onClick={() => { setCetakTarget('kiri'); setActiveTab('kiri'); }}
                         className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'kiri'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                             : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
@@ -926,7 +933,7 @@ export default function StikerMakanV2Page() {
                         onClick={() => { setCetakTarget('kanan'); setActiveTab('kanan'); }}
                         className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'kanan'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                             : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
@@ -942,7 +949,7 @@ export default function StikerMakanV2Page() {
                         onClick={() => { setCetakTarget('alternating'); setActiveTab('sepasang'); }}
                         className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'alternating'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                             : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
@@ -958,7 +965,7 @@ export default function StikerMakanV2Page() {
                         onClick={() => { setCetakTarget('both_batch'); setActiveTab('sepasang'); }}
                         className={`p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'both_batch'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                             : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
@@ -974,7 +981,7 @@ export default function StikerMakanV2Page() {
                         onClick={() => { setCetakTarget('sepasang'); setActiveTab('sepasang'); }}
                         className={`col-span-2 p-2.5 rounded-xl border font-semibold text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                           cetakTarget === 'sepasang'
-                            ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                            ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                             : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                         }`}
                       >
@@ -1113,7 +1120,7 @@ export default function StikerMakanV2Page() {
                   </div>
 
                   {/* Ringkasan Output Kertas Roll */}
-                  <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 mb-4 flex items-center justify-between text-xs">
+                  <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-slate-950 border border-blue-200 dark:border-slate-800 mb-4 flex items-center justify-between text-xs">
                     <div>
                       <div className="text-slate-600 dark:text-slate-300">
                         Total Output: <strong className="font-black text-blue-600 dark:text-blue-400 text-sm font-mono tabular-nums">{printPages.length} label</strong>
@@ -1124,7 +1131,7 @@ export default function StikerMakanV2Page() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-slate-800 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-slate-700">
                         <Check className="w-3 h-3" /> Siap Roll Thermal
                       </span>
                     </div>
@@ -1282,7 +1289,7 @@ export default function StikerMakanV2Page() {
                             onClick={() => updateCfg({ waktuMode: 'direct' })}
                             className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                               cfg.waktuMode === 'direct'
-                                ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                                ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                                 : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                             }`}
                           >
@@ -1298,7 +1305,7 @@ export default function StikerMakanV2Page() {
                             onClick={() => updateCfg({ waktuMode: 'blank' })}
                             className={`py-2 px-3 rounded-xl border text-left font-semibold cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                               cfg.waktuMode === 'blank'
-                                ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                                ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                                 : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                             }`}
                           >
@@ -1441,11 +1448,11 @@ export default function StikerMakanV2Page() {
                           <span>Proporsi Lebar Kolom Label Kanan:</span>
                         </label>
                         <div className="flex items-center gap-1.5 text-[10px]">
-                          <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 font-bold tabular-nums">
+                          <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-slate-800 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-slate-700 font-bold tabular-nums">
                             Larangan: {cfg.widthKolomLarangan || 27} mm
                           </span>
                           <span className="text-slate-400 dark:text-blue-300/80">vs</span>
-                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 font-bold tabular-nums">
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-slate-700 font-bold tabular-nums">
                             Kontak &amp; QR: {(63 - (cfg.widthKolomLarangan || 27)).toFixed(0)} mm
                           </span>
                         </div>
@@ -1519,7 +1526,7 @@ export default function StikerMakanV2Page() {
                             })
                             triggerToast('Mode Ringkas aktif (157, WA, Web)')
                           }}
-                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold border border-blue-500 bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 cursor-pointer shadow-2xs transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                          className="px-2 py-0.5 rounded-lg text-[10px] font-bold border border-blue-500 bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-300 cursor-pointer shadow-2xs transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                         >
                           Ringkas: 157, WA &amp; Web (Rekomendasi)
                         </button>
@@ -1717,7 +1724,7 @@ export default function StikerMakanV2Page() {
                           <QrCode className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           <span>QR Code Menu &amp; Analisis Gizi</span>
                         </h4>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-slate-700">
                           Di Bawah Kontak
                         </span>
                       </div>
@@ -1743,7 +1750,7 @@ export default function StikerMakanV2Page() {
                       </div>
 
                       {(cfg.showQrMenu ?? true) && (
-                        <div className="space-y-3 p-3.5 rounded-xl bg-emerald-50/40 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 animate-in fade-in duration-150">
+                        <div className="space-y-3 p-3.5 rounded-xl bg-emerald-50/40 dark:bg-slate-950 border border-emerald-200 dark:border-slate-800 animate-in fade-in duration-150">
                           {/* Input Tautan / URL */}
                           <div>
                             <div className="flex items-center justify-between mb-1">
@@ -1777,7 +1784,7 @@ export default function StikerMakanV2Page() {
                                   className={`px-2 py-0.5 rounded-lg text-[10px] font-semibold border cursor-pointer transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none ${
                                     cfg.qrMenuUrl === preset.url
                                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                                      : 'border-emerald-200 dark:border-emerald-900/60 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 bg-white dark:bg-emerald-900/30'
+                                      : 'border-emerald-200 dark:border-slate-700 hover:bg-emerald-100 dark:hover:bg-slate-800 text-emerald-800 dark:text-emerald-300 bg-white dark:bg-slate-900'
                                   }`}
                                 >
                                   {preset.label}
@@ -1825,7 +1832,7 @@ export default function StikerMakanV2Page() {
                           </div>
 
                           {/* Petunjuk Pemindaian */}
-                          <div className="p-2 rounded-lg bg-white/80 dark:bg-emerald-900/40 border border-emerald-200/80 dark:border-emerald-900/40 text-[10px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
+                          <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-800 text-[10px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
                             <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                             <span>
                               Format simpel &amp; presisi: Teks <strong>MENU &amp; ANALISIS GIZI</strong> di atas, dan QR Code di bawahnya.
@@ -1851,7 +1858,7 @@ export default function StikerMakanV2Page() {
                     Berlaku serentak untuk seluruh elemen teks pada Label Kiri &amp; Label Kanan.
                   </p>
 
-                  <div className="flex items-start gap-2 p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 text-[11px] text-emerald-800 dark:text-emerald-300 mb-3">
+                  <div className="flex items-start gap-2 p-2.5 rounded-xl bg-emerald-50/70 dark:bg-slate-950 border border-emerald-200 dark:border-slate-800 text-[11px] text-emerald-800 dark:text-emerald-300 mb-3">
                     <Info className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
                     <span>
                       <strong>Rekomendasi Thermal:</strong> Gunakan font sans-serif bersudut tegas seperti <strong>Verdana</strong> atau <strong>Tahoma</strong> agar tulisan di ukuran 4–8pt tetap tajam dan tidak kabur pada printer thermal 203 DPI.
@@ -1869,14 +1876,14 @@ export default function StikerMakanV2Page() {
                           onClick={() => updateCfg({ fontFamily: f.value })}
                           className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
                             active
-                              ? 'bg-blue-50/90 dark:bg-blue-950/70 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
+                              ? 'bg-blue-50/90 dark:bg-slate-800 border-blue-500 text-blue-700 dark:text-blue-300 shadow-xs ring-1 ring-blue-500/80'
                               : 'border-slate-200 dark:border-slate-800 dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 dark:text-slate-200'
                           }`}
                         >
                           <div className="font-bold flex items-center justify-between" style={{ fontFamily: f.value }}>
                             <span>Ag {f.label}</span>
                             {f.badge && (
-                              <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
+                              <span className="text-[9px] font-bold px-1.5 py-px rounded-full bg-emerald-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-slate-700">
                                 {f.badge}
                               </span>
                             )}
@@ -2106,9 +2113,9 @@ export default function StikerMakanV2Page() {
             <div
               className={`rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col items-center justify-start min-h-[460px] max-h-[74vh] overflow-auto overscroll-contain relative transition-colors ${
                 previewBg === 'grid'
-                  ? 'bg-[radial-gradient(#94a3b8_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(59,130,246,0.18)_1.2px,transparent_1.2px)] [background-size:16px_16px] bg-slate-50 dark:bg-slate-950'
+                  ? 'bg-slate-100/70 dark:bg-slate-950'
                   : previewBg === 'roll'
-                  ? 'bg-gradient-to-b from-slate-200/50 via-slate-100/30 to-slate-200/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950'
+                  ? 'bg-slate-200/50 dark:bg-slate-900'
                   : 'bg-white dark:bg-slate-950'
               }`}
             >
@@ -2192,13 +2199,13 @@ export default function StikerMakanV2Page() {
                   {activeTab !== 'ompreng' && (
                     <div className="w-full flex items-center justify-between text-[10px] font-mono font-semibold text-slate-500 dark:text-cyan-300 mb-2 select-none px-1">
                       <div className="flex items-center gap-1.5 w-full">
-                        <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
-                        <div className="h-[1px] flex-1 bg-slate-300 dark:bg-cyan-500/40"></div>
-                        <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-cyan-500/40 text-[9px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
+                        <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-slate-500"></div>
+                        <div className="h-[1px] flex-1 bg-slate-300 dark:bg-slate-700"></div>
+                        <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[9px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
                           {activeTab === 'sepasang' ? '140.0 mm (Lebar 2 Label)' : '70.0 mm (Lebar Standar)'}
                         </span>
-                        <div className="h-[1px] flex-1 bg-slate-300 dark:bg-cyan-500/40"></div>
-                        <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
+                        <div className="h-[1px] flex-1 bg-slate-300 dark:bg-slate-700"></div>
+                        <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-slate-500"></div>
                       </div>
                     </div>
                   )}
@@ -2208,16 +2215,16 @@ export default function StikerMakanV2Page() {
                     {/* Caliper Vertikal (Tinggi) */}
                     {activeTab !== 'ompreng' && (
                       <div className="absolute -left-8 top-0 bottom-0 flex flex-col items-center justify-between text-[9px] font-mono font-semibold text-slate-500 dark:text-cyan-300 select-none py-0.5">
-                        <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
-                        <span className="[writing-mode:vertical-lr] rotate-180 px-0.5 py-1 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-cyan-500/40 text-[8px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
+                        <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-slate-500"></div>
+                        <span className="[writing-mode:vertical-lr] rotate-180 px-0.5 py-1 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[8px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
                           50.0 mm
                         </span>
-                        <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-cyan-400/80"></div>
+                        <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-slate-500"></div>
                       </div>
                     )}
 
                     {activeTab === 'kiri' && (
-                      <div className="shadow-[0_16px_36px_-12px_rgba(15,23,42,0.18)] dark:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6)] rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white">
+                      <div className="shadow-xs rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white">
                         <LabelKiri
                           id="preview-node-kiri"
                           cfg={cfg}
@@ -2228,7 +2235,7 @@ export default function StikerMakanV2Page() {
                     )}
 
                     {activeTab === 'kanan' && (
-                      <div className="shadow-[0_16px_36px_-12px_rgba(15,23,42,0.18)] dark:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6)] rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white">
+                      <div className="shadow-xs rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white">
                         <LabelKanan
                           id="preview-node-kanan"
                           cfg={cfg}
@@ -2239,7 +2246,7 @@ export default function StikerMakanV2Page() {
                     )}
 
                     {activeTab === 'sepasang' && (
-                      <div id="preview-node-sepasang" className="shadow-[0_16px_36px_-12px_rgba(15,23,42,0.18)] dark:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.6)] rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white p-0">
+                      <div id="preview-node-sepasang" className="shadow-xs rounded-[2px] ring-1 ring-slate-900/10 dark:ring-white/10 bg-white p-0">
                         <LabelSepasang
                           cfg={cfg}
                           isBW={isBW}
@@ -2261,12 +2268,12 @@ export default function StikerMakanV2Page() {
               {/* Action Toolbar di Bawah Preview */}
               <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-slate-600 dark:text-blue-200/90 font-semibold mr-1 text-[11px]">Unduh (300 DPI):</span>
+                  <span className="text-slate-600 dark:text-slate-300 font-semibold mr-1 text-[11px]">Unduh (300 DPI):</span>
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => handleDownloadPng('preview-node-kiri', 'stiker-bgn-kiri-70x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                    onClick={() => handleDownloadPng('kiri', 'stiker-bgn-kiri-70x50mm')}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
                     <span>PNG Kiri</span>
@@ -2274,8 +2281,8 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => handleDownloadPng('preview-node-kanan', 'stiker-bgn-kanan-70x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                    onClick={() => handleDownloadPng('kanan', 'stiker-bgn-kanan-70x50mm')}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
                     <span>PNG Kanan</span>
@@ -2283,8 +2290,8 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => handleDownloadPng('preview-node-sepasang-dl', 'stiker-bgn-sepasang-140x50mm')}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                    onClick={() => handleDownloadPng('sepasang', 'stiker-bgn-sepasang-140x50mm')}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
                     <span>PNG Sepasang</span>
@@ -2293,11 +2300,8 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => {
-                      const target = activeTab === 'kanan' ? 'preview-node-kanan' : activeTab === 'sepasang' ? 'preview-node-sepasang' : 'preview-node-kiri'
-                      handleCopyPng(target)
-                    }}
-                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                    onClick={() => handleCopyPng()}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                     title="Salin gambar aktif ke clipboard"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Copy className="w-3 h-3" />}
@@ -2309,7 +2313,7 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     onClick={handleCleanThermalPrint}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-[0_10px_20px_-6px_rgba(37,99,235,0.35)] hover:shadow-[0_14px_24px_-6px_rgba(37,99,235,0.45)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-xs hover:shadow-[0_14px_24px_-6px_rgba(37,99,235,0.45)] flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                   >
                     <Printer className="w-4 h-4" />
                     <span>Cetak Sekarang ({printPages.length} Label)</span>
@@ -2319,7 +2323,7 @@ export default function StikerMakanV2Page() {
             </div>
 
             {/* Panduan Cetak Printer Thermal */}
-            <div className="bg-amber-50/80 dark:bg-amber-950/30 rounded-2xl p-4 sm:p-5 border border-amber-200/90 dark:border-amber-700/40 text-amber-900 dark:text-amber-200 text-xs shadow-xs">
+            <div className="bg-amber-50/80 dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-amber-200/90 dark:border-slate-800 text-amber-900 dark:text-amber-200 text-xs shadow-xs">
               <div className="font-bold flex items-center gap-2 mb-2 text-sm tracking-tight text-amber-950 dark:text-amber-100">
                 <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>Panduan Teknis Cetak Thermal Label Ompreng (70 × 50 mm)</span>
@@ -2352,7 +2356,7 @@ export default function StikerMakanV2Page() {
           aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-150"
         >
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-[0_25px_50px_-12px_rgba(15,23,42,0.25)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] space-y-4 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 max-w-lg w-full border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <HardDrive className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -2387,7 +2391,7 @@ export default function StikerMakanV2Page() {
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 border ${
                   hasSavedData
-                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60'
+                    ? 'bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-slate-700'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-800'
                 }`}>
                   {hasSavedData ? 'Tersimpan' : 'Belum Ada Data'}
@@ -2436,7 +2440,7 @@ export default function StikerMakanV2Page() {
                   type="button"
                   disabled={!hasSavedData}
                   onClick={handleClearLocalStorage}
-                  className="py-2 px-3 rounded-lg border border-rose-200 dark:border-rose-800/40 bg-white dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 font-semibold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
+                  className="py-2 px-3 rounded-lg border border-rose-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-slate-700 font-semibold text-xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:outline-none"
                   title="Hapus data tersimpan dari browser ini"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -2455,7 +2459,7 @@ export default function StikerMakanV2Page() {
                 <button
                   type="button"
                   onClick={handleExportConfig}
-                  className="py-1 px-2.5 rounded-lg bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 text-[11px] font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all active:scale-[0.98]"
+                  className="py-1 px-2.5 rounded-lg bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-slate-700 text-[11px] font-bold flex items-center gap-1 cursor-pointer hover:bg-blue-100 dark:hover:bg-slate-700 transition-all active:scale-[0.98]"
                 >
                   <Copy className="w-3 h-3" />
                   <span>Salin JSON</span>
@@ -2467,7 +2471,7 @@ export default function StikerMakanV2Page() {
               </p>
 
               {configError && (
-                <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 animate-in fade-in duration-100">
+                <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-slate-950 border border-rose-200 dark:border-slate-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 animate-in fade-in duration-100">
                   <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
                   <span>{configError}</span>
                 </div>
@@ -2510,11 +2514,25 @@ export default function StikerMakanV2Page() {
         </div>
       )}
 
-      {/* ─── HIDDEN PREVIEW NODES FOR DOWNLOAD (ALWAYS MOUNTED) ─── */}
-      <div style={{ position: 'fixed', left: '-9999px', top: '-9999px' }} aria-hidden="true">
-        <LabelKiri id="preview-node-kiri-dl" cfg={cfg} isBW={isBW} />
-        <LabelKanan id="preview-node-kanan-dl" cfg={cfg} isBW={isBW} />
-        <div id="preview-node-sepasang-dl" className="bg-white">
+      {/* ─── HIDDEN EXPORT NODES FOR HIGH-RES 300 DPI DOWNLOAD (MOUNTED OFF-CANVAS) ─── */}
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          zIndex: -9999,
+          opacity: 0,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      >
+        <div id="export-node-kiri" style={{ width: '70mm', height: '50mm', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+          <LabelKiri cfg={cfg} isBW={isBW} />
+        </div>
+        <div id="export-node-kanan" style={{ width: '70mm', height: '50mm', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+          <LabelKanan cfg={cfg} isBW={isBW} />
+        </div>
+        <div id="export-node-sepasang" style={{ width: '142mm', height: '50mm', backgroundColor: '#ffffff', overflow: 'hidden' }}>
           <LabelSepasang cfg={cfg} isBW={isBW} gapMm={2} />
         </div>
       </div>
