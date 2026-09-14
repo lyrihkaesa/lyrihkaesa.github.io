@@ -1,215 +1,233 @@
-import React, { useState, useRef, useMemo } from 'react'
-import Layout from '@theme/Layout'
-import {
-  Download,
-  Printer,
-  Copy,
-  Check,
-  Palette,
-  Type,
-  Layers,
-  Grid,
-  RefreshCw,
-  DoorClosed,
-  Info,
-  Sliders,
-  ZoomIn,
-  ZoomOut
-} from 'lucide-react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
+import Head from '@docusaurus/Head'
 
-// ─── PRESET WARNA STANDAR RAMBU & JALUR CEPAT ────────────────────────────────
+// ─── PALET PRESET WARNA STANDAR RAMBU FISIK & KANTOR ─────────────────────────
 const COLOR_PRESETS = [
   {
-    name: 'Hijau Jalur Cepat (Default)',
-    desc: 'Standar rambu hijau jalan tol / keselamatan',
+    id: 'jalur-cepat',
+    name: 'Hijau Jalur Cepat',
+    sub: 'Standar rambu keselamatan tol',
     bg: '#007A3D',
     border: '#FFFFFF',
     text: '#FFFFFF',
-    subtext: '#E2E8F0'
+    subtext: '#E2E8F0',
+    tag: 'Standar'
   },
   {
+    id: 'hijau-daun',
     name: 'Hijau Daun Segar',
-    desc: 'Nuansa hijau terang modern',
+    sub: 'Nuansa hijau kontemporer',
     bg: '#15803D',
     border: '#FFFFFF',
     text: '#FFFFFF',
-    subtext: '#E2E8F0'
+    subtext: '#E2E8F0',
+    tag: 'Modern'
   },
   {
+    id: 'biru-rambu',
     name: 'Biru Rambu Informasi',
-    desc: 'Standar penunjuk arah umum',
+    sub: 'Penunjuk arah fasilitas umum',
     bg: '#005596',
     border: '#FFFFFF',
     text: '#FFFFFF',
-    subtext: '#E2E8F0'
+    subtext: '#E2E8F0',
+    tag: 'Publik'
   },
   {
-    name: 'Biru Navy Elegan',
-    desc: 'Papan kantor korporat / eksekutif',
+    id: 'biru-navy',
+    name: 'Biru Navy Eksekutif',
+    sub: 'Papan kantor korporat resmi',
     bg: '#1E293B',
     border: '#E2E8F0',
     text: '#F8FAFC',
-    subtext: '#94A3B8'
+    subtext: '#94A3B8',
+    tag: 'Korporat'
   },
   {
-    name: 'Merah Bahaya / Larangan',
-    desc: 'Untuk ruang darurat / panel listrik',
+    id: 'merah-bahaya',
+    name: 'Merah Larangan / Darurat',
+    sub: 'Panel listrik & tanggap darurat',
     bg: '#B91C1C',
     border: '#FFFFFF',
     text: '#FFFFFF',
-    subtext: '#FEE2E2'
+    subtext: '#FEE2E2',
+    tag: 'K3 / Kritis'
   },
   {
-    name: 'Kuning Peringatan / Hazard',
-    desc: 'Latar kuning teks hitam kontras tinggi',
+    id: 'kuning-hazard',
+    name: 'Kuning Hazard Kontras',
+    sub: 'Perhatian & kehati-hatian',
     bg: '#EAB308',
     border: '#000000',
     text: '#000000',
-    subtext: '#3F3F46'
+    subtext: '#3F3F46',
+    tag: 'Peringatan'
   },
   {
+    id: 'hitam-matte',
     name: 'Hitam Matte Akrilik',
-    desc: 'Kesan mewah minimalis modern',
+    sub: 'Arsitektural minimalis modern',
     bg: '#18181B',
     border: '#F4F4F5',
     text: '#FFFFFF',
-    subtext: '#A1A1AA'
+    subtext: '#A1A1AA',
+    tag: 'Premium'
   },
   {
-    name: 'Putih Bersih (Clean White)',
-    desc: 'Border dan teks hitam tegas',
+    id: 'putih-bersih',
+    name: 'Putih Bersih (Monokrom)',
+    sub: 'Teks & garis hitam tegas',
     bg: '#FFFFFF',
     border: '#0F172A',
     text: '#0F172A',
-    subtext: '#475569'
+    subtext: '#475569',
+    tag: 'Minimal'
   },
   {
-    name: 'Emas Mewah (Gold Brass)',
-    desc: 'Plang kuningan hotel / ruang direksi',
+    id: 'kuningan-gold',
+    name: 'Kuningan / Gold Brass',
+    sub: 'Plang hotel & ruang pimpinan',
     bg: '#92400E',
     border: '#FEF3C7',
     text: '#FFFBEB',
-    subtext: '#FDE68A'
+    subtext: '#FDE68A',
+    tag: 'Klasik'
   }
 ]
 
-// ─── PRESET UKURAN STANDAR PAPAN NAMA ───────────────────────────────────────
+// ─── PRESET DIMENSI STANDAR INDUSTRI & CETAK ────────────────────────────────
 const SIZE_PRESETS = [
-  { label: '25 × 10 cm (Default Permintaan)', width: 25, height: 10, padding: 1 },
-  { label: '30 × 10 cm (Standar Pintu Kantor)', width: 30, height: 10, padding: 1 },
-  { label: '30 × 15 cm (Besar / Terbaca Jauh)', width: 30, height: 15, padding: 1.2 },
-  { label: '20 × 8 cm (Kompak / Minimalis)', width: 20, height: 8, padding: 0.8 },
-  { label: '35 × 12 cm (Papan Dinding Lebar)', width: 35, height: 12, padding: 1.2 },
-  { label: '40 × 15 cm (Papan Rapat / Aula)', width: 40, height: 15, padding: 1.5 }
+  { label: '25 × 10 cm', note: 'Standar Jalur Cepat', width: 25, height: 10, padding: 1 },
+  { label: '30 × 10 cm', note: 'Pintu Kantor Standar', width: 30, height: 10, padding: 1 },
+  { label: '30 × 15 cm', note: 'Jarak Pandang Jauh', width: 30, height: 15, padding: 1.2 },
+  { label: '20 × 8 cm', note: 'Kompak Minimalis', width: 20, height: 8, padding: 0.8 },
+  { label: '35 × 12 cm', note: 'Papan Koridor Lebar', width: 35, height: 12, padding: 1.2 },
+  { label: '40 × 15 cm', note: 'Aula & Ruang Sidang', width: 40, height: 15, padding: 1.5 }
 ]
 
 // ─── PRESET NAMA RUANGAN UMUM ───────────────────────────────────────────────
 const ROOM_NAME_PRESETS = [
-  { title: 'RUANG KANTOR', sub: 'OFFICE ROOM' },
+  { title: 'RUANG KANTOR', sub: 'OFFICE' },
   { title: 'RUANG RAPAT', sub: 'MEETING ROOM' },
-  { title: 'RUANG KEPALA', sub: 'HEAD OFFICE' },
-  { title: 'RUANG GURU', sub: 'TEACHERS ROOM' },
   { title: 'RUANG DIREKSI', sub: 'BOARD ROOM' },
-  { title: 'RUANG STAFF', sub: 'STAFF ROOM' },
+  { title: 'RUANG KEPALA', sub: 'DIRECTOR OFFICE' },
+  { title: 'RUANG GURU', sub: 'FACULTY ROOM' },
+  { title: 'RUANG STAFF', sub: 'STAFF ONLY' },
   { title: 'LABORATORIUM', sub: 'LABORATORY' },
-  { title: 'RUANG SERVER', sub: 'IT DATA CENTER' },
-  { title: 'GUDANG', sub: 'STORAGE ROOM' },
+  { title: 'RUANG SERVER', sub: 'DATA CENTER' },
+  { title: 'GUDANG', sub: 'STORAGE' },
   { title: 'RUANG TAMU', sub: 'GUEST ROOM' },
   { title: 'RUANG KESEHATAN', sub: 'FIRST AID / UKS' },
-  { title: 'TOILET PRIA', sub: 'GENTS RESTROOM' },
-  { title: 'TOILET WANITA', sub: 'LADIES RESTROOM' },
+  { title: 'TOILET PRIA', sub: 'MALE RESTROOM' },
+  { title: 'TOILET WANITA', sub: 'FEMALE RESTROOM' },
   { title: 'MUSHOLA', sub: 'PRAYER ROOM' },
-  { title: 'PANTRY', sub: 'KITCHEN AREA' },
-  { title: 'AREA BEBAS ROKOK', sub: 'NO SMOKING AREA' }
+  { title: 'PANTRY', sub: 'PANTRY' },
+  { title: 'AREA BEBAS ROKOK', sub: 'NO SMOKING' }
 ]
 
-// ─── PILIHAN FONT ───────────────────────────────────────────────────────────
+// ─── PILIHAN TIPOGRAFI RAMBU ────────────────────────────────────────────────
 const FONT_OPTIONS = [
-  { id: 'sans-inter', name: 'Sans-Serif Modern (Inter / Arial)', family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' },
-  { id: 'sans-bold', name: 'Impact / Highway Block (Tegas & Tebal)', family: 'Impact, "Arial Black", "Trebuchet MS", sans-serif' },
-  { id: 'geometric', name: 'Montserrat / Geometrik (Rambu Resmi)', family: '"Montserrat", "Segoe UI", sans-serif' },
-  { id: 'condensed', name: 'Condensed / Padat Rapi', family: '"Arial Narrow", "Helvetica Condensed", sans-serif' },
-  { id: 'serif', name: 'Serif Klasik / Formal (Times / Georgia)', family: 'Georgia, "Times New Roman", Times, serif' },
-  { id: 'monospace', name: 'Monospace / Industrial Tech', family: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace' }
+  {
+    id: 'grotesk-sign',
+    name: 'DIN / Transport Grotesk (Rekomendasi Rambu)',
+    family: '"SF Pro Display", "Geist Sans", "Segoe UI", system-ui, sans-serif'
+  },
+  {
+    id: 'block-heavy',
+    name: 'Highway Gothic / Blok Tebal',
+    family: '"Arial Black", Impact, "Trebuchet MS", sans-serif'
+  },
+  {
+    id: 'clean-geometric',
+    name: 'Geometric Modern / Netral',
+    family: '"Trebuchet MS", "Helvetica Neue", Arial, sans-serif'
+  },
+  {
+    id: 'condensed',
+    name: 'Condensed / Efisien Horizontal',
+    family: '"Arial Narrow", "Helvetica Condensed", sans-serif'
+  },
+  {
+    id: 'serif-editorial',
+    name: 'Klasik Formal / Serif Institusi',
+    family: 'Georgia, "Times New Roman", Times, serif'
+  },
+  {
+    id: 'mono-industrial',
+    name: 'Monospace / Industrial Terminal',
+    family: '"SF Mono", "Geist Mono", "JetBrains Mono", Menlo, Consolas, monospace'
+  }
 ]
 
 export default function PenandaRuanganPage() {
-  // ─── STATE DIMENSI (dlm cm) ────────────────────────────────────────────────
-  const [widthCm, setWidthCm] = useState(25) // Panjang / Lebar 25 cm
-  const [heightCm, setHeightCm] = useState(10) // Tinggi 10 cm
-  const [paddingCm, setPaddingCm] = useState(1) // Padding kotak dalam 1 cm
-  const [boardCornerRadiusMm, setBoardCornerRadiusMm] = useState(6) // Kelengkungan sudut luar (mm)
-  const [innerCornerRadiusMm, setInnerCornerRadiusMm] = useState(4) // Kelengkungan border kotak dalam (mm)
-  const [borderThicknessMm, setBorderThicknessMm] = useState(3) // Tebal garis border putih (mm)
+  // ─── STATE DIMENSI FISIK (cm & mm) ─────────────────────────────────────────
+  const [widthCm, setWidthCm] = useState(25)
+  const [heightCm, setHeightCm] = useState(10)
+  const [paddingCm, setPaddingCm] = useState(1)
+  const [boardCornerRadiusMm, setBoardCornerRadiusMm] = useState(6)
+  const [innerCornerRadiusMm, setInnerCornerRadiusMm] = useState(4)
+  const [borderThicknessMm, setBorderThicknessMm] = useState(3)
 
-  // ─── STATE WARNA ───────────────────────────────────────────────────────────
-  const [bgColor, setBgColor] = useState('#007A3D') // Hijau Jalur Cepat default
-  const [borderColor, setBorderColor] = useState('#FFFFFF') // Garis border putih
-  const [textColor, setTextColor] = useState('#FFFFFF') // Tulisan putih
+  // ─── STATE WARNA ELEMEN FISIK ──────────────────────────────────────────────
+  const [bgColor, setBgColor] = useState('#007A3D') // Default Hijau Jalur Cepat
+  const [borderColor, setBorderColor] = useState('#FFFFFF')
+  const [textColor, setTextColor] = useState('#FFFFFF')
   const [subtextColor, setSubtextColor] = useState('#E2E8F0')
 
-  // ─── STATE TEKS & TIPOGRAFI ───────────────────────────────────────────────
+  // ─── STATE KONTEN TEKS & TIPOGRAFI ─────────────────────────────────────────
   const [textTitle, setTextTitle] = useState('RUANG KANTOR')
   const [textSub, setTextSub] = useState('')
   const [forceUppercase, setForceUppercase] = useState(true)
   const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].family)
-  const [fontWeight, setFontWeight] = useState('800') // Bold/Black
-  const [fontSizeTitleMm, setFontSizeTitleMm] = useState(20) // Ukuran font judul (mm) - default 20mm (2cm)
-  const [fontSizeSubMm, setFontSizeSubMm] = useState(7) // Ukuran font subteks (mm) - default 7mm
-  const [letterSpacingMm, setLetterSpacingMm] = useState(1.2) // Spasi antar karakter (mm)
-  const [autoFitText, setAutoFitText] = useState(true) // Otomatis sesuaikan teks agar selalu pas di dalam kotak
+  const [fontWeight, setFontWeight] = useState('800')
+  const [fontSizeTitleMm, setFontSizeTitleMm] = useState(20)
+  const [fontSizeSubMm, setFontSizeSubMm] = useState(7)
+  const [letterSpacingMm, setLetterSpacingMm] = useState(1.2)
+  const [autoFitText, setAutoFitText] = useState(true)
 
-  // ─── STATE DETAIL REALISTIS / HARDWARE ─────────────────────────────────────
-  const [showScrews, setShowScrews] = useState(false) // Baut/sekrup pemasangan di sudut
-  const [screwInsetMm, setScrewInsetMm] = useState(5) // Jarak sekrup dari sudut luar (mm)
-  const [showGlossEffect, setShowGlossEffect] = useState(true) // Efek kilau akrilik / plat
-  const [borderStyle, setBorderStyle] = useState('solid') // 'solid' | 'double' | 'dashed'
+  // ─── STATE HARDWARE & FINISHING FISIK ──────────────────────────────────────
+  const [showScrews, setShowScrews] = useState(false)
+  const [screwInsetMm, setScrewInsetMm] = useState(5)
+  const [showGlossEffect, setShowGlossEffect] = useState(true)
   const [showInnerBorder, setShowInnerBorder] = useState(true)
+  const [borderStyle, setBorderStyle] = useState('solid') // 'solid' | 'dashed'
 
-  // ─── STATE UI & BATCH ──────────────────────────────────────────────────────
-  const [zoomScale, setZoomScale] = useState(1) // Skala preview di layar
-  const [activeTab, setActiveTab] = useState('konten') // 'konten' | 'ukuran' | 'warna' | 'batch'
+  // ─── STATE WORKBENCH & NAVIGASI ────────────────────────────────────────────
+  const [inspectorTab, setInspectorTab] = useState('papan') // 'papan' | 'batch' | 'spesifikasi'
+  const [zoomScale, setZoomScale] = useState(1)
+  const [showRulers, setShowRulers] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
   const [copiedStatus, setCopiedStatus] = useState(false)
-  const [batchRoomsText, setBatchRoomsText] = useState('RUANG KANTOR\nRUANG RAPAT\nRUANG GURU\nLABORATORIUM\nGUDANG')
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [batchRoomsText, setBatchRoomsText] = useState('RUANG KANTOR\nRUANG RAPAT\nRUANG GURU\nLABORATORIUM\nRUANG SERVER\nGUDANG')
 
-  // Referensi elemen SVG untuk ekspor
   const svgRef = useRef(null)
 
-  // ─── KONVERSI SATUAN FISIK (cm & mm ke px SVG) ──────────────────────────────
-  // 1 cm = 10 mm. Standar SVG viewBox kita gunakan unit mm agar presisi sempurna!
-  const widthMm = widthCm * 10
-  const heightMm = heightCm * 10
-  const paddingMm = paddingCm * 10
+  // ─── MATEMATIKA SATUAN FISIK (cm -> mm) ───────────────────────────────────
+  const widthMm = useMemo(() => Math.max(20, widthCm * 10), [widthCm])
+  const heightMm = useMemo(() => Math.max(10, heightCm * 10), [heightCm])
+  const paddingMm = useMemo(() => Math.max(0, paddingCm * 10), [paddingCm])
 
-  // Koordinat kotak border dalam
   const innerX = paddingMm
   const innerY = paddingMm
   const innerW = Math.max(0, widthMm - paddingMm * 2)
   const innerH = Math.max(0, heightMm - paddingMm * 2)
 
-  // Judul yang ditampilkan (uppercase bila diaktifkan)
   const displayedTitle = forceUppercase ? (textTitle || '').toUpperCase() : textTitle
 
-  // ─── PERHITUNGAN SAFE WIDTH & AUTO-FIT FONT AGAR TIDAK KELUAR BORDER ────────
-  // safeW: Lebar aman di dalam border kotak (menyisakan margin 8mm kiri dan kanan dari garis putih)
-  const safeW = Math.max(20, innerW - 16)
-  // safeH: Tinggi aman di dalam border kotak
-  const safeH = textSub ? Math.max(10, innerH * 0.42) : Math.max(10, innerH * 0.55)
+  // Batas aman penempatan tipografi di dalam kotak border
+  const safeW = Math.max(15, innerW - 14)
+  const safeH = textSub ? Math.max(8, innerH * 0.42) : Math.max(8, innerH * 0.58)
 
-  // Ukuran font yang benar-benar diterapkan ke SVG
+  // Perhitungan adaptif ukuran huruf agar tidak menabrak batas garis border
   const appliedTitleFontSize = useMemo(() => {
-    if (!autoFitText) {
-      return fontSizeTitleMm
-    }
+    if (!autoFitText) return fontSizeTitleMm
     const len = Math.max(1, displayedTitle.length)
-    // Rasio estimasi lebar font terhadap tinggi font: ~0.62
     const charWidthRatio = 0.62
-    const maxHFromWidth = Math.max(6, (safeW - (len - 1) * letterSpacingMm) / (len * charWidthRatio))
+    const maxHFromWidth = Math.max(5, (safeW - (len - 1) * letterSpacingMm) / (len * charWidthRatio))
     return Math.min(fontSizeTitleMm, safeH, maxHFromWidth)
   }, [autoFitText, fontSizeTitleMm, safeW, safeH, displayedTitle, letterSpacingMm])
 
-  // Estimasi apakah teks masih membutuhkan kompresi SVG
   const estimatedTitleWidth = useMemo(() => {
     const len = displayedTitle.length
     return len * (appliedTitleFontSize * 0.62) + (len - 1) * letterSpacingMm
@@ -217,29 +235,46 @@ export default function PenandaRuanganPage() {
 
   const needsTitleCompression = estimatedTitleWidth > safeW
 
-  // Update batch title bila user memilih dari list
-  const handleSelectBatch = (roomTitle) => {
-    setTextTitle(roomTitle)
-  }
+  // Hitungan resolusi pixel pada 300 DPI fisik (1 in = 25.4 mm)
+  const pxWidth300Dpi = Math.round((widthMm / 25.4) * 300)
+  const pxHeight300Dpi = Math.round((heightMm / 25.4) * 300)
 
-  // ─── FUNGSI EKSPOR PNG RESOLUSI TINGGI (300 DPI) ──────────────────────────
+  // Daftar batch ruangan dari textarea
+  const batchList = useMemo(() => {
+    return batchRoomsText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  }, [batchRoomsText])
+
+  // Shortcut Keyboard (Ctrl+P / Cmd+P -> Cetak, Ctrl+S / Cmd+S -> Download PNG)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault()
+        window.print()
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault()
+        handleDownloadPng(300)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [widthMm, heightMm, displayedTitle])
+
+  // ─── EKSPOR PNG 300 DPI (RESOLUSI FISIK PERCETAKAN) ───────────────────────
   const handleDownloadPng = async (dpi = 300) => {
     try {
       setIsExporting(true)
       const svgElement = svgRef.current
       if (!svgElement) return
 
-      // Hitung dimensi pixel berdasarkan DPI fisik
-      // 1 inch = 2.54 cm = 25.4 mm
-      // pixel = (mm / 25.4) * DPI
       const targetWidthPx = Math.round((widthMm / 25.4) * dpi)
       const targetHeightPx = Math.round((heightMm / 25.4) * dpi)
 
-      // Serialisasi SVG ke string XML
       const serializer = new XMLSerializer()
       let svgString = serializer.serializeToString(svgElement)
 
-      // Pastikan atribut width & height terpasang eksplisit
       if (!svgString.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
         svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"')
       }
@@ -254,8 +289,6 @@ export default function PenandaRuanganPage() {
         canvas.width = targetWidthPx
         canvas.height = targetHeightPx
         const ctx = canvas.getContext('2d')
-
-        // Render gambar tajam
         ctx.imageSmoothingEnabled = true
         ctx.imageSmoothingQuality = 'high'
         ctx.drawImage(image, 0, 0, targetWidthPx, targetHeightPx)
@@ -272,29 +305,26 @@ export default function PenandaRuanganPage() {
         setIsExporting(false)
       }
 
-      image.onerror = (err) => {
-        console.error('Gagal render canvas gambar:', err)
-        alert('Gagal menghasilkan gambar PNG. Silakan coba kembali atau gunakan unduh SVG.')
+      image.onerror = () => {
+        alert('Gagal menghasilkan file PNG. Silakan gunakan format unduh SVG.')
         setIsExporting(false)
       }
 
       image.src = blobURL
     } catch (e) {
-      console.error(e)
-      alert('Terjadi kesalahan saat memproses ekspor: ' + e.message)
+      alert('Terjadi kesalahan ekspor: ' + e.message)
       setIsExporting(false)
     }
   }
 
-  // ─── FUNGSI EKSPOR SVG VEKTOR MURNI ────────────────────────────────────────
+  // ─── EKSPOR SVG VEKTOR MURNI ──────────────────────────────────────────────
   const handleDownloadSvg = () => {
     try {
       const svgElement = svgRef.current
       if (!svgElement) return
 
       const serializer = new XMLSerializer()
-      let svgString = serializer.serializeToString(svgElement)
-
+      const svgString = serializer.serializeToString(svgElement)
       const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -310,7 +340,7 @@ export default function PenandaRuanganPage() {
     }
   }
 
-  // ─── FUNGSI SALIN SVG KE CLIPBOARD ─────────────────────────────────────────
+  // ─── SALIN SVG KE PAPAN KLIP ──────────────────────────────────────────────
   const handleCopySvgCode = async () => {
     try {
       const svgElement = svgRef.current
@@ -319,405 +349,194 @@ export default function PenandaRuanganPage() {
       const svgString = serializer.serializeToString(svgElement)
       await navigator.clipboard.writeText(svgString)
       setCopiedStatus(true)
-      setTimeout(() => setCopiedStatus(false), 2500)
+      setTimeout(() => setCopiedStatus(false), 2200)
     } catch {
-      alert('Gagal menyalin ke clipboard.')
+      alert('Gagal menyalin kode SVG.')
     }
   }
 
-  // ─── FUNGSI CETAK SKALA FISIK (PRINT 1:1) ──────────────────────────────────
-  const handlePrint = () => {
-    window.print()
+  // ─── RESET PARAMETER KE SPESIFIKASI DEFAULT ───────────────────────────────
+  const handleResetDefaults = () => {
+    setWidthCm(25)
+    setHeightCm(10)
+    setPaddingCm(1)
+    setBgColor('#007A3D')
+    setBorderColor('#FFFFFF')
+    setTextColor('#FFFFFF')
+    setSubtextColor('#E2E8F0')
+    setTextTitle('RUANG KANTOR')
+    setTextSub('')
+    setBorderThicknessMm(3)
+    setBoardCornerRadiusMm(6)
+    setInnerCornerRadiusMm(4)
+    setFontSizeTitleMm(20)
+    setFontSizeSubMm(7)
+    setLetterSpacingMm(1.2)
+    setAutoFitText(true)
+    setShowScrews(false)
+    setShowGlossEffect(true)
+    setShowInnerBorder(true)
   }
 
-  // Daftar ruangan dari batch textarea
-  const batchList = useMemo(() => {
-    return batchRoomsText
-      .split('\n')
-      .map((s) => s.trim())
-      .filter(Boolean)
-  }, [batchRoomsText])
-
   return (
-    <Layout
-      title='Generator Penanda Ruangan (Signage Maker)'
-      description='Alat pembuat gambar penanda ruangan, plang pintu kantor, ruang rapat dengan warna hijau jalur cepat, border putih, dan kustomisasi ukuran cm presisi.'
-    >
-      <div className='min-h-screen bg-slate-900 text-slate-100 font-sans pb-16'>
-        {/* ─── HEADER UTAMA ─── */}
-        <header className='border-b border-slate-800 bg-slate-950/80 backdrop-blur px-4 py-4 sticky top-0 z-30 shadow-md no-print'>
-          <div className='max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4'>
-            <div className='flex items-center space-x-3'>
-              <div className='w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-900/40'>
-                <DoorClosed className='w-5 h-5' />
-              </div>
-              <div>
-                <h1 className='text-xl font-extrabold tracking-tight text-white flex items-center gap-2'>
-                  Generator Penanda Ruangan
-                  <span className='text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'>
-                    25×10 cm Jalur Cepat
-                  </span>
-                </h1>
-                <p className='text-xs text-slate-400'>
-                  Desain plang ruangan presisi cm, ekspor 300 DPI cetak tajam, SVG vektor & print 1:1 fisik
-                </p>
-              </div>
-            </div>
+    <main className='min-h-screen bg-[#FBFBFA] dark:bg-[#111111] text-[#111111] dark:text-[#EAEAEA] font-sans transition-colors selection:bg-[#EAEAEA] selection:text-[#111111]'>
+      <Head>
+        <title>Studio Penanda Ruangan Presisi (25 × 10 cm)</title>
+        <meta
+          name='description'
+          content='Studio penanda ruangan fisik presisi skala 1:1, ekspor resolusi cetak 300 DPI, vektor SVG laser-cut, dan cetak dokumen A4 langsung.'
+        />
+      </Head>
 
-            {/* Quick Actions Header */}
-            <div className='flex items-center flex-wrap gap-2'>
-              <button
-                onClick={() => handleDownloadPng(300)}
-                disabled={isExporting}
-                className='inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-700/30 transition disabled:opacity-50 cursor-pointer'
-                title='Unduh PNG Resolusi Tinggi 300 DPI siap cetak'
-              >
-                <Download className='w-4 h-4' />
-                {isExporting ? 'Memproses...' : 'Download PNG (300 DPI)'}
-              </button>
+      {/* CSS untuk memastikan header & footer Docusaurus tidak muncul */}
+      <style>{`
+        .navbar, .footer, footer.footer, nav.navbar {
+          display: none !important;
+        }
+      `}</style>
 
-              <button
-                onClick={handleDownloadSvg}
-                className='inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer'
-                title='Unduh format vektor SVG murni untuk cutting sticker / akrilik'
-              >
-                <Layers className='w-4 h-4 text-emerald-400' />
-                SVG Vektor
-              </button>
+      {/* ─── DUA KOLOM UTAMA (DESKTOP WORKBENCH & INSPECTOR) ─── */}
+      <div className='max-w-[1500px] mx-auto px-4 sm:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start'>
 
-              <button
-                onClick={handlePrint}
-                className='inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer'
-                title='Cetak langsung skala 1:1 di printer'
-              >
-                <Printer className='w-4 h-4 text-sky-400' />
-                Cetak 1:1
-              </button>
-            </div>
-          </div>
-        </header>
-
-        {/* ─── KONTEN UTAMA DUA KOLOM ─── */}
-        <main className='max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-8'>
           {/* ═══════════════════════════════════════════════════════════════════
-              KOLOM KIRI: PANEL PENGATURAN & KUSTOMISASI (5 cols)
+              KOLOM KIRI: INSPECTOR PANEL (5 cols desktop)
              ═══════════════════════════════════════════════════════════════════ */}
-          <div className='lg:col-span-5 space-y-4 no-print'>
-            {/* Navigasi Tab Pengaturan */}
-            <div className='flex rounded-xl bg-slate-950 p-1 border border-slate-800 text-xs font-semibold'>
+          <section className='lg:col-span-5 space-y-4 no-print'>
+            {/* Segmented Control Mode */}
+            <div className='flex items-center p-1 bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[8px] text-xs font-medium text-[#787774] dark:text-[#8E8D8A]'>
               <button
-                onClick={() => setActiveTab('konten')}
-                className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition ${
-                  activeTab === 'konten'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                type='button'
+                onClick={() => setInspectorTab('papan')}
+                className={`flex-1 py-1.5 px-3 rounded-[6px] transition cursor-pointer text-center ${
+                  inspectorTab === 'papan'
+                    ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
+                    : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
                 }`}
               >
-                <Type className='w-3.5 h-3.5' />
-                Teks & Tipografi
+                Papan Desain
               </button>
-
               <button
-                onClick={() => setActiveTab('ukuran')}
-                className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition ${
-                  activeTab === 'ukuran'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                type='button'
+                onClick={() => setInspectorTab('batch')}
+                className={`flex-1 py-1.5 px-3 rounded-[6px] transition cursor-pointer text-center flex items-center justify-center gap-1.5 ${
+                  inspectorTab === 'batch'
+                    ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
+                    : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
                 }`}
               >
-                <Sliders className='w-3.5 h-3.5' />
-                Ukuran & Padding
+                <span>Daftar Ruangan</span>
+                <span className='px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-[#EAEAEA] dark:bg-[#2C2C2C] text-[#111111] dark:text-[#EAEAEA]'>
+                  {batchList.length}
+                </span>
               </button>
-
               <button
-                onClick={() => setActiveTab('warna')}
-                className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition ${
-                  activeTab === 'warna'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                type='button'
+                onClick={() => setInspectorTab('spesifikasi')}
+                className={`flex-1 py-1.5 px-3 rounded-[6px] transition cursor-pointer text-center ${
+                  inspectorTab === 'spesifikasi'
+                    ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
+                    : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
                 }`}
               >
-                <Palette className='w-3.5 h-3.5' />
-                Warna & Gaya
-              </button>
-
-              <button
-                onClick={() => setActiveTab('batch')}
-                className={`flex-1 py-2 rounded-lg flex items-center justify-center gap-1.5 transition ${
-                  activeTab === 'batch'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Grid className='w-3.5 h-3.5' />
-                Daftar Ruangan
+                Panduan
               </button>
             </div>
 
-            {/* TAB 1: TEKS & KONTEN */}
-            {activeTab === 'konten' && (
-              <div className='bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-sm'>
-                <div className='flex items-center justify-between border-b border-slate-800 pb-3'>
-                  <h2 className='text-sm font-bold text-white flex items-center gap-2'>
-                    <Type className='w-4 h-4 text-emerald-400' />
-                    Pengaturan Teks Plang
-                  </h2>
-                  <span className='text-xs text-slate-400'>
-                    Default: "RUANG KANTOR"
-                  </span>
-                </div>
+            {/* TAB 1: KONTROL PAPAN DESAIN */}
+            {inspectorTab === 'papan' && (
+              <div className='bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[10px] p-5 space-y-6'>
 
-                {/* Teks Utama */}
-                <div className='space-y-1.5'>
-                  <div className='flex justify-between items-center'>
-                    <label className='text-xs font-semibold text-slate-300'>
-                      Teks Ruangan Utama:
+                {/* 1. SEKSI TEKS UTAMA */}
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#F0F0F0] uppercase'>
+                      Teks Ruangan
                     </label>
-                    <label className='inline-flex items-center gap-1 text-[11px] text-slate-400 cursor-pointer'>
+                    <label className='inline-flex items-center gap-1.5 text-xs text-[#787774] dark:text-[#8E8D8A] cursor-pointer select-none'>
                       <input
                         type='checkbox'
                         checked={forceUppercase}
                         onChange={(e) => setForceUppercase(e.target.checked)}
-                        className='rounded accent-emerald-500'
+                        className='w-3.5 h-3.5 rounded border-[#EAEAEA] accent-[#111111] cursor-pointer'
                       />
-                      Otomatis Kapital
+                      <span>Kapital Otomatis</span>
                     </label>
                   </div>
+
                   <input
                     type='text'
                     value={textTitle}
                     onChange={(e) => setTextTitle(e.target.value)}
                     placeholder='Contoh: RUANG KANTOR'
-                    className='w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold text-base focus:outline-none focus:ring-2 focus:ring-emerald-500'
-                  />
-                </div>
-
-                {/* Preset Cepat Nama Ruangan */}
-                <div className='space-y-1.5'>
-                  <span className='text-[11px] font-medium text-slate-400'>
-                    Pilih Cepat Nama Ruangan Populer:
-                  </span>
-                  <div className='flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1'>
-                    {ROOM_NAME_PRESETS.map((item, idx) => (
-                      <button
-                        key={idx}
-                        type='button'
-                        onClick={() => {
-                          setTextTitle(item.title)
-                          if (item.sub) setTextSub(item.sub)
-                        }}
-                        className={`text-[11px] px-2.5 py-1 rounded-md border transition cursor-pointer ${
-                          textTitle === item.title
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold'
-                            : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
-                        }`}
-                      >
-                        {item.title}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Subteks / Terjemahan Bahasa Inggris / Keterangan Opsional */}
-                <div className='space-y-1.5'>
-                  <div className='flex justify-between items-center'>
-                    <label className='text-xs font-semibold text-slate-300'>
-                      Subteks / Keterangan Tambahan (Opsional):
-                    </label>
-                    {textSub && (
-                      <button
-                        type='button'
-                        onClick={() => setTextSub('')}
-                        className='text-[10px] text-rose-400 hover:underline'
-                      >
-                        Hapus Subteks
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    type='text'
-                    value={textSub}
-                    onChange={(e) => setTextSub(e.target.value)}
-                    placeholder='Contoh: OFFICE ROOM / LANTAI 2 (Kosongkan jika tidak perlu)'
-                    className='w-full px-3.5 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500'
+                    className='w-full px-3.5 py-2.5 bg-[#FFFFFF] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-sm font-semibold tracking-wide text-[#111111] dark:text-[#FFFFFF] focus:outline-none focus:border-[#111111] dark:focus:border-[#EAEAEA] transition'
                   />
 
-                  {textSub && (
-                    <div className='flex items-center justify-between p-2 bg-slate-900/70 rounded-lg border border-slate-800 text-xs'>
-                      <div className='flex items-center gap-2'>
-                        <input
-                          type='color'
-                          value={subtextColor}
-                          onChange={(e) => setSubtextColor(e.target.value)}
-                          className='w-6 h-6 rounded border border-slate-700 cursor-pointer bg-transparent'
-                          title='Ubah warna subteks'
-                        />
-                        <span className='text-[11px] text-slate-300'>Warna Subteks:</span>
-                        <span className='text-[11px] font-mono text-emerald-400'>{subtextColor}</span>
-                      </div>
-                      <div className='flex items-center gap-1.5'>
+                  {/* Preset Nama Ruangan Populer */}
+                  <div className='space-y-1.5'>
+                    <div className='text-[11px] text-[#787774] dark:text-[#8E8D8A] flex justify-between'>
+                      <span>Pilih Cepat Nama Ruangan:</span>
+                      <span className='font-mono text-[10px]'>{ROOM_NAME_PRESETS.length} opsi</span>
+                    </div>
+                    <div className='flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pr-1'>
+                      {ROOM_NAME_PRESETS.map((item, idx) => (
+                        <button
+                          key={idx}
+                          type='button'
+                          onClick={() => {
+                            setTextTitle(item.title)
+                            if (item.sub) setTextSub(item.sub)
+                          }}
+                          className={`text-xs px-2.5 py-1 rounded-[4px] border transition cursor-pointer ${
+                            textTitle === item.title
+                              ? 'bg-[#111111] text-[#FFFFFF] border-[#111111] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
+                              : 'bg-[#FBFBFA] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#D1D1D1] border-[#EAEAEA] dark:border-[#2C2C2C] hover:border-[#111111] dark:hover:border-[#EAEAEA]'
+                          }`}
+                        >
+                          {item.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Subteks / Terjemahan Bahasa Inggris (Opsional) */}
+                  <div className='space-y-1 pt-1'>
+                    <div className='flex justify-between items-center text-xs'>
+                      <span className='text-[#787774] dark:text-[#8E8D8A]'>Subteks / Bahasa Inggris:</span>
+                      {textSub && (
                         <button
                           type='button'
-                          onClick={() => setSubtextColor(textColor)}
-                          className='text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-                          title='Samakan dengan warna teks utama'
+                          onClick={() => setTextSub('')}
+                          className='text-[11px] font-semibold px-2 py-0.5 rounded-[4px] bg-[#FDEBEC] text-[#9F2F2D] dark:bg-[#3d1819] dark:text-[#fca5a5] border border-[#fca5a5]/40 hover:bg-[#fbd0d2] dark:hover:bg-[#522022] transition active:scale-[0.98] cursor-pointer'
                         >
-                          Sama Teks Utama
+                          Kosongkan
                         </button>
-                        {bgColor.toLowerCase() === '#ffffff' && (
-                          <button
-                            type='button'
-                            onClick={() => setSubtextColor('#475569')}
-                            className='text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-                          >
-                            Abu Gelap
-                          </button>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  )}
-                </div>
-
-                {/* Pilihan Font & Weight */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800'>
-                  <div className='space-y-1'>
-                    <label className='text-xs font-semibold text-slate-300'>Gaya Huruf (Font):</label>
-                    <select
-                      value={fontFamily}
-                      onChange={(e) => setFontFamily(e.target.value)}
-                      className='w-full px-2.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white'
-                    >
-                      {FONT_OPTIONS.map((f) => (
-                        <option key={f.id} value={f.family}>
-                          {f.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className='space-y-1'>
-                    <label className='text-xs font-semibold text-slate-300'>Ketebalan (Weight):</label>
-                    <select
-                      value={fontWeight}
-                      onChange={(e) => setFontWeight(e.target.value)}
-                      className='w-full px-2.5 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white'
-                    >
-                      <option value='900'>900 - Extra Black (Sangat Tebal)</option>
-                      <option value='800'>800 - Extra Bold (Standar Rambu)</option>
-                      <option value='700'>700 - Bold</option>
-                      <option value='600'>600 - Semi Bold</option>
-                      <option value='500'>500 - Medium</option>
-                    </select>
+                    <input
+                      type='text'
+                      value={textSub}
+                      onChange={(e) => setTextSub(e.target.value)}
+                      placeholder='Contoh: OFFICE / FLOOR 2 (Opsional)'
+                      className='w-full px-3 py-1.5 bg-[#FFFFFF] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs text-[#111111] dark:text-[#FFFFFF] focus:outline-none focus:border-[#111111] transition'
+                    />
                   </div>
                 </div>
 
-                {/* Fitur Auto-Fit & Slider Ukuran Font */}
-                <div className='space-y-3 pt-2 border-t border-slate-800'>
-                  {/* Toggle Auto-Fit */}
-                  <div className='flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800'>
-                    <div>
-                      <span className='text-xs font-semibold text-slate-200 block'>
-                        Auto-Fit ke Dalam Kotak
-                      </span>
-                      <span className='text-[10px] text-slate-400'>
-                        Otomatis menyesuaikan ukuran font agar pas dan tidak keluar dari garis border
-                      </span>
-                    </div>
-                    <label className='relative inline-flex items-center cursor-pointer'>
-                      <input
-                        type='checkbox'
-                        checked={autoFitText}
-                        onChange={(e) => setAutoFitText(e.target.checked)}
-                        className='sr-only peer'
-                      />
-                      <div className="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                <div className='h-[1px] bg-[#EAEAEA] dark:bg-[#262626]' />
+
+                {/* 2. SEKSI DIMENSI FISIK (CM & MM) */}
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#F0F0F0] uppercase'>
+                      Format & Ukuran Fisik
                     </label>
+                    <span className='font-mono text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                      {widthCm} × {heightCm} cm
+                    </span>
                   </div>
 
-                  {/* Slider Font Utama */}
-                  <div className='space-y-1.5'>
-                    <div className='flex justify-between text-xs'>
-                      <span className='text-slate-300 font-semibold'>
-                        {autoFitText ? 'Target / Batas Maksimal Font:' : 'Ukuran Font Teks Utama:'}
-                      </span>
-                      <span className='text-emerald-400 font-mono font-bold'>
-                        {appliedTitleFontSize.toFixed(1)} mm (~{Math.round(appliedTitleFontSize / 0.3528)} pt)
-                      </span>
-                    </div>
-                    <input
-                      type='range'
-                      min='8'
-                      max='38'
-                      step='0.5'
-                      value={fontSizeTitleMm}
-                      onChange={(e) => setFontSizeTitleMm(Number(e.target.value))}
-                      className='w-full accent-emerald-500'
-                    />
-                    {autoFitText && appliedTitleFontSize < fontSizeTitleMm && (
-                      <div className='text-[10px] text-amber-400/90 flex items-center gap-1'>
-                        <span>⚡ Font otomatis dikecilkan ke {appliedTitleFontSize.toFixed(1)} mm agar tidak menabrak border.</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Slider Subteks */}
-                  {textSub && (
-                    <div className='space-y-1'>
-                      <div className='flex justify-between text-xs'>
-                        <span className='text-slate-300 font-semibold'>Ukuran Font Subteks:</span>
-                        <span className='text-emerald-400 font-mono font-bold'>
-                          {fontSizeSubMm} mm (~{Math.round(fontSizeSubMm / 0.3528)} pt)
-                        </span>
-                      </div>
-                      <input
-                        type='range'
-                        min='4'
-                        max='16'
-                        step='0.5'
-                        value={fontSizeSubMm}
-                        onChange={(e) => setFontSizeSubMm(Number(e.target.value))}
-                        className='w-full accent-emerald-500'
-                      />
-                    </div>
-                  )}
-
-                  {/* Slider Tracking / Spasi Huruf */}
-                  <div className='space-y-1'>
-                    <div className='flex justify-between text-xs'>
-                      <span className='text-slate-300 font-semibold'>Jarak Antar Huruf (Tracking):</span>
-                      <span className='text-emerald-400 font-mono font-bold'>{letterSpacingMm} mm</span>
-                    </div>
-                    <input
-                      type='range'
-                      min='0'
-                      max='5'
-                      step='0.2'
-                      value={letterSpacingMm}
-                      onChange={(e) => setLetterSpacingMm(Number(e.target.value))}
-                      className='w-full accent-emerald-500'
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB 2: UKURAN & PADDING */}
-            {activeTab === 'ukuran' && (
-              <div className='bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-sm'>
-                <div className='flex items-center justify-between border-b border-slate-800 pb-3'>
-                  <h2 className='text-sm font-bold text-white flex items-center gap-2'>
-                    <Sliders className='w-4 h-4 text-emerald-400' />
-                    Dimensi & Ukuran Fisik (cm)
-                  </h2>
-                  <span className='text-xs text-emerald-400 font-mono font-bold'>
-                    {widthCm} × {heightCm} cm (Pad: {paddingCm} cm)
-                  </span>
-                </div>
-
-                {/* Preset Ukuran Papan */}
-                <div className='space-y-2'>
-                  <label className='text-xs font-semibold text-slate-300'>Pilih Preset Ukuran Cepat:</label>
-                  <div className='grid grid-cols-2 gap-2'>
+                  {/* Presets Ukuran */}
+                  <div className='grid grid-cols-2 sm:grid-cols-3 gap-1.5'>
                     {SIZE_PRESETS.map((p, idx) => (
                       <button
                         key={idx}
@@ -727,511 +546,570 @@ export default function PenandaRuanganPage() {
                           setHeightCm(p.height)
                           setPaddingCm(p.padding)
                         }}
-                        className={`text-left p-2 rounded-xl border text-xs transition cursor-pointer ${
+                        className={`text-left p-2 rounded-[6px] border text-xs transition cursor-pointer ${
                           widthCm === p.width && heightCm === p.height
-                            ? 'bg-emerald-500/20 border-emerald-500 text-white font-bold'
-                            : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-850'
+                            ? 'bg-[#111111] text-[#FFFFFF] border-[#111111] dark:bg-[#EAEAEA] dark:text-[#111111]'
+                            : 'bg-[#FBFBFA] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#D1D1D1] border-[#EAEAEA] dark:border-[#2C2C2C] hover:border-[#111111] dark:hover:border-[#EAEAEA]'
                         }`}
                       >
-                        <div className='font-semibold'>{p.width} × {p.height} cm</div>
-                        <div className='text-[10px] text-slate-400 truncate'>{p.label.split('(')[1]?.replace(')', '') || 'Preset'}</div>
+                        <div className='font-mono font-semibold'>{p.label}</div>
+                        <div className='text-[10px] opacity-70 truncate'>{p.note}</div>
                       </button>
                     ))}
                   </div>
-                </div>
 
-                {/* Input Manual Panjang & Tinggi (cm) */}
-                <div className='grid grid-cols-2 gap-4 pt-2 border-t border-slate-800'>
-                  <div className='space-y-1.5'>
-                    <div className='flex justify-between text-xs'>
-                      <span className='text-slate-300 font-semibold'>Panjang (Lebar):</span>
-                      <span className='text-emerald-400 font-mono font-bold'>{widthCm} cm</span>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='number'
-                        min='10'
-                        max='100'
-                        step='1'
-                        value={widthCm}
-                        onChange={(e) => setWidthCm(Math.max(5, Number(e.target.value)))}
-                        className='w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm font-mono'
-                      />
-                      <span className='text-xs text-slate-400 font-bold'>cm</span>
-                    </div>
-                    <input
-                      type='range'
-                      min='15'
-                      max='60'
-                      step='1'
-                      value={widthCm}
-                      onChange={(e) => setWidthCm(Number(e.target.value))}
-                      className='w-full accent-emerald-500'
-                    />
-                  </div>
-
-                  <div className='space-y-1.5'>
-                    <div className='flex justify-between text-xs'>
-                      <span className='text-slate-300 font-semibold'>Tinggi Papan:</span>
-                      <span className='text-emerald-400 font-mono font-bold'>{heightCm} cm</span>
-                    </div>
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='number'
-                        min='5'
-                        max='50'
-                        step='0.5'
-                        value={heightCm}
-                        onChange={(e) => setHeightCm(Math.max(4, Number(e.target.value)))}
-                        className='w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white text-sm font-mono'
-                      />
-                      <span className='text-xs text-slate-400 font-bold'>cm</span>
-                    </div>
-                    <input
-                      type='range'
-                      min='6'
-                      max='30'
-                      step='0.5'
-                      value={heightCm}
-                      onChange={(e) => setHeightCm(Number(e.target.value))}
-                      className='w-full accent-emerald-500'
-                    />
-                  </div>
-                </div>
-
-                {/* Pengaturan Padding 1 cm */}
-                <div className='space-y-2 pt-2 border-t border-slate-800'>
-                  <div className='flex justify-between items-center text-xs'>
-                    <div>
-                      <span className='text-slate-200 font-semibold block'>
-                        Padding Garis Border Putih:
-                      </span>
-                      <span className='text-[11px] text-slate-400'>
-                        Jarak dari tepi luar papan ke kotak garis border
-                      </span>
-                    </div>
-                    <span className='text-emerald-400 font-mono font-bold text-sm bg-slate-900 px-2.5 py-1 rounded border border-slate-800'>
-                      {paddingCm} cm ({paddingCm * 10} mm)
-                    </span>
-                  </div>
-
-                  <div className='flex items-center gap-3'>
-                    <input
-                      type='range'
-                      min='0.2'
-                      max='3.5'
-                      step='0.1'
-                      value={paddingCm}
-                      onChange={(e) => setPaddingCm(Number(e.target.value))}
-                      className='w-full accent-emerald-500'
-                    />
-                    <button
-                      type='button'
-                      onClick={() => setPaddingCm(1)}
-                      className='text-[10px] px-2 py-1 bg-slate-850 hover:bg-slate-800 border border-slate-700 rounded text-slate-300 shrink-0'
-                      title='Kembalikan ke standar 1 cm'
-                    >
-                      Reset 1 cm
-                    </button>
-                  </div>
-                </div>
-
-                {/* Detail Border: Tebal & Radius */}
-                <div className='grid grid-cols-2 gap-4 pt-2 border-t border-slate-800'>
-                  <div className='space-y-1.5'>
-                    <div className='flex justify-between text-xs'>
-                      <span className='text-slate-300 font-semibold'>Tebal Garis Border:</span>
-                      <span className='text-emerald-400 font-mono font-bold'>{borderThicknessMm} mm</span>
-                    </div>
-                    <input
-                      type='range'
-                      min='1'
-                      max='8'
-                      step='0.5'
-                      value={borderThicknessMm}
-                      onChange={(e) => setBorderThicknessMm(Number(e.target.value))}
-                      className='w-full accent-emerald-500'
-                    />
-                  </div>
-
-                  <div className='space-y-1.5'>
-                    <div className='flex justify-between text-xs'>
-                      <span className='text-slate-300 font-semibold'>Sudut Melengkung Papan:</span>
-                      <span className='text-emerald-400 font-mono font-bold'>{boardCornerRadiusMm} mm</span>
-                    </div>
-                    <input
-                      type='range'
-                      min='0'
-                      max='20'
-                      step='1'
-                      value={boardCornerRadiusMm}
-                      onChange={(e) => {
-                        const val = Number(e.target.value)
-                        setBoardCornerRadiusMm(val)
-                        setInnerCornerRadiusMm(Math.max(0, val - 2))
-                      }}
-                      className='w-full accent-emerald-500'
-                    />
-                  </div>
-                </div>
-
-                {/* Detail Lubang Baut / Sekrup Fisik */}
-                <div className='pt-2 border-t border-slate-800 space-y-2'>
-                  <div className='flex items-center justify-between'>
-                    <label className='inline-flex items-center gap-2 text-xs font-semibold text-slate-300 cursor-pointer'>
-                      <input
-                        type='checkbox'
-                        checked={showScrews}
-                        onChange={(e) => setShowScrews(e.target.checked)}
-                        className='rounded accent-emerald-500'
-                      />
-                      Tampilkan Titik Lubang Sekrup / Baut Sudut
-                    </label>
-                    <span className='text-[10px] text-slate-400'>
-                      (Untuk plang akrilik / plat)
-                    </span>
-                  </div>
-
-                  {showScrews && (
-                    <div className='p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2'>
-                      <div className='flex justify-between text-xs'>
-                        <span className='text-slate-400'>Jarak baut dari sudut (offset):</span>
-                        <span className='text-emerald-400 font-mono font-bold'>{screwInsetMm} mm</span>
+                  {/* Input Manual Lebar & Tinggi */}
+                  <div className='grid grid-cols-2 gap-3 pt-1'>
+                    <div className='space-y-1'>
+                      <div className='flex justify-between text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                        <span>Lebar (Panjang):</span>
+                        <span className='font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>{widthCm} cm</span>
+                      </div>
+                      <div className='flex items-center gap-1.5'>
+                        <input
+                          type='number'
+                          min='10'
+                          max='100'
+                          step='1'
+                          value={widthCm}
+                          onChange={(e) => setWidthCm(Math.max(5, Number(e.target.value)))}
+                          className='w-full px-2.5 py-1.5 bg-[#FFFFFF] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs font-mono text-[#111111] dark:text-[#FFFFFF]'
+                        />
+                        <span className='text-[11px] font-mono text-[#787774]'>cm</span>
                       </div>
                       <input
                         type='range'
-                        min='3'
-                        max='15'
+                        min='15'
+                        max='50'
                         step='1'
-                        value={screwInsetMm}
-                        onChange={(e) => setScrewInsetMm(Number(e.target.value))}
-                        className='w-full accent-emerald-500'
+                        value={widthCm}
+                        onChange={(e) => setWidthCm(Number(e.target.value))}
+                        className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
                       />
+                    </div>
+
+                    <div className='space-y-1'>
+                      <div className='flex justify-between text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                        <span>Tinggi Papan:</span>
+                        <span className='font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>{heightCm} cm</span>
+                      </div>
+                      <div className='flex items-center gap-1.5'>
+                        <input
+                          type='number'
+                          min='5'
+                          max='50'
+                          step='0.5'
+                          value={heightCm}
+                          onChange={(e) => setHeightCm(Math.max(4, Number(e.target.value)))}
+                          className='w-full px-2.5 py-1.5 bg-[#FFFFFF] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs font-mono text-[#111111] dark:text-[#FFFFFF]'
+                        />
+                        <span className='text-[11px] font-mono text-[#787774]'>cm</span>
+                      </div>
+                      <input
+                        type='range'
+                        min='6'
+                        max='30'
+                        step='0.5'
+                        value={heightCm}
+                        onChange={(e) => setHeightCm(Number(e.target.value))}
+                        className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
+                      />
+                    </div>
+                  </div>
+
+                  {/* Padding Garis Border Putih */}
+                  <div className='space-y-1 pt-1'>
+                    <div className='flex justify-between items-center text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                      <span>Padding Garis Border:</span>
+                      <span className='font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>
+                        {paddingCm} cm ({paddingMm} mm)
+                      </span>
+                    </div>
+                    <div className='flex items-center gap-3'>
+                      <input
+                        type='range'
+                        min='0.2'
+                        max='3.0'
+                        step='0.1'
+                        value={paddingCm}
+                        onChange={(e) => setPaddingCm(Number(e.target.value))}
+                        className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
+                      />
+                      <button
+                        type='button'
+                        onClick={() => setPaddingCm(1)}
+                        className='text-[11px] font-semibold px-2.5 py-1 rounded-[4px] bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] hover:bg-[#2F3437] dark:hover:bg-[#FFFFFF] transition active:scale-[0.98] shrink-0 cursor-pointer shadow-none'
+                      >
+                        Reset 1 cm
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className='h-[1px] bg-[#EAEAEA] dark:bg-[#262626]' />
+
+                {/* 3. SEKSI WARNA & PALET RAMBU */}
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <label className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#F0F0F0] uppercase'>
+                      Warna & Bahan
+                    </label>
+                    <span className='font-mono text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                      {bgColor.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Swatches Palet Populer */}
+                  <div className='grid grid-cols-3 gap-2'>
+                    {COLOR_PRESETS.map((c) => {
+                      const isSelected = bgColor.toLowerCase() === c.bg.toLowerCase()
+                      return (
+                        <button
+                          key={c.id}
+                          type='button'
+                          onClick={() => {
+                            setBgColor(c.bg)
+                            setBorderColor(c.border)
+                            setTextColor(c.text)
+                            setSubtextColor(c.subtext)
+                          }}
+                          className={`flex items-center gap-2 p-1.5 rounded-[6px] border text-left transition cursor-pointer ${
+                            isSelected
+                              ? 'border-[#111111] dark:border-[#EAEAEA] bg-[#F7F6F3] dark:bg-[#222222]'
+                              : 'border-[#EAEAEA] dark:border-[#2C2C2C] bg-[#FFFFFF] dark:bg-[#1A1A1A] hover:border-[#CCCCCC]'
+                          }`}
+                        >
+                          <span
+                            className='w-5 h-5 rounded-[4px] border border-black/15 dark:border-white/20 shrink-0'
+                            style={{ backgroundColor: c.bg }}
+                          />
+                          <div className='overflow-hidden'>
+                            <div className='text-[11px] font-medium leading-tight truncate text-[#111111] dark:text-[#EAEAEA]'>
+                              {c.name.split(' ')[0]}
+                            </div>
+                            <div className='text-[9px] text-[#787774] font-mono leading-none truncate'>
+                              {c.tag}
+                            </div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Custom Hex Color Pickers */}
+                  <div className='grid grid-cols-3 gap-2 pt-1'>
+                    <div className='space-y-1'>
+                      <span className='text-[11px] text-[#787774] dark:text-[#8E8D8A] block'>Latar Plang:</span>
+                      <div className='flex items-center gap-1.5 p-1 bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px]'>
+                        <input
+                          type='color'
+                          value={bgColor}
+                          onChange={(e) => setBgColor(e.target.value)}
+                          className='w-5 h-5 rounded border-0 bg-transparent cursor-pointer'
+                        />
+                        <input
+                          type='text'
+                          value={bgColor}
+                          onChange={(e) => setBgColor(e.target.value)}
+                          className='w-full bg-transparent text-[11px] font-mono text-[#111111] dark:text-[#EAEAEA] focus:outline-none'
+                        />
+                      </div>
+                    </div>
+
+                    <div className='space-y-1'>
+                      <span className='text-[11px] text-[#787774] dark:text-[#8E8D8A] block'>Garis Border:</span>
+                      <div className='flex items-center gap-1.5 p-1 bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px]'>
+                        <input
+                          type='color'
+                          value={borderColor}
+                          onChange={(e) => setBorderColor(e.target.value)}
+                          className='w-5 h-5 rounded border-0 bg-transparent cursor-pointer'
+                        />
+                        <input
+                          type='text'
+                          value={borderColor}
+                          onChange={(e) => setBorderColor(e.target.value)}
+                          className='w-full bg-transparent text-[11px] font-mono text-[#111111] dark:text-[#EAEAEA] focus:outline-none'
+                        />
+                      </div>
+                    </div>
+
+                    <div className='space-y-1'>
+                      <span className='text-[11px] text-[#787774] dark:text-[#8E8D8A] block'>Teks Utama:</span>
+                      <div className='flex items-center gap-1.5 p-1 bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px]'>
+                        <input
+                          type='color'
+                          value={textColor}
+                          onChange={(e) => setTextColor(e.target.value)}
+                          className='w-5 h-5 rounded border-0 bg-transparent cursor-pointer'
+                        />
+                        <input
+                          type='text'
+                          value={textColor}
+                          onChange={(e) => setTextColor(e.target.value)}
+                          className='w-full bg-transparent text-[11px] font-mono text-[#111111] dark:text-[#EAEAEA] focus:outline-none'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. DISCLOSURE: PENGATURAN PRESISI TINGKAT LANJUT */}
+                <div className='pt-2 border-t border-[#EAEAEA] dark:border-[#262626]'>
+                  <button
+                    type='button'
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className='w-full py-1.5 flex items-center justify-between text-xs font-semibold text-[#111111] dark:text-[#EAEAEA] hover:text-[#787774] transition cursor-pointer'
+                  >
+                    <span>Pengaturan Tipografi & Hardware Presisi</span>
+                    <span className='font-mono text-xs'>{showAdvanced ? '− Tutup' : '+ Buka'}</span>
+                  </button>
+
+                  {showAdvanced && (
+                    <div className='space-y-4 pt-3 mt-2 border-t border-dashed border-[#EAEAEA] dark:border-[#2C2C2C]'>
+                      {/* Pilihan Font */}
+                      <div className='space-y-1'>
+                        <label className='text-[11px] text-[#787774] dark:text-[#8E8D8A]'>Gaya Font Rambu:</label>
+                        <select
+                          value={fontFamily}
+                          onChange={(e) => setFontFamily(e.target.value)}
+                          className='w-full px-2.5 py-1.5 bg-[#FFFFFF] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs text-[#111111] dark:text-[#EAEAEA]'
+                        >
+                          {FONT_OPTIONS.map((f) => (
+                            <option key={f.id} value={f.family}>
+                              {f.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Weight & Auto-Fit */}
+                      <div className='grid grid-cols-2 gap-3'>
+                        <div className='space-y-1'>
+                          <label className='text-[11px] text-[#787774] dark:text-[#8E8D8A]'>Ketebalan Huruf:</label>
+                          <select
+                            value={fontWeight}
+                            onChange={(e) => setFontWeight(e.target.value)}
+                            className='w-full px-2.5 py-1.5 bg-[#FFFFFF] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs text-[#111111] dark:text-[#EAEAEA]'
+                          >
+                            <option value='900'>900 - Black</option>
+                            <option value='800'>800 - Extra Bold (Rambu)</option>
+                            <option value='700'>700 - Bold</option>
+                            <option value='600'>600 - Semi Bold</option>
+                            <option value='500'>500 - Medium</option>
+                          </select>
+                        </div>
+
+                        <div className='space-y-1'>
+                          <label className='text-[11px] text-[#787774] dark:text-[#8E8D8A]'>Auto-Fit Teks:</label>
+                          <label className='flex items-center gap-2 p-1.5 bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs cursor-pointer select-none'>
+                            <input
+                              type='checkbox'
+                              checked={autoFitText}
+                              onChange={(e) => setAutoFitText(e.target.checked)}
+                              className='w-3.5 h-3.5 rounded accent-[#111111] cursor-pointer'
+                            />
+                            <span className='truncate'>{autoFitText ? 'Aktif (Pas)' : 'Manual'}</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Slider Ukuran Huruf & Spasi */}
+                      <div className='space-y-2'>
+                        <div className='flex justify-between text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                          <span>Ukuran Font Huruf:</span>
+                          <span className='font-mono font-semibold text-[#111111] dark:text-[#EAEAEA]'>
+                            {appliedTitleFontSize.toFixed(1)} mm
+                          </span>
+                        </div>
+                        <input
+                          type='range'
+                          min='8'
+                          max='35'
+                          step='0.5'
+                          value={fontSizeTitleMm}
+                          onChange={(e) => setFontSizeTitleMm(Number(e.target.value))}
+                          className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
+                        />
+
+                        <div className='flex justify-between text-xs text-[#787774] dark:text-[#8E8D8A] pt-1'>
+                          <span>Jarak Antar Huruf (Tracking):</span>
+                          <span className='font-mono font-semibold text-[#111111] dark:text-[#EAEAEA]'>
+                            {letterSpacingMm} mm
+                          </span>
+                        </div>
+                        <input
+                          type='range'
+                          min='0'
+                          max='4'
+                          step='0.2'
+                          value={letterSpacingMm}
+                          onChange={(e) => setLetterSpacingMm(Number(e.target.value))}
+                          className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
+                        />
+                      </div>
+
+                      {/* Tebal Garis & Sudut Melengkung */}
+                      <div className='grid grid-cols-2 gap-3 pt-1'>
+                        <div className='space-y-1'>
+                          <div className='flex justify-between text-[11px] text-[#787774]'>
+                            <span>Tebal Garis:</span>
+                            <span className='font-mono'>{borderThicknessMm} mm</span>
+                          </div>
+                          <input
+                            type='range'
+                            min='1'
+                            max='6'
+                            step='0.5'
+                            value={borderThicknessMm}
+                            onChange={(e) => setBorderThicknessMm(Number(e.target.value))}
+                            className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
+                          />
+                        </div>
+
+                        <div className='space-y-1'>
+                          <div className='flex justify-between text-[11px] text-[#787774]'>
+                            <span>Sudut Papan:</span>
+                            <span className='font-mono'>{boardCornerRadiusMm} mm</span>
+                          </div>
+                          <input
+                            type='range'
+                            min='0'
+                            max='16'
+                            step='1'
+                            value={boardCornerRadiusMm}
+                            onChange={(e) => {
+                              const v = Number(e.target.value)
+                              setBoardCornerRadiusMm(v)
+                              setInnerCornerRadiusMm(Math.max(0, v - 2))
+                            }}
+                            className='w-full accent-[#111111] dark:accent-[#EAEAEA]'
+                          />
+                        </div>
+                      </div>
+
+                      {/* Hardware / Baut Sudut & Kilau */}
+                      <div className='space-y-2 pt-1'>
+                        <label className='flex items-center justify-between p-2 bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs cursor-pointer select-none'>
+                          <span>Titik Lubang Baut / Sekrup Sudut</span>
+                          <input
+                            type='checkbox'
+                            checked={showScrews}
+                            onChange={(e) => setShowScrews(e.target.checked)}
+                            className='w-3.5 h-3.5 rounded accent-[#111111] cursor-pointer'
+                          />
+                        </label>
+
+                        <label className='flex items-center justify-between p-2 bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs cursor-pointer select-none'>
+                          <span>Efek Refleksi Kilau Permukaan</span>
+                          <input
+                            type='checkbox'
+                            checked={showGlossEffect}
+                            onChange={(e) => setShowGlossEffect(e.target.checked)}
+                            className='w-3.5 h-3.5 rounded accent-[#111111] cursor-pointer'
+                          />
+                        </label>
+                      </div>
                     </div>
                   )}
                 </div>
-              </div>
-            )}
 
-            {/* TAB 3: WARNA & TAMPILAN */}
-            {activeTab === 'warna' && (
-              <div className='bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-5 shadow-sm'>
-                <div className='flex items-center justify-between border-b border-slate-800 pb-3'>
-                  <h2 className='text-sm font-bold text-white flex items-center gap-2'>
-                    <Palette className='w-4 h-4 text-emerald-400' />
-                    Kustomisasi Warna Plang
-                  </h2>
-                  <span className='text-xs text-slate-400'>
-                    Default: Hijau Jalur Cepat
-                  </span>
-                </div>
-
-                {/* Palette Preset Standar Rambu */}
-                <div className='space-y-2'>
-                  <label className='text-xs font-semibold text-slate-300'>Pilihan Tema Warna Cepat:</label>
-                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
-                    {COLOR_PRESETS.map((c, idx) => (
-                      <button
-                        key={idx}
-                        type='button'
-                        onClick={() => {
-                          setBgColor(c.bg)
-                          setBorderColor(c.border)
-                          setTextColor(c.text)
-                          setSubtextColor(c.subtext || (c.text === '#000000' || c.text === '#0F172A' ? '#475569' : '#E2E8F0'))
-                        }}
-                        className={`flex items-center gap-2.5 p-2 rounded-xl border text-left transition cursor-pointer ${
-                          bgColor.toLowerCase() === c.bg.toLowerCase()
-                            ? 'border-emerald-500 bg-emerald-500/10'
-                            : 'border-slate-800 bg-slate-900 hover:bg-slate-850'
-                        }`}
-                      >
-                        <div
-                          className='w-6 h-6 rounded-lg shrink-0 border border-white/20 shadow-inner'
-                          style={{ backgroundColor: c.bg }}
-                        />
-                        <div className='overflow-hidden'>
-                          <div className='text-xs font-semibold text-slate-200 truncate'>{c.name}</div>
-                          <div className='text-[10px] text-slate-400 truncate'>{c.desc}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Kustomisasi Manual Hex Picker */}
-                <div className='pt-2 border-t border-slate-800 space-y-3'>
-                  <span className='text-xs font-semibold text-slate-300 block'>
-                    Kustomisasi Warna Bebas (Color Picker):
-                  </span>
-
-                  {/* Background */}
-                  <div className='flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800'>
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='color'
-                        value={bgColor}
-                        onChange={(e) => setBgColor(e.target.value)}
-                        className='w-8 h-8 rounded border border-slate-700 cursor-pointer bg-transparent'
-                      />
-                      <div>
-                        <div className='text-xs font-semibold text-slate-200'>Warna Latar (Background)</div>
-                        <div className='text-[10px] text-slate-400'>Default: #007A3D (Hijau Jalur Cepat)</div>
-                      </div>
-                    </div>
-                    <input
-                      type='text'
-                      value={bgColor}
-                      onChange={(e) => setBgColor(e.target.value)}
-                      className='w-24 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-xs font-mono text-center text-emerald-400'
-                    />
-                  </div>
-
-                  {/* Border Kotak Dalam */}
-                  <div className='flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800'>
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='color'
-                        value={borderColor}
-                        onChange={(e) => setBorderColor(e.target.value)}
-                        className='w-8 h-8 rounded border border-slate-700 cursor-pointer bg-transparent'
-                      />
-                      <div>
-                        <div className='text-xs font-semibold text-slate-200'>Warna Garis Border Kotak</div>
-                        <div className='text-[10px] text-slate-400'>Default: #FFFFFF (Putih)</div>
-                      </div>
-                    </div>
-                    <input
-                      type='text'
-                      value={borderColor}
-                      onChange={(e) => setBorderColor(e.target.value)}
-                      className='w-24 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-xs font-mono text-center text-white'
-                    />
-                  </div>
-
-                  {/* Teks Utama */}
-                  <div className='flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800'>
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='color'
-                        value={textColor}
-                        onChange={(e) => setTextColor(e.target.value)}
-                        className='w-8 h-8 rounded border border-slate-700 cursor-pointer bg-transparent'
-                      />
-                      <div>
-                        <div className='text-xs font-semibold text-slate-200'>Warna Tulisan Teks</div>
-                        <div className='text-[10px] text-slate-400'>Default: #FFFFFF (Putih)</div>
-                      </div>
-                    </div>
-                    <input
-                      type='text'
-                      value={textColor}
-                      onChange={(e) => setTextColor(e.target.value)}
-                      className='w-24 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-xs font-mono text-center text-white'
-                    />
-                  </div>
-
-                  {/* Warna Subteks */}
-                  <div className='flex items-center justify-between p-2.5 bg-slate-900 rounded-xl border border-slate-800'>
-                    <div className='flex items-center gap-2'>
-                      <input
-                        type='color'
-                        value={subtextColor}
-                        onChange={(e) => setSubtextColor(e.target.value)}
-                        className='w-8 h-8 rounded border border-slate-700 cursor-pointer bg-transparent'
-                      />
-                      <div>
-                        <div className='text-xs font-semibold text-slate-200'>Warna Subteks / Keterangan</div>
-                        <div className='text-[10px] text-slate-400'>
-                          {bgColor.toLowerCase() === '#ffffff'
-                            ? 'Latar putih: gunakan warna kontras (#475569 atau #0F172A)'
-                            : 'Default: #E2E8F0'}
-                        </div>
-                      </div>
-                    </div>
-                    <div className='flex items-center gap-1.5'>
-                      <button
-                        type='button'
-                        onClick={() => setSubtextColor(textColor)}
-                        className='text-[10px] px-2 py-1 rounded bg-slate-800 hover:bg-slate-750 text-slate-300 border border-slate-700'
-                        title='Samakan dengan warna teks utama'
-                      >
-                        Sama Teks Utama
-                      </button>
-                      <input
-                        type='text'
-                        value={subtextColor}
-                        onChange={(e) => setSubtextColor(e.target.value)}
-                        className='w-24 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-xs font-mono text-center text-slate-300'
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Gaya Efek Visual & Border Style */}
-                <div className='pt-2 border-t border-slate-800 space-y-3'>
-                  <div className='flex items-center justify-between'>
-                    <label className='inline-flex items-center gap-2 text-xs font-semibold text-slate-300 cursor-pointer'>
-                      <input
-                        type='checkbox'
-                        checked={showInnerBorder}
-                        onChange={(e) => setShowInnerBorder(e.target.checked)}
-                        className='rounded accent-emerald-500'
-                      />
-                      Aktifkan Garis Border Dalam
-                    </label>
-                  </div>
-
-                  <div className='flex items-center justify-between'>
-                    <label className='inline-flex items-center gap-2 text-xs font-semibold text-slate-300 cursor-pointer'>
-                      <input
-                        type='checkbox'
-                        checked={showGlossEffect}
-                        onChange={(e) => setShowGlossEffect(e.target.checked)}
-                        className='rounded accent-emerald-500'
-                      />
-                      Efek Kilau Plat / Refleksi Cahaya Halus
-                    </label>
-                  </div>
+                {/* Reset Action */}
+                <div className='pt-2 flex justify-between items-center text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                  <span>Standar: 25 × 10 cm • Jalur Cepat</span>
+                  <button
+                    type='button'
+                    onClick={handleResetDefaults}
+                    className='text-[11px] font-mono font-medium px-2.5 py-1 rounded-[4px] bg-[#F4F4F2] dark:bg-[#262626] border border-[#D1D1D1] dark:border-[#404040] text-[#111111] dark:text-[#F0F0F0] hover:bg-[#EAEAEA] dark:hover:bg-[#333333] transition cursor-pointer'
+                  >
+                    Reset Default
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* TAB 4: BATCH & DAFTAR RUANGAN */}
-            {activeTab === 'batch' && (
-              <div className='bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm'>
-                <div className='flex items-center justify-between border-b border-slate-800 pb-3'>
-                  <h2 className='text-sm font-bold text-white flex items-center gap-2'>
-                    <Grid className='w-4 h-4 text-emerald-400' />
-                    Daftar Nama Ruangan Sekaligus
+            {/* TAB 2: DAFTAR RUANGAN (BATCH SWITCHER) */}
+            {inspectorTab === 'batch' && (
+              <div className='bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[10px] p-5 space-y-4'>
+                <div>
+                  <h2 className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#F0F0F0] uppercase'>
+                    Daftar Nama Banyak Ruangan
                   </h2>
-                  <span className='text-xs text-slate-400'>
-                    {batchList.length} Ruangan
-                  </span>
+                  <p className='text-xs text-[#787774] dark:text-[#8E8D8A] mt-1'>
+                    Ketik satu nama per baris. Klik nama pada daftar di bawah untuk langsung menerapkan ke plang dan mengunduh.
+                  </p>
                 </div>
-
-                <p className='text-xs text-slate-300'>
-                  Ketik nama-nama ruangan satu per baris di bawah ini. Anda bisa langsung mengklik salah satu nama untuk mengubah plang seketika, atau mencetak semuanya!
-                </p>
 
                 <textarea
                   rows={6}
                   value={batchRoomsText}
                   onChange={(e) => setBatchRoomsText(e.target.value)}
                   placeholder='Ketik 1 nama ruangan per baris...'
-                  className='w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-white focus:outline-none focus:ring-2 focus:ring-emerald-500'
+                  className='w-full p-3 bg-[#FBFBFA] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs font-mono text-[#111111] dark:text-[#EAEAEA] focus:outline-none focus:border-[#111111]'
                 />
 
                 <div className='space-y-1.5'>
-                  <div className='text-xs font-semibold text-slate-400'>Klik untuk melihat / terapkan ke plang:</div>
-                  <div className='flex flex-wrap gap-1.5 max-h-40 overflow-y-auto'>
-                    {batchList.map((room, idx) => (
-                      <button
-                        key={idx}
-                        type='button'
-                        onClick={() => handleSelectBatch(room)}
-                        className={`text-xs px-2.5 py-1.5 rounded-lg border transition cursor-pointer ${
-                          textTitle.toUpperCase() === room.toUpperCase()
-                            ? 'bg-emerald-600 text-white font-bold border-emerald-400'
-                            : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'
-                        }`}
-                      >
-                        {room}
-                      </button>
-                    ))}
+                  <div className='text-xs text-[#787774] dark:text-[#8E8D8A] flex justify-between'>
+                    <span>Pilih Ruangan untuk Di-Pratinjau:</span>
+                    <span className='font-mono text-[10px]'>{batchList.length} Ruangan</span>
+                  </div>
+
+                  <div className='flex flex-wrap gap-1.5 max-h-48 overflow-y-auto pr-1'>
+                    {batchList.map((room, idx) => {
+                      const isCurrent = textTitle.trim().toUpperCase() === room.trim().toUpperCase()
+                      return (
+                        <button
+                          key={idx}
+                          type='button'
+                          onClick={() => setTextTitle(room)}
+                          className={`text-xs px-2.5 py-1.5 rounded-[6px] border transition cursor-pointer ${
+                            isCurrent
+                              ? 'bg-[#111111] text-[#FFFFFF] border-[#111111] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
+                              : 'bg-[#FBFBFA] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#EAEAEA] border-[#EAEAEA] dark:border-[#2C2C2C] hover:border-[#111111]'
+                          }`}
+                        >
+                          {room}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Tombol Reset Default */}
-            <div className='pt-2 flex justify-between items-center text-xs text-slate-500'>
-              <span>Sesuai spesifikasi: 25×10 cm, pad 1cm, hijau jalur cepat.</span>
-              <button
-                type='button'
-                onClick={() => {
-                  setWidthCm(25)
-                  setHeightCm(10)
-                  setPaddingCm(1)
-                  setBgColor('#007A3D')
-                  setBorderColor('#FFFFFF')
-                  setTextColor('#FFFFFF')
-                  setTextTitle('RUANG KANTOR')
-                  setTextSub('')
-                  setBorderThicknessMm(3)
-                  setBoardCornerRadiusMm(6)
-                  setFontSizeTitleMm(20)
-                  setFontSizeSubMm(7)
-                  setLetterSpacingMm(1.2)
-                  setAutoFitText(true)
-                  setShowScrews(false)
-                }}
-                className='text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer'
-              >
-                <RefreshCw className='w-3 h-3' />
-                Reset ke Spesifikasi Default
-              </button>
-            </div>
-          </div>
+            {/* TAB 3: SPESIFIKASI & PANDUAN CETAK */}
+            {inspectorTab === 'spesifikasi' && (
+              <div className='bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[10px] p-5 space-y-4 text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                <div>
+                  <h2 className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#F0F0F0] uppercase'>
+                    Panduan Bahan & Cetak
+                  </h2>
+                  <p className='text-xs text-[#787774] dark:text-[#8E8D8A] mt-0.5'>
+                    Rekomendasi teknis fabrikasi plang penanda ruangan presisi.
+                  </p>
+                </div>
+
+                <div className='space-y-3 leading-relaxed text-[#111111] dark:text-[#D1D1D1]'>
+                  <div className='p-3 bg-[#FBFBFA] dark:bg-[#1E1E1E] rounded-[6px] border border-[#EAEAEA] dark:border-[#2C2C2C]'>
+                    <strong className='block font-semibold text-[#111111] dark:text-[#FFFFFF] mb-1'>
+                      1. Akrilik Custom (Cutting Sticker / Flatbed UV)
+                    </strong>
+                    Gunakan akrilik tebal 2 mm – 3 mm (warna putih susu atau bening). Potong sesuai dimensi {widthCm} × {heightCm} cm. Gambar vektor SVG dapat langsung diproses dengan mesin laser CO2 atau mesin plotter cutting stiker Oracal 651.
+                  </div>
+
+                  <div className='p-3 bg-[#FBFBFA] dark:bg-[#1E1E1E] rounded-[6px] border border-[#EAEAEA] dark:border-[#2C2C2C]'>
+                    <strong className='block font-semibold text-[#111111] dark:text-[#FFFFFF] mb-1'>
+                      2. Cetak Kertas & Laminasi Cepat (A4 Standard)
+                    </strong>
+                    Cukup klik <em>Cetak 1:1</em> di pojok kanan atas. Sistem otomatis menyesuaikan skala fisik 100% tanpa distorsi pada kertas A4 potret. Gunakan kertas Art Paper / Brief Card 260 gsm lalu laminasi doff.
+                  </div>
+
+                  <div className='p-3 bg-[#FBFBFA] dark:bg-[#1E1E1E] rounded-[6px] border border-[#EAEAEA] dark:border-[#2C2C2C]'>
+                    <strong className='block font-semibold text-[#111111] dark:text-[#FFFFFF] mb-1'>
+                      3. Resolusi Percetakan 300 DPI
+                    </strong>
+                    Ekspor PNG menghasilkan {pxWidth300Dpi} × {pxHeight300Dpi} piksel. Standar titik raster 300 DPI memastikan tepi huruf dan garis lengkung tidak bergerigi saat dicetak di mesin digital printing skala komersial.
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
 
           {/* ═══════════════════════════════════════════════════════════════════
-              KOLOM KANAN: LIVE PREVIEW PLANG & DOWNLOAD AREA (7 cols)
+              KOLOM KANAN: DRAFTING WORKBENCH & CANVASES (7 cols desktop)
              ═══════════════════════════════════════════════════════════════════ */}
-          <div className='lg:col-span-7 space-y-6'>
-            {/* Kartu Preview */}
-            <div className='bg-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden'>
-              {/* Header Preview bar */}
-              <div className='flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800 no-print'>
+          <section className='lg:col-span-7 space-y-4'>
+
+            {/* ARTBOARD CARD UTAMA */}
+            <div className='bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[10px] p-5 sm:p-6 space-y-5'>
+
+              {/* Toolbar Atas Artboard */}
+              <div className='flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#EAEAEA] dark:border-[#262626] no-print'>
                 <div className='flex items-center gap-2'>
-                  <div className='w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse' />
-                  <h3 className='text-sm font-bold text-white'>
-                    Live Signboard Preview
-                  </h3>
-                  <span className='text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800'>
-                    {widthCm} × {heightCm} cm
+                  <span className='inline-block w-2 h-2 rounded-full bg-[#346538]' />
+                  <span className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#EAEAEA]'>
+                    Pratinjau Papan Fisik
+                  </span>
+                  <span className='font-mono text-[11px] px-2 py-0.5 rounded-[4px] bg-[#FBFBFA] dark:bg-[#202020] border border-[#EAEAEA] dark:border-[#2C2C2C] text-[#787774] dark:text-[#8E8D8A]'>
+                    {widthCm}0 × {heightCm}0 mm
                   </span>
                 </div>
 
-                {/* Kontrol Zoom Preview */}
-                <div className='flex items-center gap-2'>
+                {/* Kontrol Zoom & Ruler */}
+                <div className='flex items-center gap-1.5'>
                   <button
-                    onClick={() => setZoomScale((z) => Math.max(0.5, Number((z - 0.1).toFixed(1))))}
-                    className='p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs'
+                    type='button'
+                    onClick={() => setShowRulers(!showRulers)}
+                    className={`px-2 py-1 rounded-[4px] border text-[11px] font-mono transition cursor-pointer ${
+                      showRulers
+                        ? 'bg-[#111111] text-[#FFFFFF] border-[#111111] dark:bg-[#EAEAEA] dark:text-[#111111]'
+                        : 'bg-[#FFFFFF] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#EAEAEA] border-[#D1D1D1] dark:border-[#383838]'
+                    }`}
+                    title='Tampilkan / Sembunyikan Penggaris Skala Fisik'
+                  >
+                    Penggaris
+                  </button>
+
+                  <button
+                    type='button'
+                    onClick={() => setZoomScale((z) => Math.max(0.4, Number((z - 0.1).toFixed(1))))}
+                    className='px-2 py-1 rounded-[4px] bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#D1D1D1] dark:border-[#383838] text-[#111111] dark:text-[#EAEAEA] text-xs hover:bg-[#EAEAEA] transition'
                     title='Perkecil tampilan'
                   >
-                    <ZoomOut className='w-3.5 h-3.5' />
+                    −
                   </button>
-                  <span className='text-xs font-mono text-slate-400 w-12 text-center'>
+
+                  <span className='text-xs font-mono text-[#111111] dark:text-[#EAEAEA] w-10 text-center font-medium'>
                     {Math.round(zoomScale * 100)}%
                   </span>
+
                   <button
+                    type='button'
                     onClick={() => setZoomScale((z) => Math.min(2.0, Number((z + 0.1).toFixed(1))))}
-                    className='p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs'
+                    className='px-2 py-1 rounded-[4px] bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#D1D1D1] dark:border-[#383838] text-[#111111] dark:text-[#EAEAEA] text-xs hover:bg-[#EAEAEA] transition'
                     title='Perbesar tampilan'
                   >
-                    <ZoomIn className='w-3.5 h-3.5' />
+                    +
                   </button>
+
                   <button
+                    type='button'
                     onClick={() => setZoomScale(1)}
-                    className='text-[11px] px-2 py-1 rounded bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                    className='px-2 py-1 rounded-[4px] bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-[#D1D1D1] dark:border-[#383838] text-[#111111] dark:text-[#EAEAEA] text-[11px] font-medium hover:bg-[#EAEAEA] transition'
                   >
                     100%
                   </button>
                 </div>
               </div>
 
-              {/* Area Tampilan Papan Penanda (Interactive Canvas/SVG Container) */}
-              <div className='py-8 px-2 flex items-center justify-center min-h-[300px] overflow-x-auto bg-slate-900/50 rounded-xl border border-dashed border-slate-800/80 my-4'>
+              {/* ─── AREA DRAFTING MAT / MEJA KERJA TEKNIS ─── */}
+              <div className='relative p-6 sm:p-10 flex flex-col items-center justify-center min-h-[340px] bg-[#F7F6F3] dark:bg-[#141414] rounded-[8px] border border-[#EAEAEA] dark:border-[#262626] overflow-x-auto'>
+                {/* Millimeter Measurement Guide (Top Ruler) */}
+                {showRulers && (
+                  <div
+                    className='mb-3 flex items-center justify-between text-[10px] font-mono text-[#787774] dark:text-[#666666] select-none'
+                    style={{
+                      width: `min(100%, ${Math.min(600, widthMm * 2 * zoomScale)}px)`
+                    }}
+                  >
+                    <span>0 mm</span>
+                    <span className='hidden sm:inline'>100 mm</span>
+                    <span className='hidden sm:inline'>200 mm</span>
+                    <span>{widthMm} mm ({widthCm} cm)</span>
+                  </div>
+                )}
+
+                {/* SVG Live Signboard Container */}
                 <div
                   style={{
                     transform: `scale(${zoomScale})`,
                     transformOrigin: 'center center',
                     transition: 'transform 0.15s ease-out'
                   }}
-                  className='drop-shadow-2xl'
+                  className='relative shrink-0 max-w-full'
                 >
                   {/* ─────────────────────────────────────────────────────────────
-                      KOMPONEN SVG MASTER PLANG RUANGAN (100% VECTOR & PHYSICAL UNITS)
+                      KOMPONEN SVG MASTER PLANG RUANGAN (100% PHYSICAL UNITS)
                      ───────────────────────────────────────────────────────────── */}
                   <svg
                     ref={svgRef}
@@ -1244,18 +1122,19 @@ export default function PenandaRuanganPage() {
                       display: 'block',
                       maxWidth: '100%',
                       height: 'auto',
-                      filter: 'drop-shadow(0 15px 25px rgba(0, 0, 0, 0.45))'
+                      borderRadius: `${boardCornerRadiusMm}px`,
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
                     }}
                   >
                     <defs>
-                      {/* Gradient Refleksi Kilau Halus Papan Rambu */}
+                      {/* Kilau Refleksi Permukaan Akrilik Halus */}
                       <linearGradient id='signGlossGrad' x1='0%' y1='0%' x2='100%' y2='100%'>
-                        <stop offset='0%' stopColor='#FFFFFF' stopOpacity={showGlossEffect ? '0.18' : '0'} />
-                        <stop offset='40%' stopColor='#FFFFFF' stopOpacity='0.0' />
-                        <stop offset='100%' stopColor='#000000' stopOpacity={showGlossEffect ? '0.2' : '0'} />
+                        <stop offset='0%' stopColor='#FFFFFF' stopOpacity={showGlossEffect ? '0.16' : '0'} />
+                        <stop offset='38%' stopColor='#FFFFFF' stopOpacity='0.0' />
+                        <stop offset='100%' stopColor='#000000' stopOpacity={showGlossEffect ? '0.15' : '0'} />
                       </linearGradient>
 
-                      {/* Baut Stainless Krom */}
+                      {/* Kepala Baut Stainless Steel */}
                       <radialGradient id='screwGrad' cx='35%' cy='35%' r='65%'>
                         <stop offset='0%' stopColor='#FFFFFF' />
                         <stop offset='45%' stopColor='#CBD5E1' />
@@ -1264,7 +1143,7 @@ export default function PenandaRuanganPage() {
                       </radialGradient>
                     </defs>
 
-                    {/* 1. LATAR BELAKANG PAPAN UTAMA (Warna Hijau Jalur Cepat / Kustom) */}
+                    {/* 1. Latar Belakang Papan Utama */}
                     <rect
                       x='0'
                       y='0'
@@ -1275,7 +1154,7 @@ export default function PenandaRuanganPage() {
                       fill={bgColor}
                     />
 
-                    {/* 2. OVERLAY KILAU CAHAYA ELEGAN */}
+                    {/* 2. Overlay Kilau Halus */}
                     {showGlossEffect && (
                       <rect
                         x='0'
@@ -1289,7 +1168,7 @@ export default function PenandaRuanganPage() {
                       />
                     )}
 
-                    {/* 3. KOTAK BORDER DALAM WARNA PUTIH DENGAN PADDING 1 CM */}
+                    {/* 3. Kotak Border Dalam dengan Jarak Padding cm */}
                     {showInnerBorder && innerW > 0 && innerH > 0 && (
                       <rect
                         x={innerX}
@@ -1305,10 +1184,9 @@ export default function PenandaRuanganPage() {
                       />
                     )}
 
-                    {/* 4. TEKS RUANGAN (Posisikan di Tengah Kotak Border) */}
+                    {/* 4. Tipografi Judul & Subteks */}
                     <g>
                       {textSub ? (
-                        // Jika ada Subteks (Judul agak ke atas, subteks di bawahnya)
                         <>
                           <text
                             x={widthMm / 2}
@@ -1341,7 +1219,6 @@ export default function PenandaRuanganPage() {
                           </text>
                         </>
                       ) : (
-                        // Hanya Teks Utama di Persis Tengah Sumbu X dan Y
                         <text
                           x={widthMm / 2}
                           y={heightMm / 2}
@@ -1359,21 +1236,18 @@ export default function PenandaRuanganPage() {
                       )}
                     </g>
 
-                    {/* 5. TITIK BAUT / SEKRUP REALISTIS DI 4 SUDUT (OPSIONAL) */}
+                    {/* 5. Titik Lubang Sekrup / Baut Sudut */}
                     {showScrews && (
                       <g>
                         {/* Kiri Atas */}
                         <circle cx={screwInsetMm} cy={screwInsetMm} r='2.2' fill='url(#screwGrad)' stroke='#0F172A' strokeWidth='0.3' />
                         <line x1={screwInsetMm - 1.2} y1={screwInsetMm} x2={screwInsetMm + 1.2} y2={screwInsetMm} stroke='#1E293B' strokeWidth='0.4' />
-                        
                         {/* Kanan Atas */}
                         <circle cx={widthMm - screwInsetMm} cy={screwInsetMm} r='2.2' fill='url(#screwGrad)' stroke='#0F172A' strokeWidth='0.3' />
                         <line x1={widthMm - screwInsetMm - 1.2} y1={screwInsetMm} x2={widthMm - screwInsetMm + 1.2} y2={screwInsetMm} stroke='#1E293B' strokeWidth='0.4' />
-                        
                         {/* Kiri Bawah */}
                         <circle cx={screwInsetMm} cy={heightMm - screwInsetMm} r='2.2' fill='url(#screwGrad)' stroke='#0F172A' strokeWidth='0.3' />
                         <line x1={screwInsetMm - 1.2} y1={heightMm - screwInsetMm} x2={screwInsetMm + 1.2} y2={heightMm - screwInsetMm} stroke='#1E293B' strokeWidth='0.4' />
-                        
                         {/* Kanan Bawah */}
                         <circle cx={widthMm - screwInsetMm} cy={heightMm - screwInsetMm} r='2.2' fill='url(#screwGrad)' stroke='#0F172A' strokeWidth='0.3' />
                         <line x1={widthMm - screwInsetMm - 1.2} y1={heightMm - screwInsetMm} x2={widthMm - screwInsetMm + 1.2} y2={heightMm - screwInsetMm} stroke='#1E293B' strokeWidth='0.4' />
@@ -1383,111 +1257,136 @@ export default function PenandaRuanganPage() {
                 </div>
               </div>
 
-              {/* Rincian Spesifikasi & Dimensi Riil */}
-              <div className='grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-800 text-xs no-print'>
-                <div className='bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80'>
-                  <span className='text-slate-400 block text-[10px]'>Dimensi Fisik</span>
-                  <span className='text-white font-bold font-mono text-sm'>
+              {/* ─── ACTION BAR EKSPOR (TOMBOL UTAMA PERSIS DI BAWAH PREVIEW) ─── */}
+              <div className='pt-2 flex flex-wrap items-center justify-between gap-3 no-print'>
+                <div className='flex items-center gap-2'>
+                  <button
+                    type='button'
+                    onClick={() => handleDownloadPng(300)}
+                    disabled={isExporting}
+                    className='inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] bg-[#111111] hover:bg-[#2F3437] dark:bg-[#F0F0F0] dark:text-[#111111] dark:hover:bg-[#FFFFFF] text-[#FFFFFF] text-xs font-semibold transition active:scale-[0.98] disabled:opacity-50 cursor-pointer'
+                  >
+                    <svg className='w-4 h-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' />
+                      <polyline points='7 10 12 15 17 10' />
+                      <line x1='12' y1='15' x2='12' y2='3' />
+                    </svg>
+                    <span>{isExporting ? 'Memproses HD...' : 'Download PNG (300 DPI)'}</span>
+                  </button>
+
+                  <button
+                    type='button'
+                    onClick={handleDownloadSvg}
+                    className='inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-[6px] bg-[#FFFFFF] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#EAEAEA] border border-[#EAEAEA] dark:border-[#2C2C2C] hover:bg-[#F7F6F3] text-xs font-medium transition cursor-pointer'
+                  >
+                    <svg className='w-4 h-4 text-[#787774]' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <polygon points='12 2 2 7 12 12 22 7 12 2' />
+                      <polyline points='2 17 12 22 22 17' />
+                      <polyline points='2 12 12 17 22 12' />
+                    </svg>
+                    <span>SVG Vektor</span>
+                  </button>
+                </div>
+
+                <div className='flex items-center gap-2'>
+                  <button
+                    type='button'
+                    onClick={handleCopySvgCode}
+                    className='inline-flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#FFFFFF] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#EAEAEA] hover:bg-[#F7F6F3] dark:hover:bg-[#2A2A2A] border border-[#EAEAEA] dark:border-[#2C2C2C] text-xs font-medium transition cursor-pointer'
+                    title='Salin XML SVG ke clipboard'
+                  >
+                    {copiedStatus ? (
+                      <>
+                        <svg className='w-3.5 h-3.5 text-[#346538]' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                          <polyline points='20 6 9 17 4 12' />
+                        </svg>
+                        <span className='text-[#346538] font-medium'>Tersalin</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className='w-3.5 h-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                          <rect x='9' y='9' width='13' height='13' rx='2' ry='2' />
+                          <path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1' />
+                        </svg>
+                        <span>Salin SVG</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type='button'
+                    onClick={() => window.print()}
+                    className='inline-flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#FFFFFF] dark:bg-[#1E1E1E] text-[#111111] dark:text-[#EAEAEA] border border-[#EAEAEA] dark:border-[#2C2C2C] text-xs font-medium hover:bg-[#F7F6F3] transition cursor-pointer'
+                  >
+                    <svg className='w-3.5 h-3.5 text-[#787774]' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'>
+                      <polyline points='6 9 6 2 18 2 18 9' />
+                      <path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2' />
+                      <rect x='6' y='14' width='12' height='8' />
+                    </svg>
+                    <span>Print 1:1</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* ─── BENTO SPESIFIKASI METRIK FISIK ─── */}
+              <div className='grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 border-t border-[#EAEAEA] dark:border-[#262626] text-xs no-print'>
+                <div className='p-2.5 rounded-[6px] bg-[#FBFBFA] dark:bg-[#1C1C1C] border border-[#EAEAEA] dark:border-[#2A2A2A]'>
+                  <span className='text-[10px] text-[#787774] dark:text-[#8E8D8A] block'>Dimensi Fisik</span>
+                  <span className='font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>
                     {widthCm} × {heightCm} cm
                   </span>
                 </div>
 
-                <div className='bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80'>
-                  <span className='text-slate-400 block text-[10px]'>Padding Kotak</span>
-                  <span className='text-emerald-400 font-bold font-mono text-sm'>
+                <div className='p-2.5 rounded-[6px] bg-[#FBFBFA] dark:bg-[#1C1C1C] border border-[#EAEAEA] dark:border-[#2A2A2A]'>
+                  <span className='text-[10px] text-[#787774] dark:text-[#8E8D8A] block'>Margin Border</span>
+                  <span className='font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>
                     {paddingCm} cm ({paddingMm} mm)
                   </span>
                 </div>
 
-                <div className='bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80'>
-                  <span className='text-slate-400 block text-[10px]'>Pixel @ 300 DPI</span>
-                  <span className='text-slate-300 font-bold font-mono text-sm'>
-                    {Math.round((widthMm / 25.4) * 300)} × {Math.round((heightMm / 25.4) * 300)} px
+                <div className='p-2.5 rounded-[6px] bg-[#FBFBFA] dark:bg-[#1C1C1C] border border-[#EAEAEA] dark:border-[#2A2A2A]'>
+                  <span className='text-[10px] text-[#787774] dark:text-[#8E8D8A] block'>Raster Cetak</span>
+                  <span className='font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>
+                    {pxWidth300Dpi} × {pxHeight300Dpi} px
                   </span>
                 </div>
 
-                <div className='bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80'>
-                  <span className='text-slate-400 block text-[10px]'>Warna Latar</span>
-                  <span className='text-emerald-400 font-bold font-mono text-sm flex items-center gap-1'>
-                    <span className='w-3 h-3 rounded-full inline-block border border-white/20' style={{ backgroundColor: bgColor }} />
-                    {bgColor.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons Panel */}
-              <div className='pt-5 flex flex-wrap gap-3 items-center justify-between no-print'>
-                <div className='flex items-center gap-2'>
-                  <button
-                    onClick={() => handleDownloadPng(300)}
-                    disabled={isExporting}
-                    className='inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-700/30 transition disabled:opacity-50 cursor-pointer'
-                  >
-                    <Download className='w-4 h-4' />
-                    {isExporting ? 'Membuat File HD...' : 'Download Gambar PNG (300 DPI)'}
-                  </button>
-
-                  <button
-                    onClick={handleDownloadSvg}
-                    className='inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-semibold text-sm transition cursor-pointer'
-                  >
-                    <Layers className='w-4 h-4 text-emerald-400' />
-                    SVG Vektor
-                  </button>
-                </div>
-
-                <div className='flex items-center gap-2'>
-                  <button
-                    onClick={handleCopySvgCode}
-                    className='inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 text-xs transition cursor-pointer'
-                    title='Salin kode SVG langsung ke clipboard'
-                  >
-                    {copiedStatus ? <Check className='w-3.5 h-3.5 text-emerald-400' /> : <Copy className='w-3.5 h-3.5' />}
-                    {copiedStatus ? 'Tersalin!' : 'Copy SVG'}
-                  </button>
-
-                  <button
-                    onClick={handlePrint}
-                    className='inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 text-xs font-semibold transition cursor-pointer'
-                  >
-                    <Printer className='w-3.5 h-3.5 text-sky-400' />
-                    Print 1:1 Kertas
-                  </button>
+                <div className='p-2.5 rounded-[6px] bg-[#FBFBFA] dark:bg-[#1C1C1C] border border-[#EAEAEA] dark:border-[#2A2A2A]'>
+                  <span className='text-[10px] text-[#787774] dark:text-[#8E8D8A] block'>Warna Plang</span>
+                  <div className='flex items-center gap-1.5 font-mono font-semibold text-[#111111] dark:text-[#FFFFFF]'>
+                    <span className='w-2.5 h-2.5 rounded-full border border-black/20 shrink-0' style={{ backgroundColor: bgColor }} />
+                    <span className='truncate'>{bgColor.toUpperCase()}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Panduan & Informasi Penggunaan */}
-            <div className='bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 space-y-3 text-xs text-slate-400 no-print'>
-              <h4 className='font-bold text-slate-200 flex items-center gap-2'>
-                <Info className='w-4 h-4 text-sky-400' />
-                Petunjuk Cetak & Pemasangan:
-              </h4>
-              <ul className='space-y-1.5 list-disc pl-4 text-slate-300 leading-relaxed'>
-                <li>
-                  <strong>Ukuran Presisi:</strong> Panjang 25 cm dan tinggi 10 cm dengan padding border 1 cm telah dihitung secara matematis tepat skala 1:1.
-                </li>
-                <li>
-                  <strong>Bahan Rekomendasi:</strong>
-                  <ul className='list-circle pl-4 mt-1 space-y-0.5 text-slate-400'>
-                    <li>• Akrilik Bening/Hijau tebal 2mm - 3mm dengan stiker cutting oracal / print UV.</li>
-                    <li>• Plat Alumunium composite panel (ACP) untuk ketahanan luar/dalam ruangan.</li>
-                    <li>• Kertas Art Carton 260/310 gsm dilaminasi doff/glossy untuk penggunaan cepat di pintu.</li>
-                  </ul>
-                </li>
-                <li>
-                  <strong>Ekspor Vektor SVG:</strong> Format SVG murni dapat langsung dibuka di CorelDraw, Adobe Illustrator, atau software laser cutting / cutting sticker plotter tanpa pecah sedikitpun.
-                </li>
-                <li>
-                  <strong>Ekspor PNG 300 DPI:</strong> Menggunakan resolusi percetakan 300 titik per inci ({Math.round((widthMm / 25.4) * 300)} × {Math.round((heightMm / 25.4) * 300)} px) sehingga hasil cetak tajam bebas pixelated.
-                </li>
-              </ul>
+            {/* KOTAK INFORMASI TEKNIKAL MINIMALIS */}
+            <div className='p-4 rounded-[10px] bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] text-xs space-y-2 no-print'>
+              <div className='flex items-center justify-between text-[#111111] dark:text-[#EAEAEA] font-semibold'>
+                <span>Pintasan Keyboard & Panduan Singkat</span>
+                <span className='font-mono text-[10px] text-[#787774]'>Studio Mode</span>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 text-[#787774] dark:text-[#8E8D8A]'>
+                <div className='flex items-center gap-2'>
+                  <kbd className='px-1.5 py-0.5 text-[10px] font-mono bg-[#F7F6F3] dark:bg-[#262626] border border-[#EAEAEA] dark:border-[#333333] rounded-[4px] text-[#111111] dark:text-[#EAEAEA]'>
+                    Ctrl + S
+                  </kbd>
+                  <span>Unduh PNG resolusi tinggi 300 DPI</span>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <kbd className='px-1.5 py-0.5 text-[10px] font-mono bg-[#F7F6F3] dark:bg-[#262626] border border-[#EAEAEA] dark:border-[#333333] rounded-[4px] text-[#111111] dark:text-[#EAEAEA]'>
+                    Ctrl + P
+                  </kbd>
+                  <span>Cetak langsung 100% skala fisik di printer</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </main>
+          </section>
+        </div>
 
         {/* ═══════════════════════════════════════════════════════════════════
-            TARGET CETAK PRINTER KHUSUS (@media print)
+            TARGET CETAK PRINTER FISIK 1:1 (@media print)
            ═══════════════════════════════════════════════════════════════════ */}
         <div className='print-only' style={{ display: 'none' }}>
           <div
@@ -1499,12 +1398,12 @@ export default function PenandaRuanganPage() {
               backgroundColor: bgColor,
               borderRadius: `${boardCornerRadiusMm}mm`,
               overflow: 'hidden',
-              margin: '10mm auto',
+              margin: '15mm auto',
               pageBreakInside: 'avoid',
               breakInside: 'avoid'
             }}
           >
-            {/* Border kotak dalam */}
+            {/* Garis Border Dalam */}
             {showInnerBorder && (
               <div
                 style={{
@@ -1520,7 +1419,7 @@ export default function PenandaRuanganPage() {
               />
             )}
 
-            {/* Tulisan Teks */}
+            {/* Tipografi Plang */}
             <div
               style={{
                 position: 'absolute',
@@ -1568,7 +1467,7 @@ export default function PenandaRuanganPage() {
           </div>
         </div>
 
-        {/* CSS Khusus Print 1:1 Fisik */}
+        {/* CSS Cetak Fisik Bersih */}
         <style>{`
           @media print {
             body, html, main, #__docusaurus {
@@ -1597,7 +1496,6 @@ export default function PenandaRuanganPage() {
             }
           }
         `}</style>
-      </div>
-    </Layout>
+    </main>
   )
 }
