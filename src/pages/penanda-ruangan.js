@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react'
+import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react'
 import Head from '@docusaurus/Head'
 
 // ─── PALET PRESET WARNA STANDAR RAMBU FISIK & KANTOR ─────────────────────────
@@ -159,49 +159,87 @@ const FONT_OPTIONS = [
   }
 ]
 
+// ─── DEFAULT SPESIFIKASI AWAL (UNTUK RESET LOCALSTORAGE) ────────────────────
+const DEFAULT_CONFIG = {
+  widthCm: 25,
+  heightCm: 10,
+  paddingCm: 1,
+  boardCornerRadiusMm: 6,
+  innerCornerRadiusMm: 4,
+  borderThicknessMm: 3,
+  bgColor: '#007A3D',
+  borderColor: '#FFFFFF',
+  textColor: '#FFFFFF',
+  subtextColor: '#E2E8F0',
+  textTitle: 'RUANG KANTOR',
+  textSub: '',
+  forceUppercase: true,
+  fontFamily: FONT_OPTIONS[0].family,
+  fontWeight: '800',
+  fontSizeTitleMm: 20,
+  fontSizeSubMm: 7,
+  letterSpacingMm: 1.2,
+  autoFitText: true,
+  showScrews: false,
+  screwInsetMm: 5,
+  showGlossEffect: true,
+  showInnerBorder: true,
+  borderStyle: 'solid',
+  batchRoomsText: 'RUANG KANTOR\nRUANG RAPAT\nRUANG GURU\nLABORATORIUM\nRUANG SERVER\nGUDANG'
+}
+
+const STORAGE_KEY = 'penanda_ruangan_config_v1'
+
 export default function PenandaRuanganPage() {
   // ─── STATE DIMENSI FISIK (cm & mm) ─────────────────────────────────────────
-  const [widthCm, setWidthCm] = useState(25)
-  const [heightCm, setHeightCm] = useState(10)
-  const [paddingCm, setPaddingCm] = useState(1)
-  const [boardCornerRadiusMm, setBoardCornerRadiusMm] = useState(6)
-  const [innerCornerRadiusMm, setInnerCornerRadiusMm] = useState(4)
-  const [borderThicknessMm, setBorderThicknessMm] = useState(3)
+  const [widthCm, setWidthCm] = useState(DEFAULT_CONFIG.widthCm)
+  const [heightCm, setHeightCm] = useState(DEFAULT_CONFIG.heightCm)
+  const [paddingCm, setPaddingCm] = useState(DEFAULT_CONFIG.paddingCm)
+  const [boardCornerRadiusMm, setBoardCornerRadiusMm] = useState(DEFAULT_CONFIG.boardCornerRadiusMm)
+  const [innerCornerRadiusMm, setInnerCornerRadiusMm] = useState(DEFAULT_CONFIG.innerCornerRadiusMm)
+  const [borderThicknessMm, setBorderThicknessMm] = useState(DEFAULT_CONFIG.borderThicknessMm)
 
   // ─── STATE WARNA ELEMEN FISIK ──────────────────────────────────────────────
-  const [bgColor, setBgColor] = useState('#007A3D') // Default Hijau Jalur Cepat
-  const [borderColor, setBorderColor] = useState('#FFFFFF')
-  const [textColor, setTextColor] = useState('#FFFFFF')
-  const [subtextColor, setSubtextColor] = useState('#E2E8F0')
+  const [bgColor, setBgColor] = useState(DEFAULT_CONFIG.bgColor)
+  const [borderColor, setBorderColor] = useState(DEFAULT_CONFIG.borderColor)
+  const [textColor, setTextColor] = useState(DEFAULT_CONFIG.textColor)
+  const [subtextColor, setSubtextColor] = useState(DEFAULT_CONFIG.subtextColor)
 
   // ─── STATE KONTEN TEKS & TIPOGRAFI ─────────────────────────────────────────
-  const [textTitle, setTextTitle] = useState('RUANG KANTOR')
-  const [textSub, setTextSub] = useState('')
-  const [forceUppercase, setForceUppercase] = useState(true)
-  const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].family)
-  const [fontWeight, setFontWeight] = useState('800')
-  const [fontSizeTitleMm, setFontSizeTitleMm] = useState(20)
-  const [fontSizeSubMm, setFontSizeSubMm] = useState(7)
-  const [letterSpacingMm, setLetterSpacingMm] = useState(1.2)
-  const [autoFitText, setAutoFitText] = useState(true)
+  const [textTitle, setTextTitle] = useState(DEFAULT_CONFIG.textTitle)
+  const [textSub, setTextSub] = useState(DEFAULT_CONFIG.textSub)
+  const [forceUppercase, setForceUppercase] = useState(DEFAULT_CONFIG.forceUppercase)
+  const [fontFamily, setFontFamily] = useState(DEFAULT_CONFIG.fontFamily)
+  const [fontWeight, setFontWeight] = useState(DEFAULT_CONFIG.fontWeight)
+  const [fontSizeTitleMm, setFontSizeTitleMm] = useState(DEFAULT_CONFIG.fontSizeTitleMm)
+  const [fontSizeSubMm, setFontSizeSubMm] = useState(DEFAULT_CONFIG.fontSizeSubMm)
+  const [letterSpacingMm, setLetterSpacingMm] = useState(DEFAULT_CONFIG.letterSpacingMm)
+  const [autoFitText, setAutoFitText] = useState(DEFAULT_CONFIG.autoFitText)
 
   // ─── STATE HARDWARE & FINISHING FISIK ──────────────────────────────────────
-  const [showScrews, setShowScrews] = useState(false)
-  const [screwInsetMm, setScrewInsetMm] = useState(5)
-  const [showGlossEffect, setShowGlossEffect] = useState(true)
-  const [showInnerBorder, setShowInnerBorder] = useState(true)
-  const [borderStyle, setBorderStyle] = useState('solid') // 'solid' | 'dashed'
+  const [showScrews, setShowScrews] = useState(DEFAULT_CONFIG.showScrews)
+  const [screwInsetMm, setScrewInsetMm] = useState(DEFAULT_CONFIG.screwInsetMm)
+  const [showGlossEffect, setShowGlossEffect] = useState(DEFAULT_CONFIG.showGlossEffect)
+  const [showInnerBorder, setShowInnerBorder] = useState(DEFAULT_CONFIG.showInnerBorder)
+  const [borderStyle, setBorderStyle] = useState(DEFAULT_CONFIG.borderStyle)
 
   // ─── STATE WORKBENCH & NAVIGASI ────────────────────────────────────────────
-  const [inspectorTab, setInspectorTab] = useState('papan') // 'papan' | 'batch' | 'spesifikasi'
+  const [inspectorTab, setInspectorTab] = useState('papan') // 'papan' | 'batch' | 'backup' | 'spesifikasi'
   const [zoomScale, setZoomScale] = useState(1)
   const [showRulers, setShowRulers] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
   const [copiedStatus, setCopiedStatus] = useState(false)
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const [batchRoomsText, setBatchRoomsText] = useState('RUANG KANTOR\nRUANG RAPAT\nRUANG GURU\nLABORATORIUM\nRUANG SERVER\nGUDANG')
+  const [batchRoomsText, setBatchRoomsText] = useState(DEFAULT_CONFIG.batchRoomsText)
+
+  // ─── STATE PERSISTENSI LOCALSTORAGE & CADANGAN JSON ────────────────────────
+  const [isReady, setIsReady] = useState(false)
+  const [toastMsg, setToastMsg] = useState(null)
+  const [jsonInputText, setJsonInputText] = useState('')
+  const [jsonError, setJsonError] = useState(null)
 
   const svgRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   // ─── MATEMATIKA SATUAN FISIK (cm -> mm) ───────────────────────────────────
   const widthMm = useMemo(() => Math.max(20, widthCm * 10), [widthCm])
@@ -355,27 +393,244 @@ export default function PenandaRuanganPage() {
     }
   }
 
-  // ─── RESET PARAMETER KE SPESIFIKASI DEFAULT ───────────────────────────────
-  const handleResetDefaults = () => {
-    setWidthCm(25)
-    setHeightCm(10)
-    setPaddingCm(1)
-    setBgColor('#007A3D')
-    setBorderColor('#FFFFFF')
-    setTextColor('#FFFFFF')
-    setSubtextColor('#E2E8F0')
-    setTextTitle('RUANG KANTOR')
-    setTextSub('')
-    setBorderThicknessMm(3)
-    setBoardCornerRadiusMm(6)
-    setInnerCornerRadiusMm(4)
-    setFontSizeTitleMm(20)
-    setFontSizeSubMm(7)
-    setLetterSpacingMm(1.2)
-    setAutoFitText(true)
-    setShowScrews(false)
-    setShowGlossEffect(true)
-    setShowInnerBorder(true)
+  // ─── SISTEM NOTIFIKASI TOAST ──────────────────────────────────────────────
+  const showNotification = (msg) => {
+    setToastMsg(msg)
+    if (typeof window !== 'undefined') {
+      if (window._penandaToastTimer) clearTimeout(window._penandaToastTimer)
+      window._penandaToastTimer = setTimeout(() => {
+        setToastMsg(null)
+      }, 2600)
+    }
+  }
+
+  // ─── AMBIL OBJEK KONFIGURASI SAAT INI ─────────────────────────────────────
+  const getCurrentConfig = useCallback(() => {
+    return {
+      widthCm,
+      heightCm,
+      paddingCm,
+      boardCornerRadiusMm,
+      innerCornerRadiusMm,
+      borderThicknessMm,
+      bgColor,
+      borderColor,
+      textColor,
+      subtextColor,
+      textTitle,
+      textSub,
+      forceUppercase,
+      fontFamily,
+      fontWeight,
+      fontSizeTitleMm,
+      fontSizeSubMm,
+      letterSpacingMm,
+      autoFitText,
+      showScrews,
+      screwInsetMm,
+      showGlossEffect,
+      showInnerBorder,
+      borderStyle,
+      batchRoomsText
+    }
+  }, [
+    widthCm,
+    heightCm,
+    paddingCm,
+    boardCornerRadiusMm,
+    innerCornerRadiusMm,
+    borderThicknessMm,
+    bgColor,
+    borderColor,
+    textColor,
+    subtextColor,
+    textTitle,
+    textSub,
+    forceUppercase,
+    fontFamily,
+    fontWeight,
+    fontSizeTitleMm,
+    fontSizeSubMm,
+    letterSpacingMm,
+    autoFitText,
+    showScrews,
+    screwInsetMm,
+    showGlossEffect,
+    showInnerBorder,
+    borderStyle,
+    batchRoomsText
+  ])
+
+  // ─── TERAPKAN OBJEK KONFIGURASI KE STATE ───────────────────────────────────
+  const applyConfigObject = useCallback((config, showToast = true) => {
+    if (!config || typeof config !== 'object') return false
+    try {
+      if (typeof config.widthCm === 'number') setWidthCm(config.widthCm)
+      if (typeof config.heightCm === 'number') setHeightCm(config.heightCm)
+      if (typeof config.paddingCm === 'number') setPaddingCm(config.paddingCm)
+      if (typeof config.boardCornerRadiusMm === 'number') setBoardCornerRadiusMm(config.boardCornerRadiusMm)
+      if (typeof config.innerCornerRadiusMm === 'number') setInnerCornerRadiusMm(config.innerCornerRadiusMm)
+      if (typeof config.borderThicknessMm === 'number') setBorderThicknessMm(config.borderThicknessMm)
+
+      if (typeof config.bgColor === 'string') setBgColor(config.bgColor)
+      if (typeof config.borderColor === 'string') setBorderColor(config.borderColor)
+      if (typeof config.textColor === 'string') setTextColor(config.textColor)
+      if (typeof config.subtextColor === 'string') setSubtextColor(config.subtextColor)
+
+      if (typeof config.textTitle === 'string') setTextTitle(config.textTitle)
+      if (typeof config.textSub === 'string') setTextSub(config.textSub)
+      if (typeof config.forceUppercase === 'boolean') setForceUppercase(config.forceUppercase)
+      if (typeof config.fontFamily === 'string') setFontFamily(config.fontFamily)
+      if (typeof config.fontWeight === 'string' || typeof config.fontWeight === 'number') setFontWeight(String(config.fontWeight))
+      if (typeof config.fontSizeTitleMm === 'number') setFontSizeTitleMm(config.fontSizeTitleMm)
+      if (typeof config.fontSizeSubMm === 'number') setFontSizeSubMm(config.fontSizeSubMm)
+      if (typeof config.letterSpacingMm === 'number') setLetterSpacingMm(config.letterSpacingMm)
+      if (typeof config.autoFitText === 'boolean') setAutoFitText(config.autoFitText)
+
+      if (typeof config.showScrews === 'boolean') setShowScrews(config.showScrews)
+      if (typeof config.screwInsetMm === 'number') setScrewInsetMm(config.screwInsetMm)
+      if (typeof config.showGlossEffect === 'boolean') setShowGlossEffect(config.showGlossEffect)
+      if (typeof config.showInnerBorder === 'boolean') setShowInnerBorder(config.showInnerBorder)
+      if (typeof config.borderStyle === 'string') setBorderStyle(config.borderStyle)
+      if (typeof config.batchRoomsText === 'string') setBatchRoomsText(config.batchRoomsText)
+
+      if (showToast) {
+        showNotification('Konfigurasi berhasil diterapkan.')
+      }
+      return true
+    } catch (e) {
+      console.error('Gagal menerapkan konfigurasi:', e)
+      return false
+    }
+  }, [])
+
+  // ─── HYDRATION DARI LOCALSTORAGE PADA AWAL LOAD ───────────────────────────
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          applyConfigObject(parsed, false)
+        }
+      }
+    } catch (err) {
+      console.warn('Gagal membaca dari localStorage:', err)
+    } finally {
+      setIsReady(true)
+    }
+  }, [applyConfigObject])
+
+  // ─── PENYIMPANAN OTOMATIS (AUTO-SAVE) KE LOCALSTORAGE ─────────────────────
+  useEffect(() => {
+    if (!isReady) return
+    try {
+      if (typeof window !== 'undefined') {
+        const current = getCurrentConfig()
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(current))
+      }
+    } catch (err) {
+      console.warn('Gagal menyimpan otomatis ke localStorage:', err)
+    }
+  }, [isReady, getCurrentConfig])
+
+  // ─── RESET LOCALSTORAGE & KEMBALIKAN KE DEFAULT ───────────────────────────
+  const handleResetLocalStorage = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(STORAGE_KEY)
+      }
+      applyConfigObject(DEFAULT_CONFIG, false)
+      setJsonInputText('')
+      setJsonError(null)
+      showNotification('LocalStorage dibersihkan & konfigurasi kembali ke default.')
+    } catch (err) {
+      alert('Gagal mereset localStorage: ' + err.message)
+    }
+  }
+
+  // ─── EKSPOR BERKAS JSON ───────────────────────────────────────────────────
+  const handleDownloadJsonFile = () => {
+    try {
+      const config = getCurrentConfig()
+      const jsonString = JSON.stringify(config, null, 2)
+      const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const cleanName = (textTitle || 'penanda-ruangan').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      a.download = `konfigurasi-${cleanName}-${widthCm}x${heightCm}cm.json`
+      a.href = url
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      showNotification('Berkas JSON berhasil diunduh.')
+    } catch (err) {
+      alert('Gagal mengunduh berkas JSON: ' + err.message)
+    }
+  }
+
+  // ─── SALIN JSON TEKS KE PAPAN KLIP ────────────────────────────────────────
+  const handleCopyJsonString = async () => {
+    try {
+      const config = getCurrentConfig()
+      const jsonString = JSON.stringify(config, null, 2)
+      await navigator.clipboard.writeText(jsonString)
+      showNotification('Teks konfigurasi JSON berhasil disalin.')
+    } catch {
+      alert('Gagal menyalin teks JSON ke papan klip.')
+    }
+  }
+
+  // ─── IMPOR BERKAS JSON DARI KOMPUTER ──────────────────────────────────────
+  const handleImportJsonFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result
+        if (typeof text !== 'string') return
+        const parsed = JSON.parse(text)
+        const success = applyConfigObject(parsed, true)
+        if (!success) {
+          setJsonError('Format berkas JSON tidak sesuai struktur aplikasi.')
+        } else {
+          setJsonError(null)
+          setJsonInputText('')
+        }
+      } catch (err) {
+        setJsonError('Gagal memproses berkas JSON: ' + err.message)
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = ''
+      }
+    }
+    reader.onerror = () => {
+      setJsonError('Gagal membaca berkas yang dipilih.')
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+    reader.readAsText(file)
+  }
+
+  // ─── IMPOR DENGAN MENEMPELKAN TEKS JSON SECARA LANGSUNG ───────────────────
+  const handleApplyJsonText = () => {
+    if (!jsonInputText.trim()) {
+      setJsonError('Harap tempelkan teks JSON konfigurasi terlebih dahulu.')
+      return
+    }
+    try {
+      const parsed = JSON.parse(jsonInputText)
+      const success = applyConfigObject(parsed, true)
+      if (!success) {
+        setJsonError('Format JSON tidak sesuai spesifikasi aplikasi.')
+      } else {
+        setJsonError(null)
+        setJsonInputText('')
+      }
+    } catch (err) {
+      setJsonError('Format teks JSON salah: ' + err.message)
+    }
   }
 
   return (
@@ -402,37 +657,58 @@ export default function PenandaRuanganPage() {
               KOLOM KIRI: INSPECTOR PANEL (5 cols desktop)
              ═══════════════════════════════════════════════════════════════════ */}
           <section className='lg:col-span-5 space-y-4 no-print'>
-            {/* Segmented Control Mode */}
-            <div className='flex items-center p-1 bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[8px] text-xs font-medium text-[#787774] dark:text-[#8E8D8A]'>
+            {/* Segmented Control Mode - 4 Kolom Grid Presisi & Anti-Wrap */}
+            <div className='grid grid-cols-4 p-1 bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[8px] text-xs font-medium text-[#787774] dark:text-[#8E8D8A] gap-1'>
               <button
                 type='button'
                 onClick={() => setInspectorTab('papan')}
-                className={`flex-1 py-1.5 px-3 rounded-[6px] transition cursor-pointer text-center ${
+                title='Pengaturan Desain & Dimensi Papan'
+                className={`py-1.5 px-1.5 sm:px-2 rounded-[6px] transition cursor-pointer text-center whitespace-nowrap truncate ${
                   inspectorTab === 'papan'
                     ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
                     : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
                 }`}
               >
-                Papan Desain
+                Desain
               </button>
               <button
                 type='button'
                 onClick={() => setInspectorTab('batch')}
-                className={`flex-1 py-1.5 px-3 rounded-[6px] transition cursor-pointer text-center flex items-center justify-center gap-1.5 ${
+                title='Daftar Batch Nama Ruangan'
+                className={`py-1.5 px-1.5 sm:px-2 rounded-[6px] transition cursor-pointer text-center flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap ${
                   inspectorTab === 'batch'
                     ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
                     : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
                 }`}
               >
-                <span>Daftar Ruangan</span>
-                <span className='px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-[#EAEAEA] dark:bg-[#2C2C2C] text-[#111111] dark:text-[#EAEAEA]'>
+                <span>Ruangan</span>
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono leading-none ${
+                    inspectorTab === 'batch'
+                      ? 'bg-[#333333] text-[#FFFFFF] dark:bg-[#CCCCCC] dark:text-[#111111]'
+                      : 'bg-[#EAEAEA] dark:bg-[#2C2C2C] text-[#111111] dark:text-[#EAEAEA]'
+                  }`}
+                >
                   {batchList.length}
                 </span>
               </button>
               <button
                 type='button'
+                onClick={() => setInspectorTab('backup')}
+                title='Cadangan & Ekspor Impor JSON'
+                className={`py-1.5 px-1.5 sm:px-2 rounded-[6px] transition cursor-pointer text-center whitespace-nowrap truncate ${
+                  inspectorTab === 'backup'
+                    ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
+                    : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
+                }`}
+              >
+                JSON
+              </button>
+              <button
+                type='button'
                 onClick={() => setInspectorTab('spesifikasi')}
-                className={`flex-1 py-1.5 px-3 rounded-[6px] transition cursor-pointer text-center ${
+                title='Panduan Bahan & Percetakan'
+                className={`py-1.5 px-1.5 sm:px-2 rounded-[6px] transition cursor-pointer text-center whitespace-nowrap truncate ${
                   inspectorTab === 'spesifikasi'
                     ? 'bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] font-semibold'
                     : 'hover:text-[#111111] dark:hover:text-[#FFFFFF]'
@@ -914,16 +1190,29 @@ export default function PenandaRuanganPage() {
                   )}
                 </div>
 
-                {/* Reset Action */}
-                <div className='pt-2 flex justify-between items-center text-xs text-[#787774] dark:text-[#8E8D8A]'>
-                  <span>Standar: 25 × 10 cm • Jalur Cepat</span>
-                  <button
-                    type='button'
-                    onClick={handleResetDefaults}
-                    className='text-[11px] font-mono font-medium px-2.5 py-1 rounded-[4px] bg-[#F4F4F2] dark:bg-[#262626] border border-[#D1D1D1] dark:border-[#404040] text-[#111111] dark:text-[#F0F0F0] hover:bg-[#EAEAEA] dark:hover:bg-[#333333] transition cursor-pointer'
-                  >
-                    Reset Default
-                  </button>
+                {/* LocalStorage Status & Reset Action */}
+                <div className='pt-3 mt-2 border-t border-[#EAEAEA] dark:border-[#2C2C2C] flex flex-wrap items-center justify-between gap-2 text-xs'>
+                  <div className='flex items-center gap-1.5 text-[11px] text-[#787774] dark:text-[#8E8D8A]'>
+                    <span className='inline-block w-1.5 h-1.5 rounded-full bg-[#10B981]' />
+                    <span>Auto-save LocalStorage</span>
+                  </div>
+                  <div className='flex items-center gap-1.5'>
+                    <button
+                      type='button'
+                      onClick={() => setInspectorTab('backup')}
+                      className='text-[11px] font-mono font-medium px-2 py-1 rounded-[4px] bg-[#F4F4F2] dark:bg-[#262626] border border-[#D1D1D1] dark:border-[#404040] text-[#111111] dark:text-[#F0F0F0] hover:bg-[#EAEAEA] dark:hover:bg-[#333333] transition cursor-pointer'
+                    >
+                      JSON / Cadangan
+                    </button>
+                    <button
+                      type='button'
+                      onClick={handleResetLocalStorage}
+                      className='text-[11px] font-mono font-semibold px-2 py-1 rounded-[4px] bg-[#FDEBEC] text-[#9F2F2D] border border-[#F87171]/40 dark:bg-[#3B1818] dark:text-[#FCA5A5] dark:border-[#991B1B] hover:opacity-90 transition cursor-pointer'
+                      title='Bersihkan data di browser dan kembali ke spesifikasi default'
+                    >
+                      Reset LocalStorage
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -972,6 +1261,133 @@ export default function PenandaRuanganPage() {
                         </button>
                       )
                     })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: CADANGAN & PERSISTENSI JSON */}
+            {inspectorTab === 'backup' && (
+              <div className='bg-[#FFFFFF] dark:bg-[#181818] border border-[#EAEAEA] dark:border-[#262626] rounded-[10px] p-5 space-y-6'>
+                <div>
+                  <h2 className='text-xs font-semibold tracking-tight text-[#111111] dark:text-[#F0F0F0] uppercase'>
+                    Penyimpanan & Cadangan Konfigurasi
+                  </h2>
+                  <p className='text-xs text-[#787774] dark:text-[#8E8D8A] mt-1 leading-relaxed'>
+                    Setiap perubahan spesifikasi otomatis tersimpan ke peramban (localStorage) agar tidak hilang saat halaman disegarkan (F5).
+                  </p>
+                </div>
+
+                {/* 1. STATUS PERSISTENSI & RESET LOCALSTORAGE */}
+                <div className='p-3.5 bg-[#FBFBFA] dark:bg-[#151515] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[8px] space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-2'>
+                      <span className='inline-block w-2 h-2 rounded-full bg-[#10B981]' />
+                      <span className='text-xs font-medium text-[#111111] dark:text-[#EAEAEA]'>
+                        LocalStorage Aktif
+                      </span>
+                    </div>
+                    <span className='font-mono text-[10px] text-[#787774] dark:text-[#8E8D8A]'>
+                      Kunci: penanda_ruangan_config_v1
+                    </span>
+                  </div>
+
+                  <p className='text-[11px] text-[#787774] dark:text-[#8E8D8A] leading-relaxed'>
+                    Gunakan tombol di bawah bila ingin menghapus seluruh data kustom yang tersimpan di browser dan kembali ke spesifikasi bawaan pabrik (25 × 10 cm, Hijau Jalur Cepat).
+                  </p>
+
+                  <div>
+                    <button
+                      type='button'
+                      onClick={handleResetLocalStorage}
+                      className='w-full py-2 px-3 text-xs font-semibold rounded-[6px] transition cursor-pointer bg-[#FDEBEC] text-[#9F2F2D] border border-[#F87171]/40 dark:bg-[#3B1818] dark:text-[#FCA5A5] dark:border-[#991B1B] hover:opacity-90'
+                    >
+                      Reset LocalStorage & Muat Ulang Standar Pabrik
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. EKSPOR KONFIGURASI JSON */}
+                <div className='space-y-2.5'>
+                  <label className='text-xs font-semibold uppercase tracking-tight text-[#111111] dark:text-[#EAEAEA] block'>
+                    Ekspor Konfigurasi (Cadangkan)
+                  </label>
+                  <p className='text-xs text-[#787774] dark:text-[#8E8D8A]'>
+                    Simpan konfigurasi ke berkas .json atau salin teks format data untuk diarsipkan.
+                  </p>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1'>
+                    <button
+                      type='button'
+                      onClick={handleDownloadJsonFile}
+                      className='py-2 px-3 text-xs font-medium rounded-[6px] bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] hover:opacity-90 transition cursor-pointer text-center'
+                    >
+                      Unduh Berkas JSON (.json)
+                    </button>
+                    <button
+                      type='button'
+                      onClick={handleCopyJsonString}
+                      className='py-2 px-3 text-xs font-medium rounded-[6px] bg-[#F4F4F2] dark:bg-[#262626] border border-[#D1D1D1] dark:border-[#404040] text-[#111111] dark:text-[#F0F0F0] hover:bg-[#EAEAEA] dark:hover:bg-[#333333] transition cursor-pointer text-center'
+                    >
+                      Salin Teks JSON
+                    </button>
+                  </div>
+                </div>
+
+                {/* 3. IMPOR KONFIGURASI JSON */}
+                <div className='space-y-3 pt-3 border-t border-[#EAEAEA] dark:border-[#2C2C2C]'>
+                  <div>
+                    <label className='text-xs font-semibold uppercase tracking-tight text-[#111111] dark:text-[#EAEAEA] block'>
+                      Impor Konfigurasi (Pulihkan)
+                    </label>
+                    <p className='text-xs text-[#787774] dark:text-[#8E8D8A] mt-0.5'>
+                      Muat konfigurasi dari berkas JSON eksternal atau tempelkan langsung ke kolom teks.
+                    </p>
+                  </div>
+
+                  {/* Unggah Berkas */}
+                  <div>
+                    <input
+                      type='file'
+                      ref={fileInputRef}
+                      accept='.json,application/json'
+                      onChange={handleImportJsonFile}
+                      className='hidden'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => fileInputRef.current?.click()}
+                      className='w-full py-2 px-3 text-xs font-medium rounded-[6px] bg-[#FBFBFA] dark:bg-[#1E1E1E] border border-dashed border-[#B0B0B0] dark:border-[#555555] text-[#111111] dark:text-[#EAEAEA] hover:border-[#111111] dark:hover:border-[#FFFFFF] transition cursor-pointer'
+                    >
+                      Pilih Berkas Cadangan JSON dari Komputer...
+                    </button>
+                  </div>
+
+                  {/* Tempel Teks JSON */}
+                  <div className='space-y-2 pt-1'>
+                    <textarea
+                      rows={4}
+                      value={jsonInputText}
+                      onChange={(e) => {
+                        setJsonInputText(e.target.value)
+                        if (jsonError) setJsonError(null)
+                      }}
+                      placeholder='Atau tempelkan kode JSON di sini: {"widthCm": 25, "textTitle": "RUANG RAPAT", ...}'
+                      className='w-full p-2.5 bg-[#FBFBFA] dark:bg-[#121212] border border-[#EAEAEA] dark:border-[#2C2C2C] rounded-[6px] text-xs font-mono text-[#111111] dark:text-[#EAEAEA] focus:outline-none focus:border-[#111111]'
+                    />
+
+                    {jsonError && (
+                      <div className='p-2.5 rounded-[6px] bg-[#FDEBEC] dark:bg-[#3B1818] border border-[#F87171] text-[#9F2F2D] dark:text-[#FCA5A5] text-xs leading-snug font-mono'>
+                        {jsonError}
+                      </div>
+                    )}
+
+                    <button
+                      type='button'
+                      onClick={handleApplyJsonText}
+                      className='w-full py-2 px-3 text-xs font-semibold rounded-[6px] bg-[#111111] text-[#FFFFFF] dark:bg-[#EAEAEA] dark:text-[#111111] hover:opacity-90 transition cursor-pointer'
+                    >
+                      Terapkan Teks JSON
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1496,6 +1912,17 @@ export default function PenandaRuanganPage() {
             }
           }
         `}</style>
+
+        {/* Toast Notifikasi Persistensi & Salin */}
+        {toastMsg && (
+          <div
+            role='status'
+            className='no-print fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-[8px] bg-[#111111] text-[#FFFFFF] dark:bg-[#FFFFFF] dark:text-[#111111] text-xs font-mono shadow-xl border border-[#333333] dark:border-[#EAEAEA] flex items-center gap-2.5 pointer-events-none'
+          >
+            <span className='inline-block w-2 h-2 rounded-full bg-[#10B981]' />
+            <span className='font-medium'>{toastMsg}</span>
+          </div>
+        )}
     </main>
   )
 }
