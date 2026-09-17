@@ -129,6 +129,11 @@ const config = {
             position: 'left'
           },
           // {
+          //   to: '/course',
+          //   label: 'Perkuliahan',
+          //   position: 'left'
+          // },
+          // {
           //   to: '/community',
           //   label: 'Community',
           //   position: 'left'
@@ -281,6 +286,42 @@ const config = {
 
   plugins: [
     ['./src/plugins/tailwind-config.js', {}],
+
+    // Dokumentasi Perkuliahan / Course
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'course',
+        path: 'articles/course',
+        routeBasePath: 'course',
+        sidebarPath: require.resolve('./sidebars.js'),
+        beforeDefaultRemarkPlugins: [
+          [
+            remarkCodeExample,
+            {
+              target: 'mdx3'
+            }
+          ],
+          [
+            autoTabs,
+            {
+              labels: {
+                'plantuml': 'Diagram PlantUML',
+                'plant-uml': 'Kode PlantUML'
+              }
+            }
+          ],
+          [
+            remarkKroki,
+            {
+              alias: ['plantuml'],
+              target: 'mdx3',
+              server: 'https://kroki.io'
+            }
+          ]
+        ]
+      }
+    ],
 
     // Dokumentasi Belajar
     [
