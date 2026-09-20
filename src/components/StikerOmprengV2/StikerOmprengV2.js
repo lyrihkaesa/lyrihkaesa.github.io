@@ -264,6 +264,7 @@ export function LabelKiri({
     alamatEl.style.fontSize = `${alamatBase}pt`
     let nFs = namaBase
     let aFs = alamatBase
+
     for (let i = 0; i < 60; i++) {
       const overH = box.scrollHeight - box.clientHeight > 1
       const overWBox = box.scrollWidth - box.clientWidth > 1
@@ -271,32 +272,41 @@ export function LabelKiri({
       const overHNama = namaEl.scrollHeight - namaEl.clientHeight > 1
       const overWAlamat = alamatEl.scrollWidth - alamatEl.clientWidth > 1
 
-      // Deteksi jika alamat wrap melebihi 2 baris (bila pengguna tidak menekan Enter secara manual)
-      const isManualMultiLine = alamatSppg.includes('\n')
-      const alamatLineHeight = parseFloat(window.getComputedStyle(alamatEl).lineHeight) || (aFs * 1.5)
-      const overHAlamat = !isManualMultiLine && (alamatEl.clientHeight > alamatLineHeight * 2.3)
+      // Hitung jumlah baris yang dimaksudkan pengguna (default rapi 2 baris bila tanpa enter manual)
+      const rawLines = alamatSppg ? alamatSppg.split('\n') : ['']
+      const intendedLines = Math.max(1, rawLines.length)
+      const maxAllowedLines = Math.max(2, intendedLines)
+
+      // Hitung tinggi per baris alamat
+      const cs = window.getComputedStyle(alamatEl)
+      const parsedLh = parseFloat(cs.lineHeight)
+      const alamatLineHeight = (!isNaN(parsedLh) && parsedLh > 0) ? parsedLh : (aFs * 1.5)
+
+      // Alamat meluap jika tinggi elemen melebihi jumlah baris yang diinginkan
+      const overHAlamat = alamatEl.clientHeight > (alamatLineHeight * (maxAllowedLines + 0.15))
 
       if (!overH && !overWBox && !overWNama && !overHNama && !overWAlamat && !overHAlamat) break
       let shrunk = false
-      // Prioritas 1: jika alamat melebihi 2 baris, kecilkan ukuran font alamat agar pas 2 baris
-      if (overHAlamat && aFs > 3.6) {
-        aFs = Math.max(3.6, Math.round((aFs - 0.2) * 10) / 10)
+
+      // Prioritas 1: jika baris alamat meluap melebihi batas, kecilkan font alamat agar pas
+      if (overHAlamat && aFs > 3.2) {
+        aFs = Math.max(3.2, Math.round((aFs - 0.15) * 100) / 100)
         alamatEl.style.fontSize = `${aFs}pt`
         shrunk = true
       } else if ((overWNama || overHNama || overH) && nFs > 5) {
-        nFs = Math.max(5, Math.round((nFs - 0.4) * 10) / 10)
+        nFs = Math.max(5, Math.round((nFs - 0.3) * 10) / 10)
         namaEl.style.fontSize = `${nFs}pt`
         shrunk = true
       } else if ((overH || overWBox || overWAlamat) && aFs > 3) {
-        aFs = Math.max(3, Math.round((aFs - 0.3) * 10) / 10)
+        aFs = Math.max(3, Math.round((aFs - 0.2) * 10) / 10)
         alamatEl.style.fontSize = `${aFs}pt`
         shrunk = true
       } else if (nFs > 4) {
-        nFs = Math.max(4, Math.round((nFs - 0.4) * 10) / 10)
+        nFs = Math.max(4, Math.round((nFs - 0.3) * 10) / 10)
         namaEl.style.fontSize = `${nFs}pt`
         shrunk = true
       } else if (aFs > 2.8) {
-        aFs = Math.max(2.8, Math.round((aFs - 0.2) * 10) / 10)
+        aFs = Math.max(2.8, Math.round((aFs - 0.15) * 100) / 100)
         alamatEl.style.fontSize = `${aFs}pt`
         shrunk = true
       }
@@ -350,7 +360,7 @@ export function LabelKiri({
           minWidth: 0,
           height: `${heightMm}mm`,
           maxHeight: `${heightMm}mm`,
-          padding: showOrnament ? '2mm 1.8mm 2mm 1.5mm' : '2mm 2.2mm 2mm 2.2mm',
+          padding: showOrnament ? '1.8mm 1.5mm 1.8mm 1.2mm' : '1.8mm 2mm 1.8mm 2mm',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -364,7 +374,7 @@ export function LabelKiri({
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: '1.5mm',
+            gap: '1.2mm',
             height: 'auto',
             minHeight: '11mm',
             maxHeight: '15mm',
@@ -375,8 +385,8 @@ export function LabelKiri({
           {/* Logo BGN */}
           <div
             style={{
-              width: '9.5mm',
-              height: '9.5mm',
+              width: '8.8mm',
+              height: '8.8mm',
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',

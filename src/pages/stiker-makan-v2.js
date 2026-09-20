@@ -152,7 +152,7 @@ const DEFAULT_CFG = {
 
   // Font Sizes fine-tuning
   fsNamaSppg: 8.5,
-  fsAlamatSppg: 4.8,
+  fsAlamatSppg: 4.2,
   fsBatasAman: 8.8,
   fsJam: 22,
   fsTanggal: 6.8,
