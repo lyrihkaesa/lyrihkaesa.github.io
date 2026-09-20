@@ -265,6 +265,7 @@ export default function StikerMakanV2Page() {
   const [hasSavedData, setHasSavedData] = useState(false)
   const [lastSavedTime, setLastSavedTime] = useState(null)
   const [storageSizeBytes, setStorageSizeBytes] = useState(0)
+  const [kiriMetrics, setKiriMetrics] = useState(null)
   const fileInputRef = useRef(null)
 
   // Show auto-dismiss toast
@@ -273,6 +274,21 @@ export default function StikerMakanV2Page() {
     setTimeout(() => {
       setToastMessage(null)
     }, 3500)
+  }
+
+  // Handle Auto-Fit Font Maksimal (Sinkronkan dan optimalkan ukuran ke batas maksimal yang pas)
+  const handleAutoFitMax = () => {
+    const updates = {}
+    if (kiriMetrics?.alamatFs) {
+      updates.fsAlamatSppg = kiriMetrics.alamatFs
+    } else {
+      updates.fsAlamatSppg = 4.3
+    }
+    if (kiriMetrics?.namaFs) {
+      updates.fsNamaSppg = kiriMetrics.namaFs
+    }
+    updateCfg(updates)
+    triggerToast(`Ukuran font berhasil dioptimalkan ke batas maksimal yang pas (Alamat: ${updates.fsAlamatSppg} pt, Nama: ${updates.fsNamaSppg || cfg.fsNamaSppg} pt)`)
   }
 
   // Load Saved Config & Meta from LocalStorage
@@ -2103,6 +2119,27 @@ export default function StikerMakanV2Page() {
 
                   {/* Ukuran Font per Bagian */}
                   <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+                    {/* Kartu Auto-Fit Font Maksimal */}
+                    <div className="flex items-center justify-between mb-3 p-3 rounded-xl bg-blue-50/90 dark:bg-slate-800/80 border border-blue-200 dark:border-blue-900/40">
+                      <div className="min-w-0 pr-2">
+                        <div className="text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+                          <span>Auto-Fit Font Maksimal</span>
+                        </div>
+                        <div className="text-[10px] text-slate-600 dark:text-slate-300 mt-0.5">
+                          Sesuaikan teks otomatis ke ukuran font paling besar yang pas tanpa terpotong
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAutoFitMax}
+                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer active:scale-95 transition-all shadow-xs shrink-0"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Optimalkan</span>
+                      </button>
+                    </div>
+
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                         Ukuran Font Detail (pt)
@@ -2131,9 +2168,43 @@ export default function StikerMakanV2Page() {
                             <label htmlFor={`slider-font-${f.key}`} className="font-semibold text-slate-600 dark:text-slate-200">
                               {f.label}
                             </label>
-                            <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
-                              {Number(cfg[f.key]).toFixed(1)} pt
-                            </span>
+                            {f.key === 'fsAlamatSppg' && kiriMetrics?.isAlamatLimited ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-slate-400 line-through text-[10px] tabular-nums">{Number(cfg.fsAlamatSppg).toFixed(1)} pt</span>
+                                <span className="font-bold text-amber-600 dark:text-amber-400 text-[11px] tabular-nums flex items-center gap-0.5">
+                                  <span>{kiriMetrics.alamatFs} pt</span>
+                                  <span className="text-[9px] font-normal">(Auto-Fit)</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateCfg({ fsAlamatSppg: kiriMetrics.alamatFs })}
+                                  className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700 font-semibold cursor-pointer transition-all"
+                                  title="Gunakan ukuran maksimal yang pas ini"
+                                >
+                                  Kunci Max
+                                </button>
+                              </div>
+                            ) : f.key === 'fsNamaSppg' && kiriMetrics?.isNamaLimited ? (
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-slate-400 line-through text-[10px] tabular-nums">{Number(cfg.fsNamaSppg).toFixed(1)} pt</span>
+                                <span className="font-bold text-amber-600 dark:text-amber-400 text-[11px] tabular-nums flex items-center gap-0.5">
+                                  <span>{kiriMetrics.namaFs} pt</span>
+                                  <span className="text-[9px] font-normal">(Auto-Fit)</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateCfg({ fsNamaSppg: kiriMetrics.namaFs })}
+                                  className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700 font-semibold cursor-pointer transition-all"
+                                  title="Gunakan ukuran maksimal yang pas ini"
+                                >
+                                  Kunci Max
+                                </button>
+                              </div>
+                            ) : (
+                              <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums">
+                                {Number(cfg[f.key]).toFixed(1)} pt
+                              </span>
+                            )}
                           </div>
                           <input
                             id={`slider-font-${f.key}`}
@@ -2410,6 +2481,28 @@ export default function StikerMakanV2Page() {
                     </div>
                   )}
 
+                  {/* Banner Notifikasi Auto-Fit Aktif di Preview */}
+                  {activeTab === 'kiri' && (kiriMetrics?.isAlamatLimited || kiriMetrics?.isNamaLimited) && (
+                    <div className="w-full max-w-[480px] mb-2 px-3 py-1.5 rounded-xl bg-amber-50/95 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 text-[11px] text-amber-900 dark:text-amber-200 flex items-center justify-between gap-2 shadow-2xs animate-in fade-in">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span className="truncate">
+                          <strong>Auto-Fit Aktif:</strong>{' '}
+                          {kiriMetrics.isAlamatLimited && `Alamat diatur ${kiriMetrics.alamatTargetFs}pt → ${kiriMetrics.alamatFs}pt agar pas 2 baris.`}
+                          {kiriMetrics.isNamaLimited && ` Nama SPPG ${kiriMetrics.namaTargetFs}pt → ${kiriMetrics.namaFs}pt.`}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAutoFitMax}
+                        className="px-2 py-0.5 rounded-md bg-amber-600 hover:bg-amber-700 text-white font-bold text-[10px] cursor-pointer active:scale-95 transition-all shadow-2xs shrink-0"
+                        title="Terapkan ukuran maksimal yang pas ini ke pengaturan slider"
+                      >
+                        Kunci Max
+                      </button>
+                    </div>
+                  )}
+
                   {/* Label Surface with tactile elevation and side caliper */}
                   <div className="relative flex items-center justify-center">
                     {/* Caliper Vertikal (Tinggi) */}
@@ -2430,6 +2523,7 @@ export default function StikerMakanV2Page() {
                           cfg={cfg}
                           isBW={isBW}
                           showCropMarks={showCropMarks}
+                          onMetricsChange={setKiriMetrics}
                         />
                       </div>
                     )}
@@ -2506,6 +2600,16 @@ export default function StikerMakanV2Page() {
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Copy className="w-3 h-3" />}
                     <span>Salin Gambar</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleAutoFitMax}
+                    className="px-2.5 py-1.5 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50/80 dark:bg-blue-950/60 font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 transition-colors flex items-center gap-1.5 cursor-pointer active:scale-[0.98] shadow-xs"
+                    title="Optimalkan ukuran font seluruh teks ke ukuran paling maksimal yang pas dan rapi"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Auto-Fit Max Font</span>
                   </button>
                 </div>
 

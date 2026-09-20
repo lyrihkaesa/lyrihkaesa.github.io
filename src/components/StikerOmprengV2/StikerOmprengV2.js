@@ -221,6 +221,7 @@ export function LabelKiri({
   id,
   className = '',
   style = {},
+  onMetricsChange,
 }) {
   const widthMm = Number(cfg.labelWidthMm) || 70
   const heightMm = Number(cfg.labelHeightMm) || 50
@@ -312,7 +313,18 @@ export function LabelKiri({
       }
       if (!shrunk) break
     }
-  }, [namaSppg, alamatSppg, namaBase, alamatBase, widthMm, heightMm, showOrnament])
+
+    if (onMetricsChange) {
+      onMetricsChange({
+        namaFs: nFs,
+        alamatFs: aFs,
+        namaTargetFs: namaBase,
+        alamatTargetFs: alamatBase,
+        isNamaLimited: nFs < (namaBase - 0.05),
+        isAlamatLimited: aFs < (alamatBase - 0.05),
+      })
+    }
+  }, [namaSppg, alamatSppg, namaBase, alamatBase, widthMm, heightMm, showOrnament, onMetricsChange])
 
   // Auto-fit: jam + tanggal mengecil sampai muat di kotak (tidak terpotong)
   React.useEffect(() => {
