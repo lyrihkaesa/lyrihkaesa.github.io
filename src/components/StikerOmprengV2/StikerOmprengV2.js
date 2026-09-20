@@ -685,10 +685,10 @@ export function LabelKanan({
     if (typeof window === 'undefined') return
     const el = headerPengaduanRef.current
     if (!el) return
-    const baseFs = showQrMenu ? Math.min(cfg.fsHeaderPengaduan || 6.2, 6.2) : (cfg.fsHeaderPengaduan || 7.5)
-    el.style.fontSize = `${baseFs}pt`
-    shrinkSingleLineEl(el, baseFs, 4.0)
-  }, [showQrMenu, cfg.fsHeaderPengaduan, widthMm, widthKolomLarangan])
+    const targetFs = Number(cfg.fsHeaderPengaduan) || (showQrMenu ? 6.2 : 7.5)
+    el.style.fontSize = `${targetFs}pt`
+    shrinkSingleLineEl(el, targetFs, 3.5)
+  }, [showQrMenu, cfg.fsHeaderPengaduan, widthMm, widthKolomLarangan, cfg.judulPengaduan])
 
   // Auto-fit: tiap baris wrap + font per-kontak mengecil proporsional sampai muat, ikon menyesuaikan ukuran font
   React.useEffect(() => {
@@ -918,7 +918,7 @@ export function LabelKanan({
             ref={headerPengaduanRef}
             style={{
               textAlign: 'center',
-              fontSize: `${showQrMenu ? Math.min(cfg.fsHeaderPengaduan || 6.2, 6.2) : (cfg.fsHeaderPengaduan || 7.5)}pt`,
+              fontSize: `${Number(cfg.fsHeaderPengaduan) || (showQrMenu ? 6.2 : 7.5)}pt`,
               fontWeight: '900',
               color: primaryColor,
               lineHeight: 1.15,
@@ -933,7 +933,7 @@ export function LabelKanan({
               textOverflow: 'clip',
             }}
           >
-            Kotak Pengaduan
+            {cfg.judulPengaduan || 'Kotak Pengaduan'}
           </div>
 
           {/* List Kontak Resmi BGN — posisi di atas (top), icon & text sejajar presisi di tengah (middle) */}
@@ -1028,14 +1028,14 @@ export function LabelKanan({
           >
             <div
               style={{
-                fontSize: `${cfg.fsQrJudul || 5.6}pt`,
+                fontSize: `${Number(cfg.fsQrJudul) || 5.6}pt`,
                 fontWeight: '900',
                 color: primaryColor,
                 letterSpacing: '0.02em',
                 textAlign: 'center',
                 textTransform: 'uppercase',
                 lineHeight: 1.15,
-                marginBottom: '0.8mm',
+                marginBottom: qrMenuSub ? '0.2mm' : '0.8mm',
                 width: '100%',
                 whiteSpace: 'normal',
                 overflowWrap: 'anywhere',
@@ -1044,6 +1044,25 @@ export function LabelKanan({
             >
               {qrMenuText || 'MENU & ANALISIS GIZI'}
             </div>
+
+            {qrMenuSub && (
+              <div
+                style={{
+                  fontSize: `${Number(cfg.fsQrSub) || 3.8}pt`,
+                  fontWeight: '600',
+                  color: isBW ? '#222222' : '#475569',
+                  textAlign: 'center',
+                  lineHeight: 1.15,
+                  marginBottom: '0.6mm',
+                  width: '100%',
+                  whiteSpace: 'normal',
+                  overflowWrap: 'anywhere',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {qrMenuSub}
+              </div>
+            )}
 
             <div
               style={{
@@ -1062,8 +1081,8 @@ export function LabelKanan({
                 fgColor={isBW ? '#000000' : primaryColor}
                 bgColor="#ffffff"
                 style={{
-                  width: '14.5mm',
-                  height: '14.5mm',
+                  width: qrMenuSub ? '12.5mm' : '14.5mm',
+                  height: qrMenuSub ? '12.5mm' : '14.5mm',
                   maxWidth: '100%',
                   maxHeight: '100%',
                   display: 'block',

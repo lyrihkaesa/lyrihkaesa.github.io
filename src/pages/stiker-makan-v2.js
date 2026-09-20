@@ -127,6 +127,7 @@ const DEFAULT_CFG = {
   tanggalFormat: 'long', // 'long' | 'full' | 'short' | 'dmy-dash' | 'dmy-slash'
 
   // Kotak Pengaduan Resmi BGN (Default Ringkas agar tidak terlalu panjang)
+  judulPengaduan: 'Kotak Pengaduan',
   pengaduanCallCenter: '157',
   pengaduanWa: '0811-1020-0157',
   pengaduanWeb: 'bgn.go.id',
@@ -140,7 +141,7 @@ const DEFAULT_CFG = {
   showQrMenu: true,
   qrMenuUrl: 'https://bgn.go.id',
   qrMenuText: 'MENU & ANALISIS GIZI',
-  qrMenuSub: '',
+  qrMenuSub: 'Scan rincian menu & gizi',
   fsQrJudul: 5.6,
   fsQrSub: 3.8,
 
@@ -158,7 +159,7 @@ const DEFAULT_CFG = {
   fsTanggal: 6.8,
   fsLarangan: 6.8,
   fsSegeraKonsumsi: 6.8,
-  fsHeaderPengaduan: 7.5,
+  fsHeaderPengaduan: 6.5,
   fsIsiPengaduan: 5.1,
   fsQrJudul: 5.2,
   fsQrSub: 3.8,
@@ -1717,6 +1718,44 @@ export default function StikerMakanV2Page() {
                       </div>
                     </div>
 
+                    {/* Judul Kotak Pengaduan & Ukuran Font */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800">
+                      <div>
+                        <label htmlFor="judulPengaduanInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-1">
+                          Judul Kotak Pengaduan:
+                        </label>
+                        <input
+                          id="judulPengaduanInput"
+                          type="text"
+                          value={cfg.judulPengaduan || 'Kotak Pengaduan'}
+                          onChange={(e) => updateCfg({ judulPengaduan: e.target.value })}
+                          className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs font-bold uppercase focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all"
+                          placeholder="Kotak Pengaduan"
+                        />
+                      </div>
+                      <div className="flex flex-col justify-end">
+                        <div className="flex items-center justify-between text-[11px] mb-1">
+                          <label htmlFor="slider-fsHeaderPengaduan" className="font-semibold text-slate-600 dark:text-slate-200">
+                            Ukuran Font Judul Pengaduan:
+                          </label>
+                          <span className="font-bold text-blue-600 dark:text-blue-400 tabular-nums text-[10px]">
+                            {Number(cfg.fsHeaderPengaduan || 6.5).toFixed(1)} pt
+                          </span>
+                        </div>
+                        <input
+                          id="slider-fsHeaderPengaduan"
+                          type="range"
+                          min={4.5}
+                          max={11}
+                          step={0.1}
+                          value={cfg.fsHeaderPengaduan || 6.5}
+                          onChange={(e) => updateCfg({ fsHeaderPengaduan: parseFloat(e.target.value) })}
+                          className="w-full accent-blue-600 cursor-pointer"
+                          aria-label="Ukuran font Judul Pengaduan"
+                        />
+                      </div>
+                    </div>
+
                     {/* Kontak Pengaduan Resmi BGN */}
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
@@ -2047,11 +2086,49 @@ export default function StikerMakanV2Page() {
                             </div>
                           </div>
 
+                          {/* Subjudul / Keterangan & Ukuran Font Subjudul QR */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label htmlFor="qrMenuSubInput" className="block text-[11px] font-semibold text-slate-600 dark:text-slate-200 mb-1">
+                                Subjudul / Keterangan QR:
+                              </label>
+                              <input
+                                id="qrMenuSubInput"
+                                type="text"
+                                value={cfg.qrMenuSub ?? ''}
+                                onChange={(e) => updateCfg({ qrMenuSub: e.target.value })}
+                                className="w-full py-1.5 px-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-xs focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none transition-all"
+                                placeholder="Scan rincian menu & gizi"
+                              />
+                            </div>
+                            <div className="flex flex-col justify-end">
+                              <div className="flex items-center justify-between text-[11px] mb-1">
+                                <label htmlFor="slider-fsQrSub" className="font-semibold text-slate-600 dark:text-slate-200">
+                                  Ukuran Font Subjudul QR:
+                                </label>
+                                <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums text-[10px]">
+                                  {Number(cfg.fsQrSub || 3.8).toFixed(1)} pt
+                                </span>
+                              </div>
+                              <input
+                                id="slider-fsQrSub"
+                                type="range"
+                                min={2.5}
+                                max={7}
+                                step={0.1}
+                                value={cfg.fsQrSub || 3.8}
+                                onChange={(e) => updateCfg({ fsQrSub: parseFloat(e.target.value) })}
+                                className="w-full accent-emerald-600 cursor-pointer"
+                                aria-label="Ukuran font Subjudul QR"
+                              />
+                            </div>
+                          </div>
+
                           {/* Petunjuk Pemindaian */}
                           <div className="p-2 rounded-lg bg-white/80 dark:bg-slate-900 border border-emerald-200/80 dark:border-slate-800 text-[10px] text-slate-600 dark:text-slate-300 flex items-start gap-1.5">
                             <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                             <span>
-                              Format simpel &amp; presisi: Teks <strong>MENU &amp; ANALISIS GIZI</strong> di atas, dan QR Code di bawahnya.
+                              Format simpel &amp; presisi: Teks <strong>MENU &amp; ANALISIS GIZI</strong>, subjudul keterangan, dan QR Code di bawahnya.
                             </span>
                           </div>
                         </div>
