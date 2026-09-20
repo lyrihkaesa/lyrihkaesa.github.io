@@ -109,6 +109,10 @@ const TANGGAL_FORMATS = [
 
 // Konfigurasi Default Sesuai Surat Edaran BGN 2026
 const DEFAULT_CFG = {
+  // Dimensi Label Thermal Kustom (mm)
+  labelWidthMm: 70,
+  labelHeightMm: 50,
+
   // SPPG & Logo
   namaSppg: 'SPPG JAKARTA PUSAT 1',
   alamatSppg: 'Jl. Kramat Raya No. 123, RT 01/RW 02, Kel. Kwitang, Kec. Senen, Jakarta Pusat',
@@ -168,6 +172,16 @@ const DEFAULT_CFG = {
   fsPengaduanFb: 5.1,
   fsPengaduanTiktok: 5.1,
 }
+
+// Pilihan Preset Ukuran Label Thermal (mm)
+const LABEL_SIZE_PRESETS = [
+  { label: '70 × 50 mm', width: 70, height: 50, desc: 'Standar SE BGN 2026', badge: 'Standar BGN' },
+  { label: '75 × 50 mm', width: 75, height: 50, desc: 'Thermal roll standar' },
+  { label: '80 × 50 mm', width: 80, height: 50, desc: 'Thermal sedang' },
+  { label: '60 × 40 mm', width: 60, height: 40, desc: 'Format mini kompak' },
+  { label: '100 × 50 mm', width: 100, height: 50, desc: 'Horizontal lebar' },
+  { label: '100 × 75 mm', width: 100, height: 75, desc: 'Ekstra lega & informatif' },
+]
 
 // Preset Jam Konsumsi Cepat
 const JAM_PRESETS = [
@@ -231,6 +245,8 @@ const STORAGE_META_KEY = 'stiker_ompreng_v2_meta'
 
 export default function StikerMakanV2Page() {
   const [cfg, setCfg] = useState(DEFAULT_CFG)
+  const labelW = Math.max(20, Math.min(300, Number(cfg.labelWidthMm) || 70))
+  const labelH = Math.max(15, Math.min(300, Number(cfg.labelHeightMm) || 50))
   const [colorMode, setColorMode] = useState('bw') // 'bw' (thermal) atau 'color'
   const [cetakTarget, setCetakTarget] = useState('alternating') // 'kiri', 'kanan', 'alternating', 'both_batch', 'sepasang'
   const [jumlahCetak, setJumlahCetak] = useState(1)
@@ -456,8 +472,8 @@ export default function StikerMakanV2Page() {
     }
 
     const isPair = cetakTarget === 'sepasang'
-    const pageWidthMm = isPair ? 140 : 70
-    const pageHeightMm = 50
+    const pageWidthMm = isPair ? (labelW * 2 + 2) : labelW
+    const pageHeightMm = labelH
     const innerHtml = printRoot.innerHTML
 
     const printWindow = window.open('', '_blank', 'width=560,height=480')
@@ -619,17 +635,19 @@ export default function StikerMakanV2Page() {
 
   const printPages = generatePrintLabels()
   const isPairMode = cetakTarget === 'sepasang'
-  const estimasiPanjangMeter = ((printPages.length * 52) / 1000).toFixed(1)
+  const printPageW = isPairMode ? (labelW * 2 + 2) : labelW
+  const printPageH = labelH
+  const estimasiPanjangMeter = ((printPages.length * (labelH + 2)) / 1000).toFixed(1)
 
   return (
     <main
       className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white dark:selection:bg-blue-600 dark:selection:text-white"
       style={{ accentColor: '#2563eb' }}
     >
-      {/* ─── PRINT CSS STYLES (PRESISI THERMAL 70 × 50 mm & 140 × 50 mm) ─── */}
+      {/* ─── PRINT CSS STYLES (PRESISI THERMAL ROLL) ─── */}
       <style>{`
         @page {
-          size: ${isPairMode ? '140mm 50mm' : '70mm 50mm'};
+          size: ${printPageW}mm ${printPageH}mm;
           margin: 0mm !important;
         }
         @media screen {
@@ -647,7 +665,7 @@ export default function StikerMakanV2Page() {
             margin: 0 !important;
             padding: 0 !important;
             background: #ffffff !important;
-            width: ${isPairMode ? '140mm' : '70mm'} !important;
+            width: ${printPageW}mm !important;
             color: #000000 !important;
           }
           .no-print-area, nav, footer, header, .navbar, .footer, .no-print {
@@ -659,8 +677,8 @@ export default function StikerMakanV2Page() {
             padding: 0 !important;
           }
           .thermal-label-page {
-            width: ${isPairMode ? '140mm' : '70mm'} !important;
-            height: 50mm !important;
+            width: ${printPageW}mm !important;
+            height: ${printPageH}mm !important;
             page-break-after: always !important;
             break-after: page !important;
             overflow: hidden !important;
@@ -696,8 +714,8 @@ export default function StikerMakanV2Page() {
       <header className="no-print-area border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xs dark:shadow-none">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-sm shadow-md ring-1 ring-white/20 shrink-0 select-none">
-              7×5
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-xs shadow-md ring-1 ring-white/20 shrink-0 select-none">
+              {labelW === 70 && labelH === 50 ? '7×5' : `${Math.round(labelW/10)}×${Math.round(labelH/10)}`}
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -708,7 +726,7 @@ export default function StikerMakanV2Page() {
                   <ShieldCheck className="w-3 h-3" /> Standar BGN 2026
                 </span>
                 <span className="hidden md:inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-cyan-300 border border-slate-200 dark:border-slate-800 whitespace-nowrap font-mono">
-                  Thermal Ready · 70 × 50 mm
+                  Thermal Ready · {labelW} × {labelH} mm
                 </span>
                 {hasSavedData && (
                   <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-slate-700 whitespace-nowrap font-mono tabular-nums shadow-2xs">
@@ -718,7 +736,7 @@ export default function StikerMakanV2Page() {
                 )}
               </div>
               <p className="text-xs text-slate-500 dark:text-blue-200/80 m-0 hidden sm:block">
-                Generator Label Thermal Roll 70 × 50 mm • Khusus Dapur SPPG &amp; Kotak Pengaduan
+                Generator Label Thermal Roll {labelW} × {labelH} mm • Khusus Dapur SPPG &amp; Kotak Pengaduan
               </p>
             </div>
           </div>
@@ -902,8 +920,178 @@ export default function StikerMakanV2Page() {
                       <span>Opsi Cetak Printer Thermal</span>
                     </h3>
                     <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-slate-700 font-mono">
-                      Ukuran: 70 × 50 mm
+                      Ukuran: {labelW} × {labelH} mm
                     </span>
+                  </div>
+
+                  {/* PENGATUR UKURAN LEBAR & TINGGI LABEL (CUSTOM) */}
+                  <div className="p-3.5 sm:p-4 rounded-xl bg-slate-50/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 mb-5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Ruler className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 m-0">
+                          Ukuran Label Stiker (Custom)
+                        </h4>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 shadow-2xs">
+                          {labelW} × {labelH} mm
+                        </span>
+                        {(labelW !== 70 || labelH !== 50) && (
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ labelWidthMm: 70, labelHeightMm: 50 })}
+                            className="text-[10px] font-semibold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-300 cursor-pointer px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 transition-all"
+                            title="Reset ke standar SE BGN 70 × 50 mm"
+                          >
+                            Reset 70×50
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-slate-500 dark:text-blue-200/80 mb-3">
+                      Sesuaikan ukuran stiker sesuai stok kertas thermal Anda. Desain dan tipografi otomatis menyesuaikan proporsi lebar dan tinggi.
+                    </p>
+
+                    {/* Preset Cepat Ukuran */}
+                    <div className="mb-3">
+                      <span className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                        Pilihan Preset Ukuran:
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                        {LABEL_SIZE_PRESETS.map((preset) => {
+                          const isActive = labelW === preset.width && labelH === preset.height
+                          return (
+                            <button
+                              key={preset.label}
+                              type="button"
+                              onClick={() => updateCfg({ labelWidthMm: preset.width, labelHeightMm: preset.height })}
+                              className={`p-2 rounded-lg border text-left transition-all cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none ${
+                                isActive
+                                  ? 'bg-blue-50/90 dark:bg-slate-900 border-blue-500 text-blue-700 dark:text-blue-300 shadow-2xs ring-1 ring-blue-500/80 font-bold'
+                                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between text-xs">
+                                <span>{preset.label}</span>
+                                {preset.badge && (
+                                  <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 font-bold">
+                                    {preset.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                {preset.desc}
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Input Angka & Slider untuk Lebar & Tinggi */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2.5 border-t border-slate-200 dark:border-slate-700/80">
+                      {/* Kontrol Lebar (Width) */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label htmlFor="input-label-width" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Lebar (Width):
+                          </label>
+                          <span className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 tabular-nums">
+                            {labelW} mm ({(labelW / 10).toFixed(1)} cm)
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ labelWidthMm: Math.max(30, labelW - 1) })}
+                            className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors active:scale-[0.95] shrink-0"
+                            aria-label="Kurangi lebar 1 mm"
+                          >
+                            -
+                          </button>
+                          <input
+                            id="input-label-width"
+                            type="number"
+                            min="30"
+                            max="250"
+                            step="1"
+                            value={labelW}
+                            onChange={(e) => updateCfg({ labelWidthMm: Math.max(30, Math.min(250, parseInt(e.target.value, 10) || 70)) })}
+                            className="w-full text-center py-1.5 px-2 text-xs font-bold font-mono tabular-nums rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ labelWidthMm: Math.min(250, labelW + 1) })}
+                            className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors active:scale-[0.95] shrink-0"
+                            aria-label="Tambah lebar 1 mm"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <input
+                          type="range"
+                          min="30"
+                          max="200"
+                          step="1"
+                          value={labelW}
+                          onChange={(e) => updateCfg({ labelWidthMm: parseInt(e.target.value, 10) })}
+                          className="w-full accent-blue-600 cursor-pointer"
+                          aria-label="Slider lebar label"
+                        />
+                      </div>
+
+                      {/* Kontrol Tinggi (Height) */}
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label htmlFor="input-label-height" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                            Tinggi (Height):
+                          </label>
+                          <span className="text-xs font-bold font-mono text-blue-600 dark:text-blue-400 tabular-nums">
+                            {labelH} mm ({(labelH / 10).toFixed(1)} cm)
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ labelHeightMm: Math.max(20, labelH - 1) })}
+                            className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors active:scale-[0.95] shrink-0"
+                            aria-label="Kurangi tinggi 1 mm"
+                          >
+                            -
+                          </button>
+                          <input
+                            id="input-label-height"
+                            type="number"
+                            min="20"
+                            max="200"
+                            step="1"
+                            value={labelH}
+                            onChange={(e) => updateCfg({ labelHeightMm: Math.max(20, Math.min(200, parseInt(e.target.value, 10) || 50)) })}
+                            className="w-full text-center py-1.5 px-2 text-xs font-bold font-mono tabular-nums rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => updateCfg({ labelHeightMm: Math.min(200, labelH + 1) })}
+                            className="w-8 h-8 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors active:scale-[0.95] shrink-0"
+                            aria-label="Tambah tinggi 1 mm"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <input
+                          type="range"
+                          min="20"
+                          max="150"
+                          step="1"
+                          value={labelH}
+                          onChange={(e) => updateCfg({ labelHeightMm: parseInt(e.target.value, 10) })}
+                          className="w-full accent-blue-600 cursor-pointer"
+                          aria-label="Slider tinggi label"
+                        />
+                      </div>
+                    </div>
                   </div>
 
                   {/* Pilihan Target Cetak */}
@@ -925,7 +1113,7 @@ export default function StikerMakanV2Page() {
                           <Tag className="w-3.5 h-3.5 text-blue-600" />
                           <span>Label Kiri Saja</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">SPPG &amp; Batas Waktu (70×50)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">SPPG &amp; Batas Waktu ({labelW}×{labelH})</div>
                       </button>
 
                       <button
@@ -941,7 +1129,7 @@ export default function StikerMakanV2Page() {
                           <Tag className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Label Kanan Saja</span>
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-emerald-200/80 mt-0.5">Larangan &amp; Pengaduan (70×50)</div>
+                        <div className="text-[10px] text-slate-500 dark:text-emerald-200/80 mt-0.5">Larangan &amp; Pengaduan ({labelW}×{labelH})</div>
                       </button>
 
                       <button
@@ -988,10 +1176,10 @@ export default function StikerMakanV2Page() {
                         <div className="font-bold flex items-center justify-between">
                           <div className="flex items-center gap-1.5">
                             <Maximize2 className="w-3.5 h-3.5 text-blue-600" />
-                            <span>Sepasang Berjejer (Format 140 × 50 mm)</span>
+                            <span>Sepasang Berjejer (Format {labelW * 2} × {labelH} mm)</span>
                           </div>
                           <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-blue-200 border border-slate-200 dark:border-slate-800">
-                            Printer Lebar 14cm
+                            Printer Lebar {Math.round((labelW * 2) / 10)}cm
                           </span>
                         </div>
                         <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5">
@@ -1124,7 +1312,7 @@ export default function StikerMakanV2Page() {
                     <div>
                       <div className="text-slate-600 dark:text-slate-300">
                         Total Output: <strong className="font-black text-blue-600 dark:text-blue-400 text-sm font-mono tabular-nums">{printPages.length} label</strong>
-                        <span className="text-[11px] text-slate-500 dark:text-blue-200/80 ml-1 font-mono">(@ 70 × 50 mm)</span>
+                        <span className="text-[11px] text-slate-500 dark:text-blue-200/80 ml-1 font-mono">(@ {labelW} × {labelH} mm)</span>
                       </div>
                       <div className="text-[10px] text-slate-500 dark:text-blue-200/80 mt-0.5 font-mono tabular-nums">
                         Estimasi panjang roll kertas: <strong>~{estimasiPanjangMeter} meter</strong>
@@ -2014,7 +2202,7 @@ export default function StikerMakanV2Page() {
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  Label Kiri (7×5 cm)
+                  Label Kiri ({(labelW / 10).toFixed(1)}×{(labelH / 10).toFixed(1)} cm)
                 </button>
                 <button
                   type="button"
@@ -2027,7 +2215,7 @@ export default function StikerMakanV2Page() {
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  Label Kanan (7×5 cm)
+                  Label Kanan ({(labelW / 10).toFixed(1)}×{(labelH / 10).toFixed(1)} cm)
                 </button>
                 <button
                   type="button"
@@ -2040,7 +2228,7 @@ export default function StikerMakanV2Page() {
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  Sepasang (14×5 cm)
+                  Sepasang ({((labelW * 2) / 10).toFixed(1)}×{(labelH / 10).toFixed(1)} cm)
                 </button>
                 <button
                   type="button"
@@ -2126,13 +2314,13 @@ export default function StikerMakanV2Page() {
                   <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-blue-200/80 select-none">
                     <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-mono text-[11px]">
                       <span>↔ Lebar:</span>
-                      <strong className="text-slate-800 dark:text-slate-200">{activeTab === 'sepasang' ? '14,0 cm' : '7,0 cm'}</strong>
-                      <span className="text-slate-400 dark:text-blue-300/80">({activeTab === 'sepasang' ? '140 mm' : '70 mm'})</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{activeTab === 'sepasang' ? `${((labelW * 2) / 10).toFixed(1)} cm` : `${(labelW / 10).toFixed(1)} cm`}</strong>
+                      <span className="text-slate-400 dark:text-blue-300/80">({activeTab === 'sepasang' ? `${labelW * 2} mm` : `${labelW} mm`})</span>
                     </span>
                     <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 font-mono text-[11px]">
                       <span>↕ Tinggi:</span>
-                      <strong className="text-slate-800 dark:text-slate-200">5,0 cm</strong>
-                      <span className="text-slate-400 dark:text-blue-300/80">(50 mm)</span>
+                      <strong className="text-slate-800 dark:text-slate-200">{`${(labelH / 10).toFixed(1)} cm`}</strong>
+                      <span className="text-slate-400 dark:text-blue-300/80">({`${labelH} mm`})</span>
                     </span>
                   </div>
                 ) : (
@@ -2202,7 +2390,7 @@ export default function StikerMakanV2Page() {
                         <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-slate-500"></div>
                         <div className="h-[1px] flex-1 bg-slate-300 dark:bg-slate-700"></div>
                         <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[9px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
-                          {activeTab === 'sepasang' ? '140.0 mm (Lebar 2 Label)' : '70.0 mm (Lebar Standar)'}
+                          {activeTab === 'sepasang' ? `${(labelW * 2).toFixed(1)} mm (Lebar 2 Label)` : `${labelW.toFixed(1)} mm`}
                         </span>
                         <div className="h-[1px] flex-1 bg-slate-300 dark:bg-slate-700"></div>
                         <div className="h-2.5 w-[1px] bg-slate-400 dark:bg-slate-500"></div>
@@ -2217,7 +2405,7 @@ export default function StikerMakanV2Page() {
                       <div className="absolute -left-8 top-0 bottom-0 flex flex-col items-center justify-between text-[9px] font-mono font-semibold text-slate-500 dark:text-cyan-300 select-none py-0.5">
                         <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-slate-500"></div>
                         <span className="[writing-mode:vertical-lr] rotate-180 px-0.5 py-1 rounded bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[8px] uppercase tracking-wider tabular-nums font-mono text-slate-700 dark:text-cyan-300">
-                          50.0 mm
+                          {`${labelH.toFixed(1)} mm`}
                         </span>
                         <div className="w-2.5 h-[1px] bg-slate-400 dark:bg-slate-500"></div>
                       </div>
@@ -2272,7 +2460,7 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => handleDownloadPng('kiri', 'stiker-bgn-kiri-70x50mm')}
+                    onClick={() => handleDownloadPng('kiri', `stiker-bgn-kiri-${labelW}x${labelH}mm`)}
                     className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
@@ -2281,7 +2469,7 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => handleDownloadPng('kanan', 'stiker-bgn-kanan-70x50mm')}
+                    onClick={() => handleDownloadPng('kanan', `stiker-bgn-kanan-${labelW}x${labelH}mm`)}
                     className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
@@ -2290,7 +2478,7 @@ export default function StikerMakanV2Page() {
                   <button
                     type="button"
                     disabled={isExporting}
-                    onClick={() => handleDownloadPng('sepasang', 'stiker-bgn-sepasang-140x50mm')}
+                    onClick={() => handleDownloadPng('sepasang', `stiker-bgn-sepasang-${labelW * 2}x${labelH}mm`)}
                     className="px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none shadow-xs"
                   >
                     {isExporting ? <Loader2 className="w-3 h-3 animate-spin text-blue-600" /> : <Download className="w-3 h-3" />}
@@ -2326,11 +2514,11 @@ export default function StikerMakanV2Page() {
             <div className="bg-amber-50/80 dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-amber-200/90 dark:border-slate-800 text-amber-900 dark:text-amber-200 text-xs shadow-xs">
               <div className="font-bold flex items-center gap-2 mb-2 text-sm tracking-tight text-amber-950 dark:text-amber-100">
                 <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span>Panduan Teknis Cetak Thermal Label Ompreng (70 × 50 mm)</span>
+                <span>Panduan Teknis Cetak Thermal Label Ompreng ({labelW} × {labelH} mm)</span>
               </div>
               <ul className="list-disc pl-5 space-y-1.5 text-[11px] leading-relaxed">
                 <li>
-                  Pada jendela dialog cetak printer, pastikan ukuran kertas diatur ke <strong>Paper Size: 70mm × 50mm</strong> (atau 140mm × 50mm bila memilih mode sepasang).
+                  Pada jendela dialog cetak printer, pastikan ukuran kertas diatur ke <strong>Paper Size: {labelW}mm × {labelH}mm</strong> (atau {labelW * 2}mm × {labelH}mm bila memilih mode sepasang).
                 </li>
                 <li>
                   Atur <strong>Margins: None (0 mm)</strong> dan <strong>Scale: 100% (Actual Size)</strong> agar stiker pas dan batas tepi tidak terpotong.
@@ -2526,13 +2714,13 @@ export default function StikerMakanV2Page() {
         }}
         aria-hidden="true"
       >
-        <div id="export-node-kiri" style={{ width: '70mm', height: '50mm', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+        <div id="export-node-kiri" style={{ width: `${labelW}mm`, height: `${labelH}mm`, backgroundColor: '#ffffff', overflow: 'hidden' }}>
           <LabelKiri cfg={cfg} isBW={isBW} />
         </div>
-        <div id="export-node-kanan" style={{ width: '70mm', height: '50mm', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+        <div id="export-node-kanan" style={{ width: `${labelW}mm`, height: `${labelH}mm`, backgroundColor: '#ffffff', overflow: 'hidden' }}>
           <LabelKanan cfg={cfg} isBW={isBW} />
         </div>
-        <div id="export-node-sepasang" style={{ width: '142mm', height: '50mm', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+        <div id="export-node-sepasang" style={{ width: `${labelW * 2 + 2}mm`, height: `${labelH}mm`, backgroundColor: '#ffffff', overflow: 'hidden' }}>
           <LabelSepasang cfg={cfg} isBW={isBW} gapMm={2} />
         </div>
       </div>

@@ -222,6 +222,8 @@ export function LabelKiri({
   className = '',
   style = {},
 }) {
+  const widthMm = Number(cfg.labelWidthMm) || 70
+  const heightMm = Number(cfg.labelHeightMm) || 50
   const primaryColor = isBW ? '#000000' : (cfg.primaryColor || '#0b2545')
   const fontFamily = cfg.fontFamily || "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Geist Sans', 'Helvetica Neue', sans-serif"
 
@@ -309,12 +311,12 @@ export function LabelKiri({
       id={id}
       className={`label-ompreng-kiri relative bg-white text-slate-900 overflow-hidden select-none ${className}`}
       style={{
-        width: '70mm',
-        height: '50mm',
-        maxWidth: '70mm',
-        maxHeight: '50mm',
-        minWidth: '70mm',
-        minHeight: '50mm',
+        width: `${widthMm}mm`,
+        height: `${heightMm}mm`,
+        maxWidth: `${widthMm}mm`,
+        maxHeight: `${heightMm}mm`,
+        minWidth: `${widthMm}mm`,
+        minHeight: `${heightMm}mm`,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'row',
@@ -327,7 +329,7 @@ export function LabelKiri({
     >
       {/* 1. SISI KIRI: Strip Ornamen Pangan (Opsional, bawaan diabaikan/nonaktif) */}
       {showOrnament && (
-        <FoodPatternStrip isBW={isBW} widthMm={11.5} heightMm={50} />
+        <FoodPatternStrip isBW={isBW} widthMm={11.5} heightMm={heightMm} />
       )}
 
       {/* 2. SISI KANAN: Konten Utama */}
@@ -335,8 +337,8 @@ export function LabelKiri({
         style={{
           flex: 1,
           minWidth: 0,
-          height: '50mm',
-          maxHeight: '50mm',
+          height: `${heightMm}mm`,
+          maxHeight: `${heightMm}mm`,
           padding: showOrnament ? '2mm 2.5mm 2.2mm 2.2mm' : '2.2mm 3.5mm 2.2mm 3.5mm',
           boxSizing: 'border-box',
           display: 'flex',
@@ -588,6 +590,8 @@ export function LabelKanan({
   className = '',
   style = {},
 }) {
+  const widthMm = Number(cfg.labelWidthMm) || 70
+  const heightMm = Number(cfg.labelHeightMm) || 50
   const primaryColor = isBW ? '#000000' : (cfg.primaryColor || '#0b2545')
   const fontFamily = cfg.fontFamily || "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Geist Sans', 'Helvetica Neue', sans-serif"
 
@@ -689,12 +693,12 @@ export function LabelKanan({
       id={id}
       className={`label-ompreng-kanan relative bg-white text-slate-900 overflow-hidden select-none ${className}`}
       style={{
-        width: '70mm',
-        height: '50mm',
-        maxWidth: '70mm',
-        maxHeight: '50mm',
-        minWidth: '70mm',
-        minHeight: '50mm',
+        width: `${widthMm}mm`,
+        height: `${heightMm}mm`,
+        maxWidth: `${widthMm}mm`,
+        maxHeight: `${heightMm}mm`,
+        minWidth: `${widthMm}mm`,
+        minHeight: `${heightMm}mm`,
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'row',
@@ -711,7 +715,8 @@ export function LabelKanan({
       <div
         style={{
           width: `${widthKolomLarangan}mm`,
-          height: '45mm',
+          height: '100%',
+          maxHeight: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -805,8 +810,8 @@ export function LabelKanan({
         style={{
           flex: 1,
           minWidth: 0,
-          height: '45mm',
-          maxHeight: '45mm',
+          height: '100%',
+          maxHeight: '100%',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
@@ -1064,10 +1069,12 @@ export function OmprengMockup({ cfg = {}, isBW = false }) {
     return () => ro.disconnect()
   }, [])
 
-  const labelNatW = 264.567
-  const labelNatH = 188.976
+  const labelW = Number(cfg.labelWidthMm) || 70
+  const labelH = Number(cfg.labelHeightMm) || 50
+  const labelNatW = labelW * (264.567 / 70)
+  const labelNatH = labelH * (188.976 / 50)
   const stickerW = containerWidth * 0.38
-  const stickerH = stickerW * (5 / 7)
+  const stickerH = stickerW * (labelH / labelW)
   const scale = stickerW / labelNatW
   const lidThicknessPx = stickerH * 0.28
   const totalH = stickerH + lidThicknessPx + 8
