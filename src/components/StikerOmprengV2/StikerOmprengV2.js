@@ -269,14 +269,25 @@ export function LabelKiri({
       const overWBox = box.scrollWidth - box.clientWidth > 1
       const overWNama = namaEl.scrollWidth - namaEl.clientWidth > 1
       const overHNama = namaEl.scrollHeight - namaEl.clientHeight > 1
-      if (!overH && !overWBox && !overWNama && !overHNama) break
+      const overWAlamat = alamatEl.scrollWidth - alamatEl.clientWidth > 1
+
+      // Deteksi jika alamat wrap melebihi 2 baris (bila pengguna tidak menekan Enter secara manual)
+      const isManualMultiLine = alamatSppg.includes('\n')
+      const alamatLineHeight = parseFloat(window.getComputedStyle(alamatEl).lineHeight) || (aFs * 1.5)
+      const overHAlamat = !isManualMultiLine && (alamatEl.clientHeight > alamatLineHeight * 2.3)
+
+      if (!overH && !overWBox && !overWNama && !overHNama && !overWAlamat && !overHAlamat) break
       let shrunk = false
-      // Prioritas: kecilkan nama dulu bila nama sendiri overflow / box kepenuhan
-      if ((overWNama || overHNama || overH) && nFs > 5) {
+      // Prioritas 1: jika alamat melebihi 2 baris, kecilkan ukuran font alamat agar pas 2 baris
+      if (overHAlamat && aFs > 3.6) {
+        aFs = Math.max(3.6, Math.round((aFs - 0.2) * 10) / 10)
+        alamatEl.style.fontSize = `${aFs}pt`
+        shrunk = true
+      } else if ((overWNama || overHNama || overH) && nFs > 5) {
         nFs = Math.max(5, Math.round((nFs - 0.4) * 10) / 10)
         namaEl.style.fontSize = `${nFs}pt`
         shrunk = true
-      } else if ((overH || overWBox) && aFs > 3) {
+      } else if ((overH || overWBox || overWAlamat) && aFs > 3) {
         aFs = Math.max(3, Math.round((aFs - 0.3) * 10) / 10)
         alamatEl.style.fontSize = `${aFs}pt`
         shrunk = true
@@ -339,7 +350,7 @@ export function LabelKiri({
           minWidth: 0,
           height: `${heightMm}mm`,
           maxHeight: `${heightMm}mm`,
-          padding: showOrnament ? '2mm 2.5mm 2.2mm 2.2mm' : '2.2mm 3.5mm 2.2mm 3.5mm',
+          padding: showOrnament ? '2mm 1.8mm 2mm 1.5mm' : '2mm 2.2mm 2mm 2.2mm',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -353,10 +364,10 @@ export function LabelKiri({
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: '2mm',
+            gap: '1.5mm',
             height: 'auto',
             minHeight: '11mm',
-            maxHeight: '17mm',
+            maxHeight: '15mm',
             flexShrink: 0,
             overflow: 'hidden',
           }}
@@ -393,7 +404,7 @@ export function LabelKiri({
               minWidth: 0,
               height: 'auto',
               minHeight: '11mm',
-              maxHeight: '17mm',
+              maxHeight: '15mm',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -410,8 +421,8 @@ export function LabelKiri({
                 letterSpacing: '0.02em',
                 whiteSpace: 'pre-line',
                 overflow: 'hidden',
-                overflowWrap: 'anywhere',
-                wordBreak: 'break-word',
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
                 maxWidth: '100%',
                 lineHeight: 1.1,
               }}
@@ -428,9 +439,9 @@ export function LabelKiri({
                 marginTop: '0.8pt',
                 whiteSpace: 'pre-line',
                 overflow: 'hidden',
-                overflowWrap: 'anywhere',
-                wordBreak: 'break-word',
-                lineHeight: 1.2,
+                overflowWrap: 'break-word',
+                wordBreak: 'normal',
+                lineHeight: 1.18,
                 maxWidth: '100%',
               }}
               title={alamatSppg}

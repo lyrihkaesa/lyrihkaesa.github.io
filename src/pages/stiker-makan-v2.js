@@ -543,35 +543,24 @@ export default function StikerMakanV2Page() {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
 
-      // Prioritaskan node preview aktif jika tipe target sesuai dengan tab yang sedang dilihat
+      // Selalu prioritaskan elemen ekspor 1:1 murni (bebas distorsi CSS transform scale preview)
       let node = null
-      if (activeTab === targetIdOrType) {
-        node = document.getElementById(`preview-node-${targetIdOrType}`)
+      if (targetIdOrType) {
+        node = document.getElementById(`export-node-${targetIdOrType}`)
       }
       if (!node && targetIdOrType) {
         node = document.getElementById(targetIdOrType)
       }
-      if (!node && targetIdOrType) {
-        node = document.getElementById(`export-node-${targetIdOrType}`)
-      }
       if (!node) {
         const defaultType = activeTab === 'kanan' ? 'kanan' : activeTab === 'kiri' ? 'kiri' : 'sepasang'
-        node = document.getElementById(`preview-node-${defaultType}`) || document.getElementById(`export-node-${defaultType}`)
+        node = document.getElementById(`export-node-${defaultType}`) || document.getElementById(`preview-node-${defaultType}`)
       }
       if (!node) throw new Error('Elemen stiker tidak ditemukan')
-
-      // Hitung dimensi target presisi dalam pixel (1 mm = 3.7795275591 px)
-      const pxPerMm = 3.7795275591
-      const isSepasang = targetIdOrType === 'sepasang'
-      const targetW = isSepasang ? Math.round((labelW * 2 + 2) * pxPerMm) : Math.round(labelW * pxPerMm)
-      const targetH = Math.round(labelH * pxPerMm)
 
       // Pixel ratio 4 menghasilkan resolusi tajam ~300 DPI
       const dataUrl = await htmlToImage.toPng(node, {
         pixelRatio: 4,
         quality: 1,
-        width: targetW,
-        height: targetH,
         backgroundColor: '#ffffff',
         cacheBust: true,
       })
@@ -597,42 +586,32 @@ export default function StikerMakanV2Page() {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
       let node = null
-      if (targetIdOrType && activeTab === targetIdOrType) {
-        node = document.getElementById(`preview-node-${targetIdOrType}`)
+      if (targetIdOrType) {
+        node = document.getElementById(`export-node-${targetIdOrType}`)
       }
       if (!node && targetIdOrType) {
         node = document.getElementById(targetIdOrType)
       }
-      if (!node && targetIdOrType) {
-        node = document.getElementById(`export-node-${targetIdOrType}`)
-      }
       if (!node) {
         const defaultType = activeTab === 'kanan' ? 'kanan' : activeTab === 'kiri' ? 'kiri' : 'sepasang'
-        node = document.getElementById(`preview-node-${defaultType}`) || document.getElementById(`export-node-${defaultType}`)
+        node = document.getElementById(`export-node-${defaultType}`) || document.getElementById(`preview-node-${defaultType}`)
       }
       if (!node) throw new Error('Elemen stiker tidak ditemukan')
 
-      const pxPerMm = 3.7795275591
-      const isSepasang = (targetIdOrType || activeTab) === 'sepasang'
-      const targetW = isSepasang ? Math.round((labelW * 2 + 2) * pxPerMm) : Math.round(labelW * pxPerMm)
-      const targetH = Math.round(labelH * pxPerMm)
-
       const blob = await htmlToImage.toBlob(node, {
         pixelRatio: 3,
-        width: targetW,
-        height: targetH,
         backgroundColor: '#ffffff',
         cacheBust: true,
       })
+      if (!blob) throw new Error('Gagal menghasilkan data gambar')
 
-      if (!navigator.clipboard || !window.ClipboardItem) {
-        throw new Error('Clipboard API gambar tidak didukung di browser ini')
+      if (navigator.clipboard && window.ClipboardItem) {
+        const item = new ClipboardItem({ 'image/png': blob })
+        await navigator.clipboard.write([item])
+        triggerToast('Gambar berhasil disalin ke clipboard! (Ctrl + V)')
+      } else {
+        throw new Error('Fitur clipboard tidak didukung di browser ini')
       }
-
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'image/png': blob }),
-      ])
-      triggerToast('Gambar stiker berhasil disalin ke clipboard (300 DPI)')
     } catch (err) {
       console.error(err)
       triggerToast('Gagal menyalin: ' + (err.message || err))
