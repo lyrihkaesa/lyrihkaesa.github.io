@@ -542,16 +542,36 @@ export default function StikerMakanV2Page() {
     try {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
-      let node = document.getElementById(targetIdOrType)
-      if (!node) {
+
+      // Prioritaskan node preview aktif jika tipe target sesuai dengan tab yang sedang dilihat
+      let node = null
+      if (activeTab === targetIdOrType) {
+        node = document.getElementById(`preview-node-${targetIdOrType}`)
+      }
+      if (!node && targetIdOrType) {
+        node = document.getElementById(targetIdOrType)
+      }
+      if (!node && targetIdOrType) {
         node = document.getElementById(`export-node-${targetIdOrType}`)
+      }
+      if (!node) {
+        const defaultType = activeTab === 'kanan' ? 'kanan' : activeTab === 'kiri' ? 'kiri' : 'sepasang'
+        node = document.getElementById(`preview-node-${defaultType}`) || document.getElementById(`export-node-${defaultType}`)
       }
       if (!node) throw new Error('Elemen stiker tidak ditemukan')
 
-      // Pixel ratio 4 menghasilkan resolusi tajam ~1058x756 px (300 DPI untuk 70x50mm)
+      // Hitung dimensi target presisi dalam pixel (1 mm = 3.7795275591 px)
+      const pxPerMm = 3.7795275591
+      const isSepasang = targetIdOrType === 'sepasang'
+      const targetW = isSepasang ? Math.round((labelW * 2 + 2) * pxPerMm) : Math.round(labelW * pxPerMm)
+      const targetH = Math.round(labelH * pxPerMm)
+
+      // Pixel ratio 4 menghasilkan resolusi tajam ~300 DPI
       const dataUrl = await htmlToImage.toPng(node, {
         pixelRatio: 4,
         quality: 1,
+        width: targetW,
+        height: targetH,
         backgroundColor: '#ffffff',
         cacheBust: true,
       })
@@ -576,18 +596,31 @@ export default function StikerMakanV2Page() {
     try {
       setIsExporting(true)
       const htmlToImage = await loadHtmlToImage()
-      let node = targetIdOrType ? document.getElementById(targetIdOrType) : null
+      let node = null
+      if (targetIdOrType && activeTab === targetIdOrType) {
+        node = document.getElementById(`preview-node-${targetIdOrType}`)
+      }
+      if (!node && targetIdOrType) {
+        node = document.getElementById(targetIdOrType)
+      }
       if (!node && targetIdOrType) {
         node = document.getElementById(`export-node-${targetIdOrType}`)
       }
       if (!node) {
         const defaultType = activeTab === 'kanan' ? 'kanan' : activeTab === 'kiri' ? 'kiri' : 'sepasang'
-        node = document.getElementById(`export-node-${defaultType}`)
+        node = document.getElementById(`preview-node-${defaultType}`) || document.getElementById(`export-node-${defaultType}`)
       }
       if (!node) throw new Error('Elemen stiker tidak ditemukan')
 
+      const pxPerMm = 3.7795275591
+      const isSepasang = (targetIdOrType || activeTab) === 'sepasang'
+      const targetW = isSepasang ? Math.round((labelW * 2 + 2) * pxPerMm) : Math.round(labelW * pxPerMm)
+      const targetH = Math.round(labelH * pxPerMm)
+
       const blob = await htmlToImage.toBlob(node, {
         pixelRatio: 3,
+        width: targetW,
+        height: targetH,
         backgroundColor: '#ffffff',
         cacheBust: true,
       })
@@ -2702,26 +2735,22 @@ export default function StikerMakanV2Page() {
         </div>
       )}
 
-      {/* ─── HIDDEN EXPORT NODES FOR HIGH-RES 300 DPI DOWNLOAD (MOUNTED OFF-CANVAS) ─── */}
+      {/* ─── OFF-SCREEN 1:1 HD EXPORT RENDER TARGETS ─── */}
       <div
         style={{
           position: 'fixed',
+          left: '-99999px',
           top: 0,
-          left: 0,
-          zIndex: -9999,
-          opacity: 0,
           pointerEvents: 'none',
+          visibility: 'visible',
+          zIndex: -100,
         }}
         aria-hidden="true"
       >
-        <div id="export-node-kiri" style={{ width: `${labelW}mm`, height: `${labelH}mm`, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-          <LabelKiri cfg={cfg} isBW={isBW} />
-        </div>
-        <div id="export-node-kanan" style={{ width: `${labelW}mm`, height: `${labelH}mm`, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-          <LabelKanan cfg={cfg} isBW={isBW} />
-        </div>
-        <div id="export-node-sepasang" style={{ width: `${labelW * 2 + 2}mm`, height: `${labelH}mm`, backgroundColor: '#ffffff', overflow: 'hidden' }}>
-          <LabelSepasang cfg={cfg} isBW={isBW} gapMm={2} />
+        <LabelKiri id="export-node-kiri" cfg={cfg} isBW={isBW} showCropMarks={showCropMarks} />
+        <LabelKanan id="export-node-kanan" cfg={cfg} isBW={isBW} showCropMarks={showCropMarks} />
+        <div id="export-node-sepasang" style={{ backgroundColor: '#ffffff' }}>
+          <LabelSepasang cfg={cfg} isBW={isBW} showCropMarks={showCropMarks} gapMm={2} />
         </div>
       </div>
 

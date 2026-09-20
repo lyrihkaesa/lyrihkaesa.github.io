@@ -166,42 +166,42 @@ export const IconSegeraKonsumsi = ({ isBW = false, sizeMm = 13 }) => {
 // Ikon-Ikon Kotak Pengaduan
 export const SocialIcons = {
   Web: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <circle cx="12" cy="12" r="10" />
       <line x1="2" y1="12" x2="22" y2="12" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
     </svg>
   ),
   Mail: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <rect width="20" height="16" x="2" y="4" rx="2" />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
   ),
   Phone: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
     </svg>
   ),
   WhatsApp: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
     </svg>
   ),
   Instagram: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
     </svg>
   ),
   Facebook: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
     </svg>
   ),
   TikTok: ({ color = '#000000', size = 11 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block' }}>
       <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
     </svg>
   ),
@@ -291,7 +291,7 @@ export function LabelKiri({
       }
       if (!shrunk) break
     }
-  }, [namaSppg, alamatSppg, namaBase, alamatBase])
+  }, [namaSppg, alamatSppg, namaBase, alamatBase, widthMm, heightMm, showOrnament])
 
   // Auto-fit: jam + tanggal mengecil sampai muat di kotak (tidak terpotong)
   React.useEffect(() => {
@@ -304,7 +304,7 @@ export function LabelKiri({
       const mins = [8, 4]
       fitBoxByShrinkingFonts(box, els, mins)
     }
-  }, [jamKonsumsi, tanggalKonsumsi, tanggalFormat, showTanggal, jamBase, tanggalBase, waktuMode])
+  }, [jamKonsumsi, tanggalKonsumsi, tanggalFormat, showTanggal, jamBase, tanggalBase, waktuMode, widthMm, heightMm])
 
   return (
     <div
@@ -629,6 +629,7 @@ export function LabelKanan({
   const fsTiktok = cfg.fsPengaduanTiktok ?? isiBase
   const laranganBase = cfg.fsLarangan || 6.8
   const konsumsiBase = cfg.fsSegeraKonsumsi || 6.8
+  const headerPengaduanRef = React.useRef(null)
   const pengaduanBoxRef = React.useRef(null)
   const pengaduanListRef = React.useRef(null)
   const laranganRef = React.useRef(null)
@@ -636,7 +637,27 @@ export function LabelKanan({
 
   const pengaduanKey = [pengaduan.web, pengaduan.email, pengaduan.callCenter, pengaduan.wa, pengaduan.ig, pengaduan.fb, pengaduan.tiktok].join('|')
 
-  // Auto-fit: tiap baris wrap + font per-kontak mengecil proporsional sampai muat
+  const activeContacts = [
+    pengaduan.callCenter && { type: 'callCenter', val: pengaduan.callCenter, fs: fsCall, icon: SocialIcons.Phone, isBold: true },
+    pengaduan.wa && { type: 'wa', val: pengaduan.wa, fs: fsWa, icon: SocialIcons.WhatsApp, isBold: true },
+    pengaduan.web && { type: 'web', val: pengaduan.web, fs: fsWeb, icon: SocialIcons.Web, isBold: false },
+    pengaduan.email && { type: 'email', val: pengaduan.email, fs: fsEmail, icon: SocialIcons.Mail, isBold: false },
+    pengaduan.ig && { type: 'ig', val: pengaduan.ig, fs: fsIg, icon: SocialIcons.Instagram, isBold: false },
+    pengaduan.fb && { type: 'fb', val: pengaduan.fb, fs: fsFb, icon: SocialIcons.Facebook, isBold: false },
+    pengaduan.tiktok && { type: 'tiktok', val: pengaduan.tiktok, fs: fsTiktok, icon: SocialIcons.TikTok, isBold: false },
+  ].filter(Boolean)
+
+  // Auto-fit: Header "Kotak Pengaduan" dipastikan tetap 1 baris & tidak patah di layar maupun download
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    const el = headerPengaduanRef.current
+    if (!el) return
+    const baseFs = showQrMenu ? Math.min(cfg.fsHeaderPengaduan || 6.2, 6.2) : (cfg.fsHeaderPengaduan || 7.5)
+    el.style.fontSize = `${baseFs}pt`
+    shrinkSingleLineEl(el, baseFs, 4.0)
+  }, [showQrMenu, cfg.fsHeaderPengaduan, widthMm, widthKolomLarangan])
+
+  // Auto-fit: tiap baris wrap + font per-kontak mengecil proporsional sampai muat, ikon menyesuaikan ukuran font
   React.useEffect(() => {
     const box = pengaduanBoxRef.current
     const list = pengaduanListRef.current
@@ -645,6 +666,17 @@ export function LabelKanan({
     const bases = spans.map((el) => parseFloat(el.getAttribute('data-pfs')) || isiBase)
     spans.forEach((el, i) => {
       el.style.fontSize = `${bases[i]}pt`
+      const iconWrap = el.previousElementSibling
+      if (iconWrap && iconWrap.hasAttribute('data-icon-wrap')) {
+        const sz = Math.max(8.5, Math.round(bases[i] * 1.55))
+        iconWrap.style.width = `${sz}px`
+        iconWrap.style.height = `${sz}px`
+        const svg = iconWrap.querySelector('svg')
+        if (svg) {
+          svg.setAttribute('width', sz)
+          svg.setAttribute('height', sz)
+        }
+      }
     })
     for (let i = 0; i < 40; i++) {
       const overH = box.scrollHeight - box.clientHeight > 1
@@ -655,13 +687,25 @@ export function LabelKanan({
       spans.forEach((el, j) => {
         const cur = parseFloat(el.style.fontSize) || bases[j]
         if (cur > 2.8) {
-          el.style.fontSize = `${Math.max(2.8, Math.round((cur - 0.2) * 10) / 10)}pt`
+          const next = Math.max(2.8, Math.round((cur - 0.2) * 10) / 10)
+          el.style.fontSize = `${next}pt`
+          const iconWrap = el.previousElementSibling
+          if (iconWrap && iconWrap.hasAttribute('data-icon-wrap')) {
+            const sz = Math.max(8.5, Math.round(next * 1.55))
+            iconWrap.style.width = `${sz}px`
+            iconWrap.style.height = `${sz}px`
+            const svg = iconWrap.querySelector('svg')
+            if (svg) {
+              svg.setAttribute('width', sz)
+              svg.setAttribute('height', sz)
+            }
+          }
           shrunk = true
         }
       })
       if (!shrunk) break
     }
-  }, [pengaduanKey, isiBase, fsWeb, fsEmail, fsCall, fsWa, fsIg, fsFb, fsTiktok])
+  }, [pengaduanKey, isiBase, fsWeb, fsEmail, fsCall, fsWa, fsIg, fsFb, fsTiktok, widthMm, heightMm, widthKolomLarangan, showQrMenu, cfg.fsHeaderPengaduan])
 
   // Auto-fit: teks larangan (statis, tapi aman bila fs diperbesar user)
   React.useEffect(() => {
@@ -837,26 +881,29 @@ export function LabelKanan({
           }}
         >
           {/* Header: Kotak Pengaduan */}
-          {/* Header: Kotak Pengaduan */}
           <div
+            ref={headerPengaduanRef}
             style={{
               textAlign: 'center',
-              fontSize: `${showQrMenu ? (cfg.fsHeaderPengaduan || 6.2) : (cfg.fsHeaderPengaduan || 7.5)}pt`,
+              fontSize: `${showQrMenu ? Math.min(cfg.fsHeaderPengaduan || 6.2, 6.2) : (cfg.fsHeaderPengaduan || 7.5)}pt`,
               fontWeight: '900',
               color: primaryColor,
-              lineHeight: 1.1,
+              lineHeight: 1.15,
               paddingBottom: showQrMenu ? '0.6mm' : '1.2mm',
               borderBottom: `0.8pt solid ${isBW ? '#444444' : '#cbd5e1'}`,
               marginBottom: showQrMenu ? '0.8mm' : '1.2mm',
               flexShrink: 0,
               textTransform: 'uppercase',
               letterSpacing: '0.03em',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'clip',
             }}
           >
             Kotak Pengaduan
           </div>
 
-          {/* List Kontak Resmi BGN — wrap + auto-shrink, ringkas & tidak kepanjangan */}
+          {/* List Kontak Resmi BGN — posisi di atas (top), icon & text sejajar presisi di tengah (middle) */}
           <div
             ref={pengaduanListRef}
             style={{
@@ -865,97 +912,64 @@ export function LabelKanan({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'flex-start',
-              gap: showQrMenu ? '0.7mm' : '0.9mm',
+              gap: showQrMenu ? '0.8mm' : '1.1mm',
               fontSize: `${isiBase}pt`,
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               color: isBW ? '#000000' : '#1e293b',
               overflow: 'hidden',
               minWidth: 0,
             }}
           >
-            {/* Call Center 157 */}
-            {pengaduan.callCenter && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.Phone color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.callCenter} data-pfs={fsCall} style={{ fontWeight: '800', flex: 1, minWidth: 0, fontSize: `${fsCall}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.callCenter}
-                </span>
-              </div>
-            )}
-
-            {/* WhatsApp */}
-            {pengaduan.wa && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.WhatsApp color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.wa} data-pfs={fsWa} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWa}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.wa}
-                </span>
-              </div>
-            )}
-
-            {/* Website */}
-            {pengaduan.web && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.Web color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.web} data-pfs={fsWeb} style={{ fontWeight: '600', flex: 1, minWidth: 0, fontSize: `${fsWeb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.web}
-                </span>
-              </div>
-            )}
-
-            {/* Email */}
-            {pengaduan.email && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.Mail color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.email} data-pfs={fsEmail} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsEmail}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.email}
-                </span>
-              </div>
-            )}
-
-            {/* Instagram */}
-            {pengaduan.ig && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.Instagram color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.ig} data-pfs={fsIg} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsIg}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.ig}
-                </span>
-              </div>
-            )}
-
-            {/* Facebook */}
-            {pengaduan.fb && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.Facebook color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.fb} data-pfs={fsFb} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsFb}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.fb}
-                </span>
-              </div>
-            )}
-
-            {/* TikTok */}
-            {pengaduan.tiktok && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2mm', minWidth: 0 }}>
-                <span style={{ flexShrink: 0, lineHeight: 1.15, display: 'inline-flex' }}>
-                  <SocialIcons.TikTok color={iconColor} size={9.5} />
-                </span>
-                <span title={pengaduan.tiktok} data-pfs={fsTiktok} style={{ fontWeight: '500', flex: 1, minWidth: 0, fontSize: `${fsTiktok}pt`, whiteSpace: 'normal', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', lineHeight: 1.15 }}>
-                  {pengaduan.tiktok}
-                </span>
-              </div>
-            )}
+            {activeContacts.map((item) => {
+              const itemIconSize = Math.max(8.5, Math.round(Number(item.fs || isiBase) * 1.55))
+              return (
+                <div
+                  key={item.type}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.4mm',
+                    minWidth: 0,
+                    width: '100%',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  <span
+                    data-icon-wrap="true"
+                    style={{
+                      flexShrink: 0,
+                      width: `${itemIconSize}px`,
+                      height: `${itemIconSize}px`,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      lineHeight: 1,
+                    }}
+                  >
+                    <item.icon color={iconColor} size={itemIconSize} />
+                  </span>
+                  <span
+                    title={item.val}
+                    data-pfs={item.fs}
+                    style={{
+                      fontWeight: item.isBold ? '700' : '500',
+                      flex: 1,
+                      minWidth: 0,
+                      fontSize: `${item.fs}pt`,
+                      lineHeight: 1.2,
+                      whiteSpace: 'normal',
+                      overflow: 'hidden',
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {item.val}
+                  </span>
+                </div>
+              )
+            })}
           </div>
         </div>
 
